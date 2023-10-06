@@ -22,73 +22,81 @@
 
 #include "vm.h"
 
-uint8_t test_pop(vm_t vm) {
+uint8_t test_pop(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_push(vm_t vm) {
+uint8_t test_push(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_stack(vm_t vm) {
+uint8_t test_stack(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_goto(vm_t vm) {
+uint8_t test_goto(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_if(vm_t vm) {
+uint8_t test_if(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_call(vm_t vm) {
+uint8_t test_call(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_return(vm_t vm) {
+uint8_t test_return(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_load(vm_t vm) {
+uint8_t test_load(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_store(vm_t vm) {
+uint8_t test_store(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_const(vm_t vm) {
+uint8_t test_const(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_newarray(vm_t vm) {
+uint8_t test_newarray(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_aload(vm_t vm) {
+uint8_t test_aload(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_astore(vm_t vm) {
+uint8_t test_astore(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_alu_arithmetic(vm_t vm) {
+uint8_t test_alu_arithmetic(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_alu_bitwise(vm_t vm) {
+uint8_t test_alu_bitwise(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_convert(vm_t vm) {
+uint8_t test_convert(vm_t *vm) {
     return 0;
 }
 
-uint8_t test_compare(vm_t vm) {
+uint8_t test_compare(vm_t *vm) {
     return 0;
 }
+
+/////
+
+uint8_t test_opcodes(vm_t *vm) {
+    return 0;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
 
 vm_image_t* vm_image_load(FILE *file) {
     vm_image_t *image;
@@ -136,9 +144,9 @@ vm_image_t* vm_image_load(FILE *file) {
 
 int main(int argc, char *argv[]) {
     vm_error_t res = 0;
-    FILE *file;
-    vm_image_t *image;
-    vm_t *i;
+    FILE *file = NULL;
+    vm_image_t *image = NULL;
+    vm_t *i = NULL;
 
     if (argc < 2) {
         fprintf(stderr, "Usage: ijvm [OPTION] FILENAME [PARAMETERS ...]\n\n");
@@ -150,23 +158,27 @@ int main(int argc, char *argv[]) {
         exit(-1);
     }
 
+    i = vm_new(image, argc, argv);
+    test_opcodes(i);
+
     if (strcmp(argv[1], "-") == 0)
         file = stdin;
     else
         file = fopen(argv[1], "r");
     if (file == NULL) {
         printf("Could not open bytecode file `%s'\n", argv[1]);
+        vm_free(i);
         exit(-1);
     }
     image = vm_image_load(file);
     fclose(file);
-    i = vm_new(image, argc, argv);
 
     while (vm_active(i))
         if ((res = vm_step(i)) != VM_ERR_OK)
             break;
 
     printf("END STATUS: %d\n", res);
+    vm_free(i);
 
     return 0;
 }

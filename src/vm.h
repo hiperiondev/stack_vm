@@ -1044,7 +1044,6 @@ vm_t* vm_new(vm_image_t *image, int argc, char *argv[]) {
     // Number of arguments to main
     nargs = i->method[main_offset] * 256 + i->method[main_offset + 1];
 
-    // Don't count argv[0], argv[1] or obj. ref.
     if (argc - 2 != nargs - 1) {
         printf("Incorrect number of arguments\n");
         exit(-1);
@@ -1063,6 +1062,11 @@ vm_t* vm_new(vm_image_t *image, int argc, char *argv[]) {
     vm_call(i, image->main_index);
 
     return i;
+}
+
+void vm_free(vm_t *i) {
+    free(i->method);
+    free(i);
 }
 
 #endif /* VM_H_ */

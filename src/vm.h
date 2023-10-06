@@ -22,7 +22,7 @@
  * OPCODES
  *
  * opcode: ooooommm, o: opcode, m: modifier
- * NEXT_BYTE_DATA: xXbbbaaa: aaa=a data type, bbb=b data type, x, X: 1=a/b from prog, 0= a/b from stack
+ * NEXT_BYTE_DATA: xXbbbaaa: aaa=a data type, bbb=b data type, x:1=a from prog, 0=a from stack, X:1=b from prog, 0=b from stack
  * NEXT_BYTE_LEN: uint8, if 0: from temp
  *
  * | MNEMONIC           | OP   | MODIFIER                | NOTES                          | FUNCTION
@@ -68,17 +68,62 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/**
+ * @def VM_MEMORY_SIZE
+ * @brief
+ *
+ */
 #define VM_MEMORY_SIZE      (640 << 10)
+
+/**
+ * @def VM_INITIAL_OBJ_REF
+ * @brief
+ *
+ */
 #define VM_INITIAL_OBJ_REF  42
+
+/**
+ * @def VM_INITIAL_PC
+ * @brief
+ *
+ */
 #define VM_INITIAL_PC       1
 
 /////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @def TYPE_POS
+ * @brief
+ *
+ */
 #define TYPE_POS(x)  (x % 3)
+
+/**
+ * @def TYPE_MASK
+ * @brief
+ *
+ */
 #define TYPE_MASK(x) (0x07 << TYPE_POS(x))
+
+/**
+ * @def TYPE_WORD
+ * @brief
+ *
+ */
 #define TYPE_WORD(x) ((x) / 3)
+
+/**
+ * @def TYPE_TYPE
+ * @brief
+ *
+ */
 #define TYPE_TYPE(x) ((TYPE_WORD(x) && TYPE_MASK) >> TYPE_POS(x))
 
+/**
+ * @def VALUE_GET
+ * @brief
+ *
+ */
 #define VALUE_GET(type, data, vm_i)                                                   \
             (type == VM_MOD_UINT8)     ? ((uint8_t)(data))                          : \
             (type == VM_MOD_INT8)      ? ((int8_t)(data))                           : \
@@ -90,6 +135,11 @@
             (type == VM_MOD_REFERENCE) ? (vm_i->stack[vm_i->lv + (uint32_t)(data)]) : \
             0
 
+/**
+ * @def VALUE_GET_INT
+ * @brief
+ *
+ */
 #define VALUE_GET_INT(type, data, vm_i)                                               \
             (type == VM_MOD_UINT8)     ? ((uint8_t)(data))                          : \
             (type == VM_MOD_INT8)      ? ((int8_t)(data))                           : \
@@ -100,6 +150,11 @@
             (type == VM_MOD_REFERENCE) ? (vm_i->stack[vm_i->lv + (uint32_t)(data)]) : \
             0
 
+/**
+ * @def VALUE_FETCH
+ * @brief
+ *
+ */
 #define VALUE_FETCH(type, vm_i)                                    \
             (type == VM_MOD_UINT8)     ? (vm_fetch_uint8(vm_i))  : \
             (type == VM_MOD_INT8)      ? (vm_fetch_int8(vm_i))   : \
@@ -111,13 +166,53 @@
             (type == VM_MOD_REFERENCE) ? (vm_fetch_uint32(vm_i)) : \
             0
 
+/**
+ * @def OP
+ * @brief
+ *
+ */
 #define OP(x)        ((x && 0xf8) >> 3)
+
+/**
+ * @def MODIFIER
+ * @brief
+ *
+ */
 #define MODIFIER(x)  (x && 0x07)
+
+/**
+ * @def A_TYPE
+ * @brief
+ *
+ */
 #define A_TYPE(x)    (x && 0x07)
+
+/**
+ * @def B_TYPE
+ * @brief
+ *
+ */
 #define B_TYPE(x)    ((x && 0x38) >> 3)
+
+/**
+ * @def A_FROM
+ * @brief
+ *
+ */
 #define A_FROM(x)    (x && 0x80)
+
+/**
+ * @def B_FROM
+ * @brief
+ *
+ */
 #define B_FROM(x)    (x && 0x40)
 
+/**
+ * @enum VM_ERRORS
+ * @brief
+ *
+ */
 typedef enum VM_ERRORS {
     VM_ERR_OK     = 0x00, // ok
     VM_ERR_DIVBYZ = 0x01, // division by zero
@@ -131,6 +226,11 @@ typedef enum VM_ERRORS {
 
 } vm_error_t;
 
+/**
+ * @enum MODIFIER_DATA_TYPE
+ * @brief
+ *
+ */
 enum MODIFIER_DATA_TYPE {
     VM_MOD_UINT8,     // 0x00 *
     VM_MOD_INT8,      // 0x01 *
@@ -142,6 +242,11 @@ enum MODIFIER_DATA_TYPE {
     VM_MOD_REFERENCE, // 0x07 *
 };
 
+/**
+ * @enum MODIFIER_ALU_ARITHMETIC
+ * @brief
+ *
+ */
 enum MODIFIER_ALU_ARITHMETIC {
     VM_MOD_ADD, // 0x00 *
     VM_MOD_SUB, // 0x01 *
@@ -153,6 +258,11 @@ enum MODIFIER_ALU_ARITHMETIC {
     VM_MOD_DEC, // 0x07 *
 };
 
+/**
+ * @enum MODIFIER_ALU_BITWISE
+ * @brief
+ *
+ */
 enum MODIFIER_ALU_BITWISE {
     VM_MOD_AND, // 0x00 *
     VM_MOD_OR,  // 0x01 *
@@ -164,6 +274,11 @@ enum MODIFIER_ALU_BITWISE {
     VM_MOD_NOT, // 0x07 *
 };
 
+/**
+ * @enum MODIFIER_IF
+ * @brief
+ *
+ */
 enum MODIFIER_IF {
     VM_MOD_EQZ,  // 0x00 * A == 0
     VM_MOD_GTZ,  // 0x01 * A > 0
@@ -175,6 +290,11 @@ enum MODIFIER_IF {
     VM_MOD_NEQ   // 0x07 * A != B
 };
 
+/**
+ * @enum MODIFIER_LEN
+ * @brief
+ *
+ */
 enum MODIFIER_LEN {
     VM_MOD_LEN0, // 0x00 *
     VM_MOD_LEN1, // 0x01 *
@@ -186,6 +306,11 @@ enum MODIFIER_LEN {
     VM_MOD_LEN7, // 0x07 *
 };
 
+/**
+ * @enum MODIFIER_CALL
+ * @brief
+ *
+ */
 enum MODIFIER_CALL {
     VM_MOD_PROG,  // 0x00 *
     VM_MOD_STACK, // 0x01 *
@@ -197,6 +322,11 @@ enum MODIFIER_CALL {
     VM_MOD_EXXX,  // 0x07 *
 };
 
+/**
+ * @enum MODIFIER_STACK
+ * @brief
+ *
+ */
 enum MODIFIER_STACK {
     VM_MOD_DUP,  // 0x00 * ( a -- a a )
     VM_MOD_SWAP, // 0x01 * ( a b -- b a )
@@ -208,6 +338,11 @@ enum MODIFIER_STACK {
     VM_MOD_LI1,  // 0x07 * ( -- 1 )
 };
 
+/**
+ * @enum OPCODES
+ * @brief
+ *
+ */
 enum OPCODES {
     VM_NOP,            // 0x00
     VM_POP,            // 0x01
@@ -244,8 +379,21 @@ enum OPCODES {
 };
 
 struct vm_s;
+
+/**
+ * @fn vm_error_t (*)(struct vm_s*)
+ * @brief
+ *
+ * @param vm
+ * @return
+ */
 typedef vm_error_t (*func_builtin)(struct vm_s *vm);
 
+/**
+ * @struct vm_s
+ * @brief
+ *
+ */
 typedef struct vm_s {
     uint32_t sp;         //
     uint32_t lv;         //
@@ -253,15 +401,20 @@ typedef struct vm_s {
     uint32_t temp;       //
     uint32_t *stack;     //
     uint32_t *cpp;       //
-    uint8_t *method;    //
+    uint8_t *method;     //
     uint32_t initial_sp; //
-    func_builtin *ffi;       //
+    func_builtin *ffi;   //
     uint32_t ffi_qty;    //
 } vm_t;
 
+/**
+ * @struct vm_image_s
+ * @brief
+ *
+ */
 typedef struct vm_image_s {
     uint16_t main_index;       //
-    uint8_t *method_area;     //
+    uint8_t *method_area;      //
     uint32_t method_area_size; //
     uint32_t *cpool;           //
     uint32_t cpool_size;       //
@@ -269,6 +422,13 @@ typedef struct vm_image_s {
 
 /////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @fn int8_t vm_fetch_int8(vm_t *i)
+ * @brief
+ *
+ * @param i
+ * @return
+ */
 inline int8_t vm_fetch_int8(vm_t *i) {
     int8_t byte = 0;
 
@@ -278,6 +438,13 @@ inline int8_t vm_fetch_int8(vm_t *i) {
     return byte;
 }
 
+/**
+ * @fn uint8_t vm_fetch_uint8(vm_t *i)
+ * @brief
+ *
+ * @param i
+ * @return
+ */
 inline uint8_t vm_fetch_uint8(vm_t *i) {
     uint8_t byte = 0;
 
@@ -287,6 +454,13 @@ inline uint8_t vm_fetch_uint8(vm_t *i) {
     return byte;
 }
 
+/**
+ * @fn int16_t vm_fetch_int16(vm_t *i)
+ * @brief
+ *
+ * @param i
+ * @return
+ */
 inline int16_t vm_fetch_int16(vm_t *i) {
     int16_t word = 0;
 
@@ -296,6 +470,13 @@ inline int16_t vm_fetch_int16(vm_t *i) {
     return word;
 }
 
+/**
+ * @fn uint16_t vm_fetch_uint16(vm_t *i)
+ * @brief
+ *
+ * @param i
+ * @return
+ */
 inline uint16_t vm_fetch_uint16(vm_t *i) {
     uint16_t word = 0;
 
@@ -305,6 +486,13 @@ inline uint16_t vm_fetch_uint16(vm_t *i) {
     return word;
 }
 
+/**
+ * @fn int32_t vm_fetch_int32(vm_t *i)
+ * @brief
+ *
+ * @param i
+ * @return
+ */
 inline int32_t vm_fetch_int32(vm_t *i) {
     int32_t word = 0;
 
@@ -316,6 +504,13 @@ inline int32_t vm_fetch_int32(vm_t *i) {
     return word;
 }
 
+/**
+ * @fn uint32_t vm_fetch_uint32(vm_t *i)
+ * @brief
+ *
+ * @param i
+ * @return
+ */
 inline uint32_t vm_fetch_uint32(vm_t *i) {
     uint32_t word = 0;
 
@@ -327,6 +522,13 @@ inline uint32_t vm_fetch_uint32(vm_t *i) {
     return word;
 }
 
+/**
+ * @fn float vm_fetch_float(vm_t *i)
+ * @brief
+ *
+ * @param i
+ * @return
+ */
 inline float vm_fetch_float(vm_t *i) {
     uint32_t word = 0;
 
@@ -338,14 +540,36 @@ inline float vm_fetch_float(vm_t *i) {
     return (float) word;
 }
 
+/**
+ * @fn void vm_push(vm_t*, uint32_t word)
+ * @brief
+ *
+ * @param i
+ * @param word
+ */
 inline void vm_push(vm_t *i, uint32_t word) {
     i->stack[++i->sp] = word;
 }
 
+/**
+ * @fn uint32_t vm_pop(vm_t *i)
+ * @brief
+ *
+ * @param i
+ * @return
+ */
 inline uint32_t vm_pop(vm_t *i) {
     return i->stack[i->sp--];
 }
 
+/**
+ * @fn vm_error_t vm_call(vm_t *i, uint32_t index)
+ * @brief
+ *
+ * @param i
+ * @param index
+ * @return
+ */
 inline vm_error_t vm_call(vm_t *i, uint32_t index) {
     if (index >= 0x8000) {
         if (index - 0x8000 > i->ffi_qty - 1)
@@ -371,6 +595,13 @@ inline vm_error_t vm_call(vm_t *i, uint32_t index) {
     return VM_ERR_OK;
 }
 
+/**
+ * @fn vm_error_t vm_step(vm_t *i)
+ * @brief
+ *
+ * @param i
+ * @return
+ */
 vm_error_t vm_step(vm_t *i) {
     uint8_t opcode, modifier, nextbyte, a_type, b_type;
     uint32_t index, varnum, opc, result;
@@ -770,10 +1001,26 @@ vm_error_t vm_step(vm_t *i) {
     return VM_ERR_OK;
 }
 
+/**
+ * @fn bool vm_active(vm_t *i)
+ * @brief
+ *
+ * @param i
+ * @return
+ */
 bool vm_active(vm_t *i) {
     return i->pc != VM_INITIAL_PC;
 }
 
+/**
+ * @fn vm_t vm_new*(vm_image_t *image, int argc, char *argv[])
+ * @brief
+ *
+ * @param image
+ * @param argc
+ * @param argv
+ * @return
+ */
 vm_t* vm_new(vm_image_t *image, int argc, char *argv[]) {
     vm_t *i;
     int main_offset, nargs, j;

@@ -135,15 +135,15 @@ typedef struct vm_value_s {
     uint8_t type;
     union {
         union {
-               bool boolean;
-            int32_t integer;
-           uint32_t uinteger;
-              float real;
-            uint8_t byte[4];
+               bool boolean;  // VM_VAL_BOOL
+            int32_t integer;  // VM_VAL_INT
+           uint32_t uinteger; // VM_VAL_UINT
+              float real;     // VM_VAL_FLOAT
+            uint8_t byte[4];  // for serialize
         } number;
-        const char *cstr;  // for VM_VAL_CONST_STRING
-              void *addr;  // for VM_VAL_LIGHT_NATIVE
-       vm_object_t *obj;
+        const char *cstr;     // VM_VAL_CONST_STRING
+              void *addr;     // VM_VAL_LIGHT_NATIVE
+       vm_object_t *obj;      // objects
     };
 } vm_value_t;
 
@@ -248,18 +248,6 @@ typedef struct vm_state_thread_s {
           vm_frame_t frames[VM_THREAD_MAX_CALL_DEPTH]; // frames
                 void *userdata;                        // userdata pointer
 } vm_state_thread_t;
-
-typedef struct vm_heap_s {
-      uint32_t *allocated;
-      uint32_t size;
-    vm_value_t *data;
-} vm_heap_t;
-
-vm_heap_t* vm_heap_create(uint32_t size);
-      void vm_heap_destroy(vm_heap_t *heap);
-  uint32_t vm_heap_save(vm_heap_t *heap, vm_value_t value);
-vm_value_t vm_heap_load(vm_heap_t *heap, uint32_t pos);
-      void vm_heap_free(vm_heap_t *heap, uint32_t pos);
 
 /**
  * @fn void vm_step(vm_state_thread_t *thread)
@@ -393,6 +381,57 @@ float vm_api_read_f32(vm_state_thread_t **thread, uint32_t *pc);
  * @return
  */
 vm_errors_t vm_api_create_string(vm_state_thread_t **thread, uint32_t index, const char *str);
+
+/////////// heap ////////
+/**
+ * @struct vm_heap_s
+ * @brief
+ *
+ */
+typedef struct vm_heap_s {
+      uint32_t *allocated;
+      uint32_t size;
+    vm_value_t *data;
+} vm_heap_t;
+
+/**
+ * @fn vm_heap_t* vm_heap_create(uint32_t size)
+ * @brief
+ *
+ * @param size
+ * @return
+ */
+vm_heap_t* vm_heap_create(uint32_t size);
+
+/**
+ * @fn void vm_heap_destroy(vm_heap_t *heap)
+ * @brief
+ *
+ * @param heap
+ */
+void vm_heap_destroy(vm_heap_t *heap);
+
+/**
+ * @fn uint32_t vm_heap_save(vm_heap_t *heap, vm_value_t value)
+ * @brief
+ *
+ * @param heap
+ * @param value
+ * @return
+ */
+uint32_t vm_heap_save(vm_heap_t *heap, vm_value_t value);
+
+/**
+ * @fn vm_value_t vm_heap_load(vm_heap_t *heap, uint32_t pos)
+ * @brief
+ *
+ * @param heap
+ * @param pos
+ * @return
+ */
+vm_value_t vm_heap_load(vm_heap_t *heap, uint32_t pos);
+
+void vm_heap_free(vm_heap_t *heap, uint32_t pos);
 
 ///////////////////////////////////////////
 

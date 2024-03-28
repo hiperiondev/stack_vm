@@ -21,7 +21,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "vm_heap.h"
 #include "vm.h"
 
 #define GET_BIT(v, b)   ((v >> b) & 1)

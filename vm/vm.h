@@ -24,8 +24,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "vm_heap.h"
-
 /**
  * @enum VM_ERRORS
  * @brief

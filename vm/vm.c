@@ -24,7 +24,6 @@
 
 #include "vm.h"
 #include "vm_opcodes.h"
-#include "vm_heap.h"
 
 // memory
 void* vm_malloc(vm_context_t *ctx, size_t size) {

@@ -177,6 +177,17 @@ typedef struct vm_state_s {
     vm_foreign_function_t *foreign_functions;
 } vm_state_t;
 
+/**
+ * @struct vm_heap_s
+ * @brief
+ *
+ */
+typedef struct vm_heap_s {
+      uint32_t *allocated;
+      uint32_t size;
+    vm_value_t *data;
+} vm_heap_t;
+
 extern const vm_value_t vm_value_null;
 typedef struct vm_context_s vm_context_t;
 
@@ -208,7 +219,7 @@ typedef struct vm_object_s {
 
         struct {
                               void *addr;  //
-            const vm_native_prop_t *prop;  // can be used to check type of native (ex. obj->native.prop == &ArrayProp // this is an Array)
+            const vm_native_prop_t *prop;  // can be used to check type of native (ex. obj->native.prop == &ArrayProp // this is an array)
         } native;                          //
 
         struct {
@@ -239,15 +250,17 @@ typedef struct vm_state_thread_s {
                 bool halted;                           // vm is halted
         vm_context_t ctx;                              // each thread can maintain its own context so that you can e.g. override allocation on a per-thread basis.
           vm_state_t *state;                           // each thread stores a reference to its state
-          vm_value_t *global_vars;                     // global vars are owned by each thread
+          vm_value_t *global_vars;                     // global vars
             uint32_t global_vars_qty;                  // global vars quantity
             uint32_t pc, fp, sp;                       // program counter, frame pointer, stack pointer
           vm_value_t ret_val;                          // return value from CALL / CALL_FOREIGN
           vm_value_t stack[VM_THREAD_STACK_SIZE];      // vm stack
             uint32_t fc;                               // frame counter
           vm_frame_t frames[VM_THREAD_MAX_CALL_DEPTH]; // frames
-                void *userdata;                        // userdata pointer
+                void *userdata;                        // generic userdata pointer
 } vm_state_thread_t;
+
+/////////////////// API ///////////////////
 
 /**
  * @fn void vm_step(vm_state_thread_t *thread)
@@ -273,8 +286,6 @@ void vm_create_thread(vm_state_thread_t **thread);
  * @param thread
  */
 void vm_destroy_thread(vm_state_thread_t **thread);
-
-/////////////////// API ///////////////////
 
 /**
  * @fn void vm_api_push(vm_state_thread_t **thread, vm_value_t value)
@@ -383,16 +394,6 @@ float vm_api_read_f32(vm_state_thread_t **thread, uint32_t *pc);
 vm_errors_t vm_api_create_string(vm_state_thread_t **thread, uint32_t index, const char *str);
 
 /////////// heap ////////
-/**
- * @struct vm_heap_s
- * @brief
- *
- */
-typedef struct vm_heap_s {
-      uint32_t *allocated;
-      uint32_t size;
-    vm_value_t *data;
-} vm_heap_t;
 
 /**
  * @fn vm_heap_t* vm_heap_create(uint32_t size)
@@ -431,6 +432,13 @@ uint32_t vm_heap_save(vm_heap_t *heap, vm_value_t value);
  */
 vm_value_t vm_heap_load(vm_heap_t *heap, uint32_t pos);
 
+/**
+ * @fn void vm_heap_free(vm_heap_t *heap, uint32_t pos)
+ * @brief
+ *
+ * @param heap
+ * @param pos
+ */
 void vm_heap_free(vm_heap_t *heap, uint32_t pos);
 
 ///////////////////////////////////////////

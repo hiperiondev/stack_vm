@@ -1,0 +1,48 @@
+PUSH_INT 10 ; comment after 
+PUSH_INT 20
+.macro _macro1
+ADD
+SET_GLOBAL 0
+GOTO 76
+GET_LOCAL 1
+.string "string in macro"
+PUSH_1
+LTE
+ADD
+.endm
+.equ _a_value 2345
+ADD
+SET_GLOBAL 0
+GOTO Continue
+GET_LOCAL $HERE+2
+PUSH_1
+LTE
+GOTOZ _a_value
+
+_macro1
+.label Continue
+PUSH_1
+RETURN_VALUE
+GET_LOCAL 1
+GET_LOCAL 1
+
+_TEST_INSTRUCTION_ 5 1 2 3 4 5
+
+DEC
+CALL 1 0
+GET_RETVAL
+MUL
+RETURN_VALUE
+
+.string "this is a 'string'"
+
+.DATAU16 12 23 34 45 67 78 90
+.datai8 -12 23 -34 -45 67 -78 90
+.dataf32 34.1 4.2 34 -5 -89.1
+
+RETURN
+CALL Continue 0
+CALL 1 0
+GET_RETVAL
+MUL
+RETURN_VALUE

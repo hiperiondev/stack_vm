@@ -1,0 +1,32 @@
+    PUSH_INT 10
+    PUSH_INT 20
+    ADD
+    SET_GLOBAL 0
+    .include test_include.inc
+    GOTO end
+    GET_LOCAL 1 ;this is a semicolon comment
+    PUSH_1
+    LTE
+    ; other comment
+    GOTOZ exit
+    PUSH_1
+    RETURN_VALUE
+.label exit
+    GET_LOCAL 1
+    GET_LOCAL 1
+    DEC
+    CALL 1 0
+    GET_RETVAL
+    MUL
+    GOTO $HERE + 2
+    RETURN_VALUE
+    RETURN
+    RETURN
+.label end
+    HALT 0
+    HALT 99
+    PUSH_INT 88
+    PUSH_CONST_UINT8 12
+    -@PUSH_CONST_UINT8 15
+    +@PUSH_CONST_UINT8 12
+    

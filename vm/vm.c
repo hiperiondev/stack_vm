@@ -314,7 +314,7 @@ void vm_step(vm_thread_t **thread) {
 
         case GET_ARRAY_VALUE: {
             uint16_t index = vm_read_u16(thread, &(*thread)->pc);
-            vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, (*thread)->stack[(*thread)->sp - 1].heap_ref);
+            vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
 
             if (indirect) {
                 uint32_t _indx = index + (*thread)->indirect;
@@ -450,30 +450,30 @@ void vm_step(vm_thread_t **thread) {
 #undef REL_OP
 
         case INC: {
-            switch ((*thread)->stack[(*thread)->sp - 1].type) {
+            switch (STKTOP(thread).type) {
                 case VM_VAL_UINT:
-                    ++(*thread)->stack[(*thread)->sp - 1].number.uinteger;
+                    ++STKTOP(thread).number.uinteger;
                     break;
                 case VM_VAL_INT:
-                    ++(*thread)->stack[(*thread)->sp - 1].number.integer;
+                    ++STKTOP(thread).number.integer;
                     break;
                 case VM_VAL_FLOAT:
-                    ++(*thread)->stack[(*thread)->sp - 1].number.real;
+                    ++STKTOP(thread).number.real;
                     break;
             }
         }
             break;
 
         case DEC: {
-            switch ((*thread)->stack[(*thread)->sp - 1].type) {
+            switch (STKTOP(thread).type) {
                 case VM_VAL_UINT:
-                    --(*thread)->stack[(*thread)->sp - 1].number.uinteger;
+                    --STKTOP(thread).number.uinteger;
                     break;
                 case VM_VAL_INT:
-                    --(*thread)->stack[(*thread)->sp - 1].number.integer;
+                    --STKTOP(thread).number.integer;
                     break;
                 case VM_VAL_FLOAT:
-                    --(*thread)->stack[(*thread)->sp - 1].number.real;
+                    --STKTOP(thread).number.real;
                     break;
             }
         }
@@ -652,10 +652,10 @@ void vm_step(vm_thread_t **thread) {
             break;
 
         case LIB_FN: {
-            if ((*thread)->stack[(*thread)->sp - 1].type == VM_VAL_LIB_OBJ) {
+            if (STKTOP(thread).type == VM_VAL_LIB_OBJ) {
                 uint8_t calltype = vm_read_byte(thread, &(*thread)->pc);
                 uint32_t nargs = vm_read_u32(thread, &(*thread)->pc);
-                err = (*thread)->state->lib[(*thread)->stack[(*thread)->sp - 1].lib_obj.lib_idx](thread, calltype, nargs);
+                err = (*thread)->state->lib[STKTOP(thread).lib_obj.lib_idx](thread, calltype, nargs);
             } else
                 err = VM_ERR_BAD_VALUE;
         }
@@ -758,7 +758,7 @@ void vm_step(vm_thread_t **thread) {
             break;
 
         case PUSH_HEAP_OBJECT: {
-            vm_value_t value = (*thread)->stack[(*thread)->sp - 1];
+            vm_value_t value = STKTOP(thread);
             if (value.type != VM_VAL_UINT)
                 err = VM_ERR_BAD_VALUE;
             else {
@@ -768,13 +768,13 @@ void vm_step(vm_thread_t **thread) {
                 else {
                     switch (obj->type) {
                         case VM_VAL_GENERIC:
-                            (*thread)->stack[(*thread)->sp - 1] = obj->value;
+                            STKTOP(thread) = obj->value;
                             break;
                         case VM_VAL_LIB_OBJ:
                             value.type = VM_VAL_LIB_OBJ;
                             value.lib_obj.addr = obj->lib_obj.addr;
                             value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
-                            (*thread)->stack[(*thread)->sp - 1] = value;
+                            STKTOP(thread) = value;
                             err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, 1);
                             break;
                         default:
@@ -788,58 +788,58 @@ void vm_step(vm_thread_t **thread) {
         case TO_TYPE: {
 #ifdef VM_ENABLE_TOTYPES
             uint8_t type = (*thread)->state->program[(*thread)->pc++];
-            if ((*thread)->stack[(*thread)->sp - 1].type == type)
+            if (STKTOP(thread).type == type)
                     return;
 
                 vm_value_t tmp;
                 switch (type) {
                     case VM_VAL_UINT: {
-                        switch ((*thread)->stack[(*thread)->sp - 1].type) {
+                        switch (STKTOP(thread).type) {
                             case VM_VAL_INT: {
-                                tmp.number.uinteger = (*thread)->stack[(*thread)->sp - 1].number.integer;
-                                (*thread)->stack[(*thread)->sp - 1].number.uinteger = tmp.number.uinteger;
-                                (*thread)->stack[(*thread)->sp - 1].type = VM_VAL_UINT;
+                                tmp.number.uinteger = STKTOP(thread).number.integer;
+                                STKTOP(thread).number.uinteger = tmp.number.uinteger;
+                                STKTOP(thread).type = VM_VAL_UINT;
                             }
                                 break;
                             case VM_VAL_FLOAT: {
-                                tmp.number.uinteger = (*thread)->stack[(*thread)->sp - 1].number.real;
-                                (*thread)->stack[(*thread)->sp - 1].number.uinteger = tmp.number.uinteger;
-                                (*thread)->stack[(*thread)->sp - 1].type = VM_VAL_UINT;
+                                tmp.number.uinteger = STKTOP(thread).number.real;
+                                STKTOP(thread).number.uinteger = tmp.number.uinteger;
+                                STKTOP(thread).type = VM_VAL_UINT;
                             }
                                 break;
                         }
                     }
                         break;
                     case VM_VAL_INT: {
-                        switch ((*thread)->stack[(*thread)->sp - 1].type) {
+                        switch (STKTOP(thread).type) {
                             case VM_VAL_UINT: {
-                                tmp.number.integer = (*thread)->stack[(*thread)->sp - 1].number.uinteger;
-                                (*thread)->stack[(*thread)->sp - 1].number.integer = tmp.number.integer;
-                                (*thread)->stack[(*thread)->sp - 1].type = VM_VAL_INT;
+                                tmp.number.integer = STKTOP(thread).number.uinteger;
+                                STKTOP(thread).number.integer = tmp.number.integer;
+                                STKTOP(thread).type = VM_VAL_INT;
                             }
                                 break;
                             case VM_VAL_FLOAT: {
-                                tmp.number.integer = (*thread)->stack[(*thread)->sp - 1].number.real;
-                                (*thread)->stack[(*thread)->sp - 1].number.integer = tmp.number.integer;
-                                (*thread)->stack[(*thread)->sp - 1].type = VM_VAL_INT;
+                                tmp.number.integer = STKTOP(thread).number.real;
+                                STKTOP(thread).number.integer = tmp.number.integer;
+                                STKTOP(thread).type = VM_VAL_INT;
                             }
                                 break;
                         }
                     }
                         break;
                     case VM_VAL_FLOAT: {
-                        switch ((*thread)->stack[(*thread)->sp - 1].type) {
+                        switch (STKTOP(thread).type) {
                             case VM_VAL_UINT: {
-                                tmp.number.real = (*thread)->stack[(*thread)->sp - 1].number.uinteger;
-                                (*thread)->stack[(*thread)->sp - 1].number.real = tmp.number.real;
-                                (*thread)->stack[(*thread)->sp - 1].type = VM_VAL_FLOAT;
+                                tmp.number.real = STKTOP(thread).number.uinteger;
+                                STKTOP(thread).number.real = tmp.number.real;
+                                STKTOP(thread).type = VM_VAL_FLOAT;
                             }
                                 break;
                             case VM_VAL_INT: {
 
-                                tmp.number.real = (*thread)->stack[(*thread)->sp - 1].number.integer;
-                                (*thread)->stack[(*thread)->sp - 1].number.real = tmp.number.real;
-                                (*thread)->stack[(*thread)->sp - 1].type = VM_VAL_FLOAT;
+                                tmp.number.real = STKTOP(thread).number.integer;
+                                STKTOP(thread).number.real = tmp.number.real;
+                                STKTOP(thread).type = VM_VAL_FLOAT;
                             }
                                 break;
                         }

@@ -80,9 +80,9 @@
 //    10: indirect, increment register
 //    11: indirect, decrement register
 // O: op
+#define OP_INDIRECT(op)  (op & 0xc0) /**< indirect argument */
 
-#define OP_INDIRECT(op)  (op & 0xc0)
-
+#define STKTOP(thread)   (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
 //////////////////// internals ////////////////////
 
 #define vm_new_bool(val, value) \

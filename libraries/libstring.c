@@ -156,29 +156,23 @@ static vm_errors_t libstring_find(char *result, char *str1, char *str2) {
 }
 
 // vm cases
-static vm_errors_t libstring_edfat_new(void) {
+static vm_errors_t libstring_edfat_new(vm_thread_t **thread, void *args) {
     return VM_ERR_OK;
 }
 
-static vm_errors_t libstring_edfat_push(void) {
+static vm_errors_t libstring_edfat_push(vm_thread_t **thread, void *args) {
     return VM_ERR_OK;
 }
 
-static vm_errors_t libstring_edfat_cmp(char *str1, char *str2) {
-    if (strcmp(str1, str2) != 0)
-        return VM_ERR_FAIL;
+static vm_errors_t libstring_edfat_cmp(vm_thread_t **thread, void *args) {
     return VM_ERR_OK;
 }
 
-static vm_errors_t libstring_edfat_gc(vm_thread_t **thread, vm_string_args_s *str_args) {
-    if ((*thread)->state->heap[str_args->heap_indx].data->string.ptr != NULL) {
-        free((*thread)->state->heap[str_args->heap_indx].data->string.ptr);
-        (*thread)->state->heap[str_args->heap_indx].data->string.ptr = NULL;
-    }
+static vm_errors_t libstring_edfat_gc(vm_thread_t **thread, void *args) {
     return VM_ERR_OK;
 }
 
-vm_errors_t libstring(vm_thread_t **thread, uint8_t call_type, vm_string_args_s *str_args) {
+vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *args) {
     if (*thread == NULL)
         return VM_ERR_FAIL;
 
@@ -187,16 +181,16 @@ vm_errors_t libstring(vm_thread_t **thread, uint8_t call_type, vm_string_args_s 
     switch (call_type) {
         // vm cases
         case VM_EDFAT_NEW:
-            res = libstring_edfat_new();
+            res = libstring_edfat_new(thread, args);
             break;
         case VM_EDFAT_PUSH:
-            res = libstring_edfat_push();
+            res = libstring_edfat_push(thread, args);
             break;
         case VM_EDFAT_CMP:
-            res = libstring_edfat_cmp(str_args->strs.s1->string.ptr, str_args->strs.s2->string.ptr);
+            res = libstring_edfat_cmp(thread, args);
             break;
         case VM_EDFAT_GC:
-            res = libstring_edfat_gc(thread, str_args);
+            res = libstring_edfat_gc(thread, args);
             break;
 
         // internal cases

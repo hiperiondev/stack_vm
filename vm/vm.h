@@ -66,13 +66,6 @@
 #define VM_HEAP_SHRINK_AFTER_GC
 
 /**
- * @def VM_ENABLE_STRINGS
- * @brief Enable strings primitives
- *
- */
-#define VM_ENABLE_STRINGS
-
-/**
  * @def VM_ENABLE_TOTYPES
  * @brief Enable TO_TYPES op
  *
@@ -151,12 +144,12 @@ typedef enum VM_VALUE_TYPE {
     VM_VAL_UINT,         /**< Value UINT */
     VM_VAL_INT,          /**< Value INT */
     VM_VAL_FLOAT,        /**< Value FLOAT */
-    VM_VAL_STRING,       /**< Value STRING */
     VM_VAL_CONST_STRING, /**< Value CONST_STRING */
     VM_VAL_NATIVE,       /**< Value NATIVE */
     VM_VAL_ARRAY,        /**< Value ARRAY */
     VM_VAL_GENERIC,      /**< Value GENERIC */
     VM_VAL_HEAP_REF,     /**< Value HEAP REFERENCE */
+    VM_VAL_LIB_OBJ,      /**< Value LIB_OBJ */
 } vm_value_type_t;
 
 typedef enum VM_EXTERNAL_DATA_FUNCTION_ARG_TYPE {
@@ -169,23 +162,8 @@ typedef enum VM_EXTERNAL_DATA_FUNCTION_ARG_TYPE {
 typedef struct vm_heap_object_s vm_heap_object_t;
 typedef struct vm_thread_s vm_thread_t;
 typedef struct vm_heap_s vm_heap_t;
-
-/**
- * @struct vm_string_args_s
- * @brief String argument for external function
- *
- */
-typedef struct vm_string_args_s {
-    union {
-        struct {
-            vm_heap_object_t *s1; /**< argument string */
-            vm_heap_object_t *s2; /**< argument string */
-        } strs;
-        uint32_t heap_indx; /**< heap index of allocated string */
-    };
-} vm_string_args_s;
-
 typedef struct vm_native_s vm_native_t;
+
 /**
  * @struct vm_native_s
  * @brief Native argument for external function
@@ -218,10 +196,9 @@ typedef struct vm_value_s {
         } native;
 
         struct {
-               uint32_t len;                                                                               /**< length */
-                   char *ptr;                                                                              /**< string pointer */
-            vm_errors_t (*vm_string)(vm_thread_t **thread, uint8_t call_type, vm_string_args_s *str_args); /**< function for manage strings */
-        } string;
+                void *addr;   /**< library obj reference */
+            uint32_t lib_idx; /**< library entry function */
+        } lib_obj;
 
         const char *cstr;    /**< VM_VAL_CONST_STRING */
           uint32_t heap_ref; /**< VM_VAL_HEAP_REF */
@@ -240,6 +217,17 @@ typedef struct vm_value_s {
 typedef vm_value_t (*vm_foreign_function_t)(vm_thread_t *thread, const vm_value_t *args, uint32_t count);
 
 /**
+ * @fn vm_errors_t (*lib_entry)(vm_thread_t **thread, uint8_t call_type, void *args)
+ * @brief Main entry for libraries.
+ *
+ * @param thread Thread.
+ * @param call_type Type of call.
+ * @param args Arbitrary arguments.
+ * @return Status.
+ */
+typedef vm_errors_t (*lib_entry)(vm_thread_t **thread, uint8_t call_type, void *args);
+
+/**
  * @struct vm_state_s
  * @brief VM internal state
  *
@@ -250,6 +238,8 @@ typedef struct vm_state_s {
                 vm_heap_t *heap;                 /**< heap */
     vm_foreign_function_t *foreign_functions;    /**< pointers to foreign functions */
                  uint32_t foreign_functions_qty; /**< foreign functions quantity */
+                lib_entry *lib;
+                 uint32_t lib_qty;
 } vm_state_t;
 
 extern const vm_value_t vm_value_null; // predefined null value
@@ -298,12 +288,6 @@ typedef struct vm_heap_object_s {
         vm_value_t value;       /**< generic value */
 
         struct {
-               uint32_t len;                                                                               /**< length */
-                   char *ptr;                                                                              /**< string pointer */
-            vm_errors_t (*vm_string)(vm_thread_t **thread, uint8_t call_type, vm_string_args_s *str_args); /**< function for manage strings */
-        } string;
-
-        struct {
                uint8_t qty;     /**< quantity */
             vm_value_t *fields; /**< data */
         } array;
@@ -312,6 +296,11 @@ typedef struct vm_heap_object_s {
                    void *addr;                                                               /**< native reference */
             vm_errors_t (*vm_native)(vm_thread_t **thread, uint8_t arg, vm_native_t *value); /**< native function for manage external data */
         } native;
+
+        struct {
+            void *addr;       /**< library obj reference */
+            uint32_t lib_idx; /**< library entry function */
+        } lib_obj;
     };
 } vm_heap_object_t;
 

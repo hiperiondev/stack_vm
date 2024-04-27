@@ -28,31 +28,8 @@
 // values
 const vm_value_t vm_value_null = { VM_VAL_NULL };
 
-#ifdef VM_ENABLE_STRINGS
-static size_t vm_string_len(vm_thread_t **thread, const vm_value_t value) {
-    if (value.type == VM_VAL_CONST_STRING) {
-        return strlen(value.cstr);
-    }
-    if (value.type != VM_VAL_STRING)
-        return 0;
-
-    vm_heap_object_t *str = vm_heap_load((*thread)->state->heap, value.heap_ref);
-    return str->string.len;
-}
-
-static const char* vm_to_string(vm_thread_t **thread, const vm_value_t value) {
-    if (value.type == VM_VAL_CONST_STRING)
-        return value.cstr;
-    if (value.type != VM_VAL_STRING)
-        return NULL;
-
-    vm_heap_object_t *str = vm_heap_load((*thread)->state->heap, value.heap_ref);
-    return str->string.ptr;
-}
-#endif
-
 static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_value_t b) {
-    bool both_strings = ((a.type == VM_VAL_CONST_STRING && b.type == VM_VAL_STRING) || (a.type == VM_VAL_STRING && b.type == VM_VAL_CONST_STRING));
+    bool both_strings = (a.type == VM_VAL_CONST_STRING && b.type == VM_VAL_CONST_STRING);
 
     if (a.type != b.type && !both_strings) {
         return false;
@@ -78,41 +55,17 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
         return a.number.real == b.number.real;
     }
 
-#ifdef VM_ENABLE_STRINGS
-    if (a.type == VM_VAL_STRING) {
-        vm_heap_object_t *a1 = vm_heap_load((*thread)->state->heap, a.heap_ref);
-        vm_heap_object_t *a2 = vm_heap_load((*thread)->state->heap, b.heap_ref);
-        vm_string_args_s strs = {
-                .strs.s1 = a1,
-                .strs.s2 = a2
-        };
-
-        if(a1->string.vm_string(thread, VM_EDFAT_CMP, &strs)  != VM_ERR_OK)
-            return false;
-        return true;
-    }
-
-    if (a.type == VM_VAL_CONST_STRING) {
-        if (b.type == VM_VAL_CONST_STRING && a.cstr == b.cstr) {
-            return true;
-        }
-
-        size_t a_len = vm_string_len(thread, a);
-        size_t b_len = vm_string_len(thread, b);
-
-        if (a_len != b_len) {
-            return false;
-        }
-
-        return strncmp(a.cstr, vm_to_string(thread, b), a_len) == 0;
-    }
-#endif
-
     if (a.type == VM_VAL_NATIVE) {
         vm_native_t value;
         value.addr = a.native.addr;
         value.vm_native = a.native.vm_native;
         if (a.native.vm_native(thread, VM_EDFAT_CMP, &value) != VM_ERR_OK)
+            return false;
+        return true;
+    }
+
+    if (a.type == VM_VAL_LIB_OBJ) {
+        if (a.native.vm_native(thread, VM_EDFAT_CMP, NULL) != VM_ERR_OK)
             return false;
         return true;
     }
@@ -261,6 +214,19 @@ void vm_step(vm_thread_t **thread) {
 
             memset(&(*thread)->stack[(*thread)->sp], 0, sizeof(vm_value_t) * n);
             (*thread)->sp += n;
+        }
+            break;
+
+        case PUSH_NEW_HEAP_OBJ: {
+            vm_value_t lib_idx = vm_do_pop(thread);
+            if (lib_idx.type != VM_VAL_UINT || lib_idx.number.uinteger > (*thread)->state->lib_qty)
+                err = VM_ERR_BAD_VALUE;
+
+            vm_value_t ref = { VM_VAL_LIB_OBJ };
+            vm_heap_object_t obj = { VM_VAL_LIB_OBJ };
+            (*thread)->state->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, &obj);
+            ref.heap_ref = vm_heap_save((*thread)->state->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
+            vm_do_push(thread, ref);
         }
             break;
 
@@ -735,9 +701,8 @@ void vm_step(vm_thread_t **thread) {
         case PUSH_CONST_UINT32:
         case PUSH_CONST_INT32:
         case PUSH_CONST_FLOAT:
-#ifdef VM_ENABLE_STRINGS
         case PUSH_CONST_STRING:
-#endif
+
         {
             uint8_t type = state->program[(*thread)->pc - 1] - PUSH_CONST_UINT8;
             uint32_t const_pc = vm_read_u32(thread, &(*thread)->pc);
@@ -781,12 +746,10 @@ void vm_step(vm_thread_t **thread) {
                     (*thread)->stack[(*thread)->sp].type = VM_VAL_FLOAT;
                     (*thread)->stack[(*thread)->sp].number.real = vm_read_f32(thread, &const_pc);
                     break;
-#ifdef VM_ENABLE_STRINGS
                 case 7: // string
                     (*thread)->stack[(*thread)->sp].type = VM_VAL_CONST_STRING;
                     (*thread)->stack[(*thread)->sp].cstr = (char*) ((*thread)->state->program + const_pc);
                     break;
-#endif
                 default:
                     err = VM_ERR_CONST_BADTYPE;
             }
@@ -821,15 +784,15 @@ void vm_step(vm_thread_t **thread) {
                             err = value.native.vm_native(thread, VM_EDFAT_PUSH, &val);
                         }
                             break;
-                        case VM_VAL_STRING:
-                            value.type = VM_VAL_STRING;
-                            value.string.ptr = obj->string.ptr;
-                            value.string.vm_string = obj->string.vm_string;
+                        case VM_VAL_LIB_OBJ:
+                            value.type = VM_VAL_LIB_OBJ;
+                            value.lib_obj.addr = obj->lib_obj.addr;
+                            value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
                             (*thread)->stack[(*thread)->sp - 1] = value;
-                            err = value.string.vm_string(thread, VM_EDFAT_PUSH, NULL);
+                            err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, obj);
                             break;
                         default:
-                            // TODO: external generic heap object manage
+                            break;
                     }
                 }
             }

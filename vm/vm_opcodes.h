@@ -46,7 +46,7 @@ enum VM_OPCODE {
     PUSH_CONST_FLOAT,  // | 0x10 | @u32  |   -    | push constant float value from program address
     PUSH_CONST_STRING, // | 0x11 | @u32  |   -    | push constant string value from program address
     PUSH_HEAP_OBJECT,  // | 0x12 |  u32  |   -    | push a heap object
-    NEW_ARRAY,         // | 0x13 |  u16  |   -    | create new array in heap and fill with n elements from stack. Push heap index
+    NEW_ARRAY,         // | 0x13 |  u16  |   -    | create new array in heap and fill with n elements from stack. push heap index
     PUSH_ARRAY,        // | 0x14 |   -   |   -    | push array to stack
     GET_ARRAY_VALUE,   // | 0x15 | @u16  |   -    | get value from array
     SET_ARRAY_VALUE,   // | 0x16 | @u16  |   -    | set value on array

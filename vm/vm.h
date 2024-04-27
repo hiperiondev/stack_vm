@@ -160,6 +160,7 @@ typedef enum VM_VALUE_TYPE {
 } vm_value_type_t;
 
 typedef enum VM_EXTERNAL_DATA_FUNCTION_ARG_TYPE {
+    VM_EDFAT_NEW,  //
     VM_EDFAT_PUSH, //
     VM_EDFAT_CMP,  //
     VM_EDFAT_GC,   //

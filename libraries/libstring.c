@@ -16,6 +16,9 @@
  * @see https://github.com/hiperiondev/stack_vm
  */
 
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 #include <string.h>
 #include <wchar.h>
 
@@ -152,20 +155,26 @@ static vm_errors_t libstring_find(char *result, char *str1, char *str2) {
     return VM_ERR_OK;
 }
 
-
 // vm cases
-static vm_errors_t libstring_edfat_push(char *result, char *str1, char *str2) {
-
+static vm_errors_t libstring_edfat_new(void) {
     return VM_ERR_OK;
 }
 
-static vm_errors_t libstring_edfat_cmp(char *result, char *str1, char *str2) {
-
+static vm_errors_t libstring_edfat_push(void) {
     return VM_ERR_OK;
 }
 
-static vm_errors_t libstring_edfat_gc(char *result, char *str1, char *str2) {
+static vm_errors_t libstring_edfat_cmp(char *str1, char *str2) {
+    if (strcmp(str1, str2) != 0)
+        return VM_ERR_FAIL;
+    return VM_ERR_OK;
+}
 
+static vm_errors_t libstring_edfat_gc(vm_thread_t **thread, vm_string_args_s *str_args) {
+    if ((*thread)->state->heap[str_args->heap_indx].data->string.ptr != NULL) {
+        free((*thread)->state->heap[str_args->heap_indx].data->string.ptr);
+        (*thread)->state->heap[str_args->heap_indx].data->string.ptr = NULL;
+    }
     return VM_ERR_OK;
 }
 
@@ -177,17 +186,20 @@ vm_errors_t libstring(vm_thread_t **thread, uint8_t call_type, vm_string_args_s 
 
     switch (call_type) {
         // vm cases
+        case VM_EDFAT_NEW:
+            res = libstring_edfat_new();
+            break;
         case VM_EDFAT_PUSH:
-
+            res = libstring_edfat_push();
             break;
         case VM_EDFAT_CMP:
-
+            res = libstring_edfat_cmp(str_args->strs.s1->string.ptr, str_args->strs.s2->string.ptr);
             break;
         case VM_EDFAT_GC:
-
+            res = libstring_edfat_gc(thread, str_args);
             break;
 
-        // libstring cases
+        // internal cases
         case LIBSTRING_FN_LEN:
 
             break;

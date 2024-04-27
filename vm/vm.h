@@ -184,8 +184,8 @@ typedef struct vm_value_s {
         } number;
 
         struct {
-                void *addr;   /**< library obj reference */
-            uint32_t lib_idx; /**< library entry function */
+            uint32_t heap_ref; /**< library obj reference */
+            uint32_t lib_idx;  /**< library entry function */
         } lib_obj;
 
         const char *cstr;    /**< VM_VAL_CONST_STRING */

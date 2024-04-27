@@ -25,7 +25,7 @@
 #include "vm.h"
 #include "libstring.h"
 
-#define STR_OBJ(thread, stk)  vm_heap_load((*thread)->state->heap, (stk).heap_ref) /**< string object in heap */
+#define STR_OBJ(thread, heap_ref)  vm_heap_load((*thread)->state->heap, heap_ref) /**< string object in heap */
 
 /**
  * @fn vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *args)
@@ -55,7 +55,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
     switch (call_type) {
         // vm cases
         case VM_EDFAT_NEW: {
-            vm_heap_object_t *obj = STR_OBJ(thread, STKTOP(thread));
+            vm_heap_object_t *obj = STR_OBJ(thread, arg);
             obj->lib_obj.addr = strdup(STKSND(thread).cstr);
             STKDROP2(thread);
         }
@@ -63,7 +63,9 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         case VM_EDFAT_PUSH:
             break;
         case VM_EDFAT_CMP: {
-            if (strcmp(STKTOP(thread).lib_obj.addr, STKSND(thread).lib_obj.addr) != 0)
+            vm_heap_object_t *obj1 = STR_OBJ(thread, STKTOP(thread).lib_obj.heap_ref);
+            vm_heap_object_t *obj2 = STR_OBJ(thread, STKSND(thread).lib_obj.heap_ref);
+            if (strcmp(obj1->lib_obj.addr, obj2->lib_obj.addr) != 0)
             res = VM_ERR_FAIL;
         }
         break;

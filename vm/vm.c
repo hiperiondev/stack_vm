@@ -213,10 +213,10 @@ void vm_step(vm_thread_t **thread) {
 
             vm_value_t ref = { VM_VAL_LIB_OBJ };
             vm_heap_object_t obj = { VM_VAL_LIB_OBJ };
-            ref.heap_ref = vm_heap_save((*thread)->state->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
-            ref.lib_obj.lib_idx = lib_idx.number.uinteger;
+            uint32_t heap_ref = vm_heap_save((*thread)->state->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
+            ref.lib_obj.heap_ref = heap_ref;
             vm_do_push(thread, ref);
-            (*thread)->state->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, 1);
+            (*thread)->state->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, heap_ref);
         }
             break;
 
@@ -760,10 +760,12 @@ void vm_step(vm_thread_t **thread) {
 
         case PUSH_HEAP_OBJECT: {
             vm_value_t value = STKTOP(thread);
+
             if (value.type != VM_VAL_UINT)
                 err = VM_ERR_BAD_VALUE;
             else {
-                vm_heap_object_t *obj = vm_heap_load((*thread)->state->heap, value.number.uinteger);
+                uint32_t idx = value.number.uinteger;
+                vm_heap_object_t *obj = vm_heap_load((*thread)->state->heap, idx);
                 if (obj->type == VM_VAL_NULL)
                     err = VM_ERR_HEAPNOTEXIST;
                 else {
@@ -773,7 +775,7 @@ void vm_step(vm_thread_t **thread) {
                             break;
                         case VM_VAL_LIB_OBJ:
                             value.type = VM_VAL_LIB_OBJ;
-                            value.lib_obj.addr = obj->lib_obj.addr;
+                            value.lib_obj.heap_ref = idx;
                             value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
                             STKTOP(thread) = value;
                             err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, 1);

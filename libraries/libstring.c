@@ -25,6 +25,25 @@
 #include "vm.h"
 #include "libstring.h"
 
+/**
+ * @fn vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *args)
+ * @brief Function entry for strings library
+ * This functions support functions:
+ *       LEN: Return the length of a string.
+ *      LEFT: Return the left part of a string.
+ *     RIGHT: Return the right part of a string.
+ *       MID: Return the middle part of a string.
+ *    CONCAT: Add together (concatenate) two or more strings.
+ *    INSERT: Insert one string into another string.
+ *    DELETE: Delete part of a string.
+ *   REPLACE: Replaces part of one string with another string.
+ *      FIND: Finds the location of one string within another.
+ *
+ * @param thread Thread
+ * @param call_type Call type
+ * @param args Arguments
+ * @return
+ */
 vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *args) {
     if (*thread == NULL)
         return VM_ERR_FAIL;
@@ -43,41 +62,41 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *arg
             break;
 
         // internal cases
-        case LIBSTRING_FN_LEN: {// Return the length of a string.
+        case LIBSTRING_FN_LEN: {
             STKTOP(thread).type = VM_VAL_UINT;
             vm_heap_object_t* obj = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
             STKTOP(thread).number.uinteger = strlen((char*)obj->lib_obj.addr);
         }
             break;
-        case LIBSTRING_FN_LEFT: {    // Return the left part of a string.
+        case LIBSTRING_FN_LEFT: {
 
         }
             break;
-        case LIBSTRING_FN_RIGHT: {   // Return the right part of a string.
+        case LIBSTRING_FN_RIGHT: {
 
         }
             break;
-        case LIBSTRING_FN_MID: {     // Return the middle part of a string.
+        case LIBSTRING_FN_MID: {
 
         }
             break;
-        case LIBSTRING_FN_CONCAT: {  // Add together (concatenate) two or more strings.
+        case LIBSTRING_FN_CONCAT: {
 
         }
             break;
-        case LIBSTRING_FN_INSERT: {  // Insert one string into another string.
+        case LIBSTRING_FN_INSERT: {
 
         }
             break;
-        case LIBSTRING_FN_DELETE: {  // Delete part of a string.
+        case LIBSTRING_FN_DELETE: {
 
         }
             break;
-        case LIBSTRING_FN_REPLACE: { // Replaces part of one string with another string.
+        case LIBSTRING_FN_REPLACE: {
 
         }
             break;
-        case LIBSTRING_FN_FIND: {    // Finds the location of one string within another.
+        case LIBSTRING_FN_FIND: {
 
         }
             break;

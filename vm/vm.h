@@ -217,9 +217,9 @@ typedef struct vm_value_s {
         } native;
 
         struct {
-               uint32_t len;                                                                /**< length */
-                   char *ptr;                                                               /**< string pointer */
-            vm_errors_t (*vm_string)(vm_thread_t **thread, uint8_t arg, vm_string_args_s*); /**< function for manage strings */
+               uint32_t len;                                                                               /**< length */
+                   char *ptr;                                                                              /**< string pointer */
+            vm_errors_t (*vm_string)(vm_thread_t **thread, uint8_t call_type, vm_string_args_s *str_args); /**< function for manage strings */
         } string;
 
         const char *cstr;    /**< VM_VAL_CONST_STRING */
@@ -297,9 +297,9 @@ typedef struct vm_heap_object_s {
         vm_value_t value;       /**< generic value */
 
         struct {
-               uint32_t len;                                                                /**< length */
-                   char *ptr;                                                               /**< string pointer */
-            vm_errors_t (*vm_string)(vm_thread_t **thread, uint8_t arg, vm_string_args_s*); /**< function for manage strings */
+               uint32_t len;                                                                               /**< length */
+                   char *ptr;                                                                              /**< string pointer */
+            vm_errors_t (*vm_string)(vm_thread_t **thread, uint8_t call_type, vm_string_args_s *str_args); /**< function for manage strings */
         } string;
 
         struct {

@@ -25,153 +25,6 @@
 #include "vm.h"
 #include "libstring.h"
 
-/**
- * @fn vm_errors_t libstring_len(uint32_t result, char *str)
- * @brief Return the length of a string.
- *
- * @param result
- * @param str
- * @return
- */
-static vm_errors_t libstring_len(uint32_t result, char *str) {
-
-    return VM_ERR_OK;
-}
-
-/**
- * @fn vm_errors_t libstring_left(char *result, char *str, uint32_t pos)
- * @brief Return the left part of a string.
- *
- * @param result
- * @param str
- * @param pos
- * @return
- */
-static vm_errors_t libstring_left(char *result, char *str, uint32_t pos) {
-
-    return VM_ERR_OK;
-}
-
-/**
- * @fn vm_errors_t libstring_right(char *result, char *str, uint32_t pos)
- * @brief Return the right part of a string.
- *
- * @param result
- * @param str
- * @param pos
- * @return
- */
-static vm_errors_t libstring_right(char *result, char *str, uint32_t pos) {
-
-    return VM_ERR_OK;
-}
-
-/**
- * @fn vm_errors_t libstring_mid(char *result, char *str, uint32_t posl, uint32_t posr)
- * @brief Return the middle part of a string.
- *
- * @param result
- * @param str
- * @param posl
- * @param posr
- * @return
- */
-static vm_errors_t libstring_mid(char *result, char *str, uint32_t posl, uint32_t posr) {
-
-    return VM_ERR_OK;
-}
-
-/**
- * @fn vm_errors_t libstring_concat(char *result, char *str1, char *str2)
- * @brief Add together (concatenate) two or more strings.
- *
- * @param result
- * @param str1
- * @param str2
- * @return
- */
-static vm_errors_t libstring_concat(char *result, char *str1, char *str2) {
-
-    return VM_ERR_OK;
-
-}
-
-/**
- * @fn vm_errors_t libstring_insert(char *result, char *str1, char *str2, uint32_t pos)
- * @brief Insert one string into another string.
- *
- * @param result
- * @param str1
- * @param str2
- * @param pos
- * @return
- */
-static vm_errors_t libstring_insert(char *result, char *str1, char *str2, uint32_t pos) {
-
-    return VM_ERR_OK;
-}
-
-/**
- * @fn vm_errors_t libstring_delete(char *result, char *str, uint32_t posl, uint32_t posr)
- * @brief Delete part of a string.
- *
- * @param result
- * @param str
- * @param posl
- * @param posr
- * @return
- */
-static vm_errors_t libstring_delete(char *result, char *str, uint32_t posl, uint32_t posr) {
-
-    return VM_ERR_OK;
-}
-
-/**
- * @fn vm_errors_t libstring_replace(char *result, char *str1, char *str2, uint32_t pos)
- * @brief Replaces part of one string with another string.
- *
- * @param result
- * @param str1
- * @param str2
- * @param pos
- * @return
- */
-static vm_errors_t libstring_replace(char *result, char *str1, char *str2, uint32_t pos) {
-
-    return VM_ERR_OK;
-}
-
-/**
- * @fn vm_errors_t libstring_find(char *result, char *str1, char *str2)
- * @brief Finds the location of one string within another.
- *
- * @param result
- * @param str1
- * @param str2
- * @return
- */
-static vm_errors_t libstring_find(char *result, char *str1, char *str2) {
-
-    return VM_ERR_OK;
-}
-
-// vm cases
-static vm_errors_t libstring_edfat_new(vm_thread_t **thread, void *args) {
-    return VM_ERR_OK;
-}
-
-static vm_errors_t libstring_edfat_push(vm_thread_t **thread, void *args) {
-    return VM_ERR_OK;
-}
-
-static vm_errors_t libstring_edfat_cmp(vm_thread_t **thread, void *args) {
-    return VM_ERR_OK;
-}
-
-static vm_errors_t libstring_edfat_gc(vm_thread_t **thread, void *args) {
-    return VM_ERR_OK;
-}
-
 vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *args) {
     if (*thread == NULL)
         return VM_ERR_FAIL;
@@ -181,45 +34,52 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *arg
     switch (call_type) {
         // vm cases
         case VM_EDFAT_NEW:
-            res = libstring_edfat_new(thread, args);
             break;
         case VM_EDFAT_PUSH:
-            res = libstring_edfat_push(thread, args);
             break;
         case VM_EDFAT_CMP:
-            res = libstring_edfat_cmp(thread, args);
             break;
         case VM_EDFAT_GC:
-            res = libstring_edfat_gc(thread, args);
             break;
 
         // internal cases
-        case LIBSTRING_FN_LEN:
-
+        case LIBSTRING_FN_LEN: {// Return the length of a string.
+            STKTOP(thread).type = VM_VAL_UINT;
+            vm_heap_object_t* obj = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+            STKTOP(thread).number.uinteger = strlen((char*)obj->lib_obj.addr);
+        }
             break;
-        case LIBSTRING_FN_LEFT:
+        case LIBSTRING_FN_LEFT: {    // Return the left part of a string.
 
+        }
             break;
-        case LIBSTRING_FN_RIGHT:
+        case LIBSTRING_FN_RIGHT: {   // Return the right part of a string.
 
+        }
             break;
-        case LIBSTRING_FN_MID:
+        case LIBSTRING_FN_MID: {     // Return the middle part of a string.
 
+        }
             break;
-        case LIBSTRING_FN_CONCAT:
+        case LIBSTRING_FN_CONCAT: {  // Add together (concatenate) two or more strings.
 
+        }
             break;
-        case LIBSTRING_FN_INSERT:
+        case LIBSTRING_FN_INSERT: {  // Insert one string into another string.
 
+        }
             break;
-        case LIBSTRING_FN_DELETE:
+        case LIBSTRING_FN_DELETE: {  // Delete part of a string.
 
+        }
             break;
-        case LIBSTRING_FN_REPLACE:
+        case LIBSTRING_FN_REPLACE: { // Replaces part of one string with another string.
 
+        }
             break;
-        case LIBSTRING_FN_FIND:
+        case LIBSTRING_FN_FIND: {    // Finds the location of one string within another.
 
+        }
             break;
         default:
             res = VM_ERR_FAIL;

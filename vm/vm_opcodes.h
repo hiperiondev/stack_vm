@@ -74,14 +74,15 @@ enum VM_OPCODE {
     RETURN,            // | 0x2c |   -   |   -    | return from function without values
     RETURN_VALUE,      // | 0x2d |   -   |   -    | return from function with value
     CALL_FOREIGN,      // | 0x2e |   u8  |  @u32  | call foreign function
-    GET_LOCAL,         // | 0x2f |  u32  |   -    | get local variable
-    GET_LOCAL_FF,      // | 0x30 |   u8  |   -    | get local variable if the local index >= 0 and <= 0xff
-    SET_LOCAL,         // | 0x31 |  u32  |   -    | set local variable
-    SET_LOCAL_FF,      // | 0x32 |   u8  |   -    | set local variable if the local index >= 0 and <= 0xff
-    GET_RETVAL,        // | 0x33 |   -   |   -    | push in stack value from function return
-    TO_TYPE,           // | 0x34 |   u8  |   -    | convert value to new type
-    DROP,              // | 0x35 |   -   |   -    | drop top of stack
-    HALT,              // | 0x36 |   u8  |   -    | stop vm
+    LIB_FN,            // | 0x2f |   u8  |   u32  | call library function entry for lib_obj in stack with u8 function call type and u32 arguments
+    GET_LOCAL,         // | 0x30 |  u32  |   -    | get local variable
+    GET_LOCAL_FF,      // | 0x31 |   u8  |   -    | get local variable if the local index >= 0 and <= 0xff
+    SET_LOCAL,         // | 0x32 |  u32  |   -    | set local variable
+    SET_LOCAL_FF,      // | 0x33 |   u8  |   -    | set local variable if the local index >= 0 and <= 0xff
+    GET_RETVAL,        // | 0x34 |   -   |   -    | push in stack value from function return
+    TO_TYPE,           // | 0x35 |   u8  |   -    | convert value to new type
+    DROP,              // | 0x36 |   -   |   -    | drop top of stack
+    HALT,              // | 0x37 |   u8  |   -    | stop vm
 };
 
 #endif /* VM_OPCODES_H */

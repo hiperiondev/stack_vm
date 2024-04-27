@@ -145,8 +145,7 @@ void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_
                 if (GET_BIT((*gc_mark)[allocated_word], b)) {
                     switch (heap->data[HEAP_POS(allocated_word, b)].type) {
                         case VM_VAL_LIB_OBJ:
-                            (*thread)->state->lib[heap->data[HEAP_POS(allocated_word, b)].lib_obj.lib_idx](thread, VM_EDFAT_GC,
-                                    &(heap->data[HEAP_POS(allocated_word, b)]));
+                            (*thread)->state->lib[heap->data[HEAP_POS(allocated_word, b)].lib_obj.lib_idx](thread, VM_EDFAT_GC, HEAP_POS(allocated_word, b));
                             break;
                         case VM_VAL_ARRAY:
                             free(heap->data[HEAP_POS(allocated_word, b)].array.fields);

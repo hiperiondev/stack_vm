@@ -162,17 +162,6 @@ typedef enum VM_EXTERNAL_DATA_FUNCTION_ARG_TYPE {
 typedef struct vm_heap_object_s vm_heap_object_t;
 typedef struct vm_thread_s vm_thread_t;
 typedef struct vm_heap_s vm_heap_t;
-typedef struct vm_native_s vm_native_t;
-
-/**
- * @struct vm_native_s
- * @brief Native argument for external function
- *
- */
-typedef struct vm_native_s {
-           void *addr;                                                               /**< native reference */
-    vm_errors_t (*vm_native)(vm_thread_t **thread, uint8_t arg, vm_native_t *value); /**< native function for manage external data */
-} vm_native_t;
 
 /**
  * @struct vm_value_s
@@ -217,10 +206,10 @@ typedef vm_value_t (*vm_foreign_function_t)(vm_thread_t *thread, const vm_value_
  *
  * @param thread Thread.
  * @param call_type Type of call.
- * @param args Arbitrary arguments.
+ * @param args stack arguments qty.
  * @return Status.
  */
-typedef vm_errors_t (*lib_entry)(vm_thread_t **thread, uint8_t call_type, void *args);
+typedef vm_errors_t (*lib_entry)(vm_thread_t **thread, uint8_t call_type, uint32_t args);
 
 /**
  * @struct vm_state_s
@@ -233,11 +222,9 @@ typedef struct vm_state_s {
                 vm_heap_t *heap;                 /**< heap */
     vm_foreign_function_t *foreign_functions;    /**< pointers to foreign functions */
                  uint32_t foreign_functions_qty; /**< foreign functions quantity */
-                lib_entry *lib;
-                 uint32_t lib_qty;
+                lib_entry *lib;                  /**< library entry functions */
+                 uint32_t lib_qty;               /**< library quantity */
 } vm_state_t;
-
-extern const vm_value_t vm_value_null; // predefined null value
 
 /**
  * @struct vm_frame_s

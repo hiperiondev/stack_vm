@@ -26,8 +26,6 @@
 #include "vm_opcodes.h"
 
 // values
-const vm_value_t vm_value_null = { VM_VAL_NULL };
-
 static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_value_t b) {
     bool both_strings = (a.type == VM_VAL_CONST_STRING && b.type == VM_VAL_CONST_STRING);
 
@@ -56,7 +54,7 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
     }
 
     if (a.type == VM_VAL_LIB_OBJ) {
-        if ((*thread)->state->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, NULL) != VM_ERR_OK)
+        if ((*thread)->state->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, 2) != VM_ERR_OK)
             return false;
         return true;
     }
@@ -215,9 +213,9 @@ void vm_step(vm_thread_t **thread) {
 
             vm_value_t ref = { VM_VAL_LIB_OBJ };
             vm_heap_object_t obj = { VM_VAL_LIB_OBJ };
-            (*thread)->state->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, &obj);
             ref.heap_ref = vm_heap_save((*thread)->state->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
             vm_do_push(thread, ref);
+            (*thread)->state->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, 1);
         }
             break;
 
@@ -613,6 +611,7 @@ void vm_step(vm_thread_t **thread) {
             break;
 
         case RETURN: {
+            vm_value_t vm_value_null = { VM_VAL_NULL };
             (*thread)->ret_val = vm_value_null;
             if ((*thread)->fc > 0)
                 vm_do_pop_frame(thread);
@@ -649,6 +648,16 @@ void vm_step(vm_thread_t **thread) {
                 (*thread)->sp = prev_size;
             } else
                 err = VM_ERR_FOREINGFNUNKN;
+        }
+            break;
+
+        case LIB_FN: {
+            if ((*thread)->stack[(*thread)->sp - 1].type == VM_VAL_LIB_OBJ) {
+                uint8_t calltype = vm_read_byte(thread, &(*thread)->pc);
+                uint32_t nargs = vm_read_u32(thread, &(*thread)->pc);
+                err = (*thread)->state->lib[(*thread)->stack[(*thread)->sp - 1].lib_obj.lib_idx](thread, calltype, nargs);
+            } else
+                err = VM_ERR_BAD_VALUE;
         }
             break;
 
@@ -766,7 +775,7 @@ void vm_step(vm_thread_t **thread) {
                             value.lib_obj.addr = obj->lib_obj.addr;
                             value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
                             (*thread)->stack[(*thread)->sp - 1] = value;
-                            err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, obj);
+                            err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, 1);
                             break;
                         default:
                             break;

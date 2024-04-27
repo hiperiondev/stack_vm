@@ -22,7 +22,7 @@
 #include "vm.h"
 
 enum LIBSTRING_FN {
-    LIBSTRING_FN_LEN = 10, //
+    LIBSTRING_FN_LEN,      //
     LIBSTRING_FN_LEFT,     //
     LIBSTRING_FN_RIGHT,    //
     LIBSTRING_FN_MID,      //

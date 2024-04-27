@@ -55,17 +55,8 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
         return a.number.real == b.number.real;
     }
 
-    if (a.type == VM_VAL_NATIVE) {
-        vm_native_t value;
-        value.addr = a.native.addr;
-        value.vm_native = a.native.vm_native;
-        if (a.native.vm_native(thread, VM_EDFAT_CMP, &value) != VM_ERR_OK)
-            return false;
-        return true;
-    }
-
     if (a.type == VM_VAL_LIB_OBJ) {
-        if (a.native.vm_native(thread, VM_EDFAT_CMP, NULL) != VM_ERR_OK)
+        if ((*thread)->state->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, NULL) != VM_ERR_OK)
             return false;
         return true;
     }
@@ -701,9 +692,7 @@ void vm_step(vm_thread_t **thread) {
         case PUSH_CONST_UINT32:
         case PUSH_CONST_INT32:
         case PUSH_CONST_FLOAT:
-        case PUSH_CONST_STRING:
-
-        {
+        case PUSH_CONST_STRING:{
             uint8_t type = state->program[(*thread)->pc - 1] - PUSH_CONST_UINT8;
             uint32_t const_pc = vm_read_u32(thread, &(*thread)->pc);
 
@@ -771,18 +760,6 @@ void vm_step(vm_thread_t **thread) {
                     switch (obj->type) {
                         case VM_VAL_GENERIC:
                             (*thread)->stack[(*thread)->sp - 1] = obj->value;
-                            break;
-                        case VM_VAL_NATIVE: {
-                            value.type = VM_VAL_NATIVE;
-                            value.native.addr = obj->native.addr;
-                            value.native.vm_native = obj->native.vm_native;
-                            (*thread)->stack[(*thread)->sp - 1] = value;
-                            vm_native_t val = {
-                                    .addr = value.native.addr,
-                                    .vm_native = value.native.vm_native
-                            };
-                            err = value.native.vm_native(thread, VM_EDFAT_PUSH, &val);
-                        }
                             break;
                         case VM_VAL_LIB_OBJ:
                             value.type = VM_VAL_LIB_OBJ;

@@ -151,12 +151,6 @@ void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_
                         case VM_VAL_ARRAY:
                             free(heap->data[HEAP_POS(allocated_word, b)].array.fields);
                             break;
-                        case VM_VAL_NATIVE:
-                            vm_native_t val = { .addr = heap->data[HEAP_POS(allocated_word, b)].native.addr, .vm_native =
-                                    heap->data[HEAP_POS(allocated_word, b)].native.vm_native };
-                            heap->data[HEAP_POS(allocated_word, b)].native.vm_native(thread, VM_EDFAT_GC, &val);
-                            break;
-
                         default:
                     }
 

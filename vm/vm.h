@@ -153,10 +153,10 @@ typedef enum VM_VALUE_TYPE {
 } vm_value_type_t;
 
 typedef enum VM_EXTERNAL_DATA_FUNCTION_ARG_TYPE {
-    VM_EDFAT_NEW,  //
-    VM_EDFAT_PUSH, //
-    VM_EDFAT_CMP,  //
-    VM_EDFAT_GC,   //
+    VM_EDFAT_NEW = 0xfa,  //
+    VM_EDFAT_PUSH,        //
+    VM_EDFAT_CMP,         //
+    VM_EDFAT_GC,          //
 } vm_edf_arg_type_t;
 
 typedef struct vm_heap_object_s vm_heap_object_t;
@@ -189,11 +189,6 @@ typedef struct vm_value_s {
                float real;                                            /**< VM_VAL_FLOAT */
              uint8_t byte[4];                                         /**< for serialize */
         } number;
-
-        struct {
-                       void *addr;                                                               /**< native reference */
-                vm_errors_t (*vm_native)(vm_thread_t **thread, uint8_t arg, vm_native_t *value); /**< native function for manage external data */
-        } native;
 
         struct {
                 void *addr;   /**< library obj reference */
@@ -291,11 +286,6 @@ typedef struct vm_heap_object_s {
                uint8_t qty;     /**< quantity */
             vm_value_t *fields; /**< data */
         } array;
-
-        struct {
-                   void *addr;                                                               /**< native reference */
-            vm_errors_t (*vm_native)(vm_thread_t **thread, uint8_t arg, vm_native_t *value); /**< native function for manage external data */
-        } native;
 
         struct {
             void *addr;       /**< library obj reference */

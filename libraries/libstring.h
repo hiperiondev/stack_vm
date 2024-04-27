@@ -22,15 +22,15 @@
 #include "vm.h"
 
 enum LIBSTRING_FN {
-    LIBSTRING_FN_LEN,      //
-    LIBSTRING_FN_LEFT,     //
-    LIBSTRING_FN_RIGHT,    //
-    LIBSTRING_FN_MID,      //
-    LIBSTRING_FN_CONCAT,   //
-    LIBSTRING_FN_INSERT,   //
-    LIBSTRING_FN_DELETE,   //
-    LIBSTRING_FN_REPLACE,  //
-    LIBSTRING_FN_FIND,     //
+    LIBSTRING_FN_LEN,     //
+    LIBSTRING_FN_LEFT,    //
+    LIBSTRING_FN_RIGHT,   //
+    LIBSTRING_FN_MID,     //
+    LIBSTRING_FN_CONCAT,  //
+    LIBSTRING_FN_INSERT,  //
+    LIBSTRING_FN_DELETE,  //
+    LIBSTRING_FN_REPLACE, //
+    LIBSTRING_FN_FIND,    //
 };
 
 /**

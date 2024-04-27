@@ -52,14 +52,22 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *arg
 
     switch (call_type) {
         // vm cases
-        case VM_EDFAT_NEW:
-            break;
+        case VM_EDFAT_NEW: {
+            vm_heap_object_t *obj = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+            obj->lib_obj.addr = strdup(STKSND(thread).cstr);
+            STKDROP2(thread);
+        }
+        break;
         case VM_EDFAT_PUSH:
-            break;
-        case VM_EDFAT_CMP:
-            break;
-        case VM_EDFAT_GC:
-            break;
+        break;
+        case VM_EDFAT_CMP: {
+
+        }
+        break;
+        case VM_EDFAT_GC: {
+            free(vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref)->lib_obj.addr);
+        }
+        break;
 
         // internal cases
         case LIBSTRING_FN_LEN: {
@@ -67,41 +75,41 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *arg
             vm_heap_object_t* obj = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
             STKTOP(thread).number.uinteger = strlen((char*)obj->lib_obj.addr);
         }
-            break;
+        break;
         case LIBSTRING_FN_LEFT: {
 
         }
-            break;
+        break;
         case LIBSTRING_FN_RIGHT: {
 
         }
-            break;
+        break;
         case LIBSTRING_FN_MID: {
 
         }
-            break;
+        break;
         case LIBSTRING_FN_CONCAT: {
 
         }
-            break;
+        break;
         case LIBSTRING_FN_INSERT: {
 
         }
-            break;
+        break;
         case LIBSTRING_FN_DELETE: {
 
         }
-            break;
+        break;
         case LIBSTRING_FN_REPLACE: {
 
         }
-            break;
+        break;
         case LIBSTRING_FN_FIND: {
 
         }
-            break;
+        break;
         default:
-            res = VM_ERR_FAIL;
+        res = VM_ERR_FAIL;
     }
 
     return res;

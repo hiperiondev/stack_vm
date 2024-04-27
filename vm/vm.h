@@ -83,6 +83,14 @@
 #define OP_INDIRECT(op)  (op & 0xc0) /**< indirect argument */
 
 #define STKTOP(thread)   (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
+#define STKSND(thread)   (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
+
+/**< drop second element of stack */
+#define STKDROP2(tread)                  \
+        STKSND(thread) = STKTOP(thread); \
+        --((*thread)->sp)
+
+
 //////////////////// internals ////////////////////
 
 #define vm_new_bool(val, value) \

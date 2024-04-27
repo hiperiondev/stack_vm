@@ -214,6 +214,7 @@ void vm_step(vm_thread_t **thread) {
             vm_value_t ref = { VM_VAL_LIB_OBJ };
             vm_heap_object_t obj = { VM_VAL_LIB_OBJ };
             ref.heap_ref = vm_heap_save((*thread)->state->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
+            ref.lib_obj.lib_idx = lib_idx.number.uinteger;
             vm_do_push(thread, ref);
             (*thread)->state->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, 1);
         }

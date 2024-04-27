@@ -25,6 +25,8 @@
 #include "vm.h"
 #include "libstring.h"
 
+#define STR_OBJ(thread, stk)  vm_heap_load((*thread)->state->heap, (stk).heap_ref) /**< string object in heap */
+
 /**
  * @fn vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *args)
  * @brief Function entry for strings library
@@ -44,28 +46,29 @@
  * @param args Arguments
  * @return
  */
-vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *args) {
+
+vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t arg) {
     if (*thread == NULL)
         return VM_ERR_FAIL;
 
     vm_errors_t res = VM_ERR_OK;
-
     switch (call_type) {
         // vm cases
         case VM_EDFAT_NEW: {
-            vm_heap_object_t *obj = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+            vm_heap_object_t *obj = STR_OBJ(thread, STKTOP(thread));
             obj->lib_obj.addr = strdup(STKSND(thread).cstr);
             STKDROP2(thread);
         }
-        break;
+            break;
         case VM_EDFAT_PUSH:
-        break;
+            break;
         case VM_EDFAT_CMP: {
-
+            if (strcmp(STKTOP(thread).lib_obj.addr, STKSND(thread).lib_obj.addr) != 0)
+            res = VM_ERR_FAIL;
         }
         break;
         case VM_EDFAT_GC: {
-            free(vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref)->lib_obj.addr);
+            free(vm_heap_load((*thread)->state->heap, arg)->lib_obj.addr);
         }
         break;
 

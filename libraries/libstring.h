@@ -34,14 +34,14 @@ enum LIBSTRING_FN {
 };
 
 /**
- * @fn vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *args)
+ * @fn vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, , uint32_t arg)
  * @brief Main call
  *
  * @param thread Thread
  * @param call_type Type of call
- * @param args Arguments
+ * @param arg Argument
  * @return
  */
-vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *args);
+vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t arg);
 
 #endif /* LIBSTRING_H_ */

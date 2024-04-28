@@ -54,7 +54,7 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
     }
 
     if (a.type == VM_VAL_LIB_OBJ) {
-        if ((*thread)->state->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, 2) != VM_ERR_OK)
+        if ((*thread)->state->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, a.lib_obj.lib_idx, 2) != VM_ERR_OK)
             return false;
         return true;
     }
@@ -216,7 +216,7 @@ void vm_step(vm_thread_t **thread) {
             uint32_t heap_ref = vm_heap_save((*thread)->state->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
             ref.lib_obj.heap_ref = heap_ref;
             vm_do_push(thread, ref);
-            (*thread)->state->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, heap_ref);
+            (*thread)->state->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, lib_idx.number.uinteger, heap_ref);
         }
             break;
 
@@ -656,7 +656,7 @@ void vm_step(vm_thread_t **thread) {
             if (STKTOP(thread).type == VM_VAL_LIB_OBJ) {
                 uint8_t calltype = vm_read_byte(thread, &(*thread)->pc);
                 uint32_t arg = vm_read_u32(thread, &(*thread)->pc);
-                err = (*thread)->state->lib[STKTOP(thread).lib_obj.lib_idx](thread, calltype, arg);
+                err = (*thread)->state->lib[STKTOP(thread).lib_obj.lib_idx](thread, calltype, STKTOP(thread).lib_obj.lib_idx, arg);
             } else
                 err = VM_ERR_BAD_VALUE;
         }
@@ -778,7 +778,7 @@ void vm_step(vm_thread_t **thread) {
                             value.lib_obj.heap_ref = idx;
                             value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
                             STKTOP(thread) = value;
-                            err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, idx);
+                            err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, obj->lib_obj.lib_idx, idx);
                             break;
                         default:
                             break;

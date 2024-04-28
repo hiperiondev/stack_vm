@@ -74,19 +74,38 @@
 
 ////////////// END VM CONFIGURATION //////////////
 
-#define OP_INDIRECT(op)  (op & 0xc0)                         /**< indirect argument */
-#define STKTOP(thread)   (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
-#define STKSND(thread)   (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
-#define STKTRD(thread)   (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
+#define OP_INDIRECT(op)   (op & 0xc0)                         /**< indirect argument */
+#define STKTOP(thread)    (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
+#define STKSND(thread)    (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
+#define STKTRD(thread)    (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
+#define STKDROP(thread)   --((*thread)->sp)                   /**< drop top of stack */
+#define STKDROP2(thread)  (*thread)->sp -= 2                  /**< drop 2 top elements of stack */
+#define STKDROP3(thread)  (*thread)->sp -= 3                  /**< drop 3 top elements of stack */
 
 /**
- * @def STKDROP2
+ * @def STKDROPSND
  * @brief drop second element of stack
  *
  */
-#define STKDROP2(tread)                  \
+#define STKDROPSND(tread)                \
         STKSND(thread) = STKTOP(thread); \
         --((*thread)->sp)
+
+/**
+ * @def STKDROPST
+ * @brief drop second and third element of stack
+ *
+ */
+#define STKDROPST(tread)                 \
+        STKTRD(thread) = STKTOP(thread); \
+        (*thread)->sp -= 2
+
+/**
+ * @def NEW_HEAP_REF
+ * @brief Create a new variable pointer referenced heap object
+ *
+ */
+#define NEW_HEAP_REF(obj, ref)  vm_heap_object_t *obj = vm_heap_load((*thread)->state->heap, ref)
 
 //////////////////// internals ////////////////////
 
@@ -211,10 +230,11 @@ typedef vm_value_t (*vm_foreign_function_t)(vm_thread_t *thread, const vm_value_
  *
  * @param thread Thread.
  * @param call_type Type of call.
+ * @param lib_idx Index of called lib
  * @param args stack arguments qty.
  * @return Status.
  */
-typedef vm_errors_t (*lib_entry)(vm_thread_t **thread, uint8_t call_type, uint32_t args);
+typedef vm_errors_t (*lib_entry)(vm_thread_t **thread, uint8_t call_type, uint32_t lib_idx, uint32_t args);
 
 /**
  * @struct vm_state_s

@@ -41,9 +41,10 @@ enum LIBSTRING_FN {
  *
  * @param thread Thread
  * @param call_type Type of call
+ * @param lib_idx Index of called lib
  * @param arg Argument
  * @return
  */
-vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t arg);
+vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t lib_idx, uint32_t arg);
 
 #endif /* LIBSTRING_H_ */

@@ -957,6 +957,18 @@ void test_opcodes(void) {
     OP_TEST_END();
     END_TEST();
     ///////////////////////////////////
+    /*
+    START_TEST(LIBRARY,//
+            "\n"
+            );
+
+    TEST_EXECUTE;
+    OP_TEST_START(1, 0, 0);
+
+    OP_TEST_END();
+    END_TEST();
+    */
+    ///////////////////////////////////
     printf("---( tests: %u / fails: %u )---\n", tests_qty, tests_fails);
     printf("---[ END TEST OPCODES ]---\n");
 

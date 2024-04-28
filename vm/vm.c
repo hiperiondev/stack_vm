@@ -655,8 +655,8 @@ void vm_step(vm_thread_t **thread) {
         case LIB_FN: {
             if (STKTOP(thread).type == VM_VAL_LIB_OBJ) {
                 uint8_t calltype = vm_read_byte(thread, &(*thread)->pc);
-                uint32_t nargs = vm_read_u32(thread, &(*thread)->pc);
-                err = (*thread)->state->lib[STKTOP(thread).lib_obj.lib_idx](thread, calltype, nargs);
+                uint32_t arg = vm_read_u32(thread, &(*thread)->pc);
+                err = (*thread)->state->lib[STKTOP(thread).lib_obj.lib_idx](thread, calltype, arg);
             } else
                 err = VM_ERR_BAD_VALUE;
         }
@@ -778,7 +778,7 @@ void vm_step(vm_thread_t **thread) {
                             value.lib_obj.heap_ref = idx;
                             value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
                             STKTOP(thread) = value;
-                            err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, 1);
+                            err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, idx);
                             break;
                         default:
                             break;
@@ -857,7 +857,7 @@ void vm_step(vm_thread_t **thread) {
             break;
 
         case DROP: {
-            vm_do_pop(thread);
+            --(*thread)->sp;
         }
             break;
 

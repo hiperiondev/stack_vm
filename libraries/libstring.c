@@ -57,6 +57,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         case VM_EDFAT_NEW: {
             vm_heap_object_t *obj = STR_OBJ(thread, arg);
             obj->lib_obj.addr = strdup(STKSND(thread).cstr);
+            obj->lib_obj.identifier = STRING_LIBRARY_IDENTIFIER;
             STKDROP2(thread);
         }
             break;
@@ -66,15 +67,15 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             vm_heap_object_t *obj1 = STR_OBJ(thread, STKTOP(thread).lib_obj.heap_ref);
             vm_heap_object_t *obj2 = STR_OBJ(thread, STKSND(thread).lib_obj.heap_ref);
             if (strcmp(obj1->lib_obj.addr, obj2->lib_obj.addr) != 0)
-            res = VM_ERR_FAIL;
+                res = VM_ERR_FAIL;
         }
-        break;
+            break;
         case VM_EDFAT_GC: {
             free(vm_heap_load((*thread)->state->heap, arg)->lib_obj.addr);
         }
-        break;
+            break;
 
-        // internal cases
+            // internal cases
         case LIBSTRING_FN_LEN: {
             STKTOP(thread).type = VM_VAL_UINT;
             vm_heap_object_t* obj = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
@@ -82,35 +83,107 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         }
         break;
         case LIBSTRING_FN_LEFT: {
+            if(STKSND(thread).type != VM_VAL_UINT) {
+                return VM_ERR_BAD_VALUE;
+            }
 
+            vm_heap_object_t* obj = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+            uint32_t pos = STKSND(thread).number.uinteger;
         }
         break;
         case LIBSTRING_FN_RIGHT: {
+            if(STKSND(thread).type != VM_VAL_UINT) {
+                return VM_ERR_BAD_VALUE;
+            }
 
+            vm_heap_object_t* obj = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+            uint32_t pos = STKSND(thread).number.uinteger;
         }
         break;
         case LIBSTRING_FN_MID: {
+            if(STKSND(thread).type != VM_VAL_UINT || STKTRD(thread).type != VM_VAL_UINT) {
+                return VM_ERR_BAD_VALUE;
+            }
 
+            vm_heap_object_t* obj = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+            uint32_t posl = STKSND(thread).number.uinteger;
+            uint32_t posr = STKTRD(thread).number.uinteger;
         }
         break;
         case LIBSTRING_FN_CONCAT: {
+            bool is_lib_obj = false;
 
+            vm_heap_object_t* obj2 = vm_heap_load((*thread)->state->heap, STKSND(thread).heap_ref);
+            if(STKSND(thread).type == VM_VAL_LIB_OBJ && obj2->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) {
+                is_lib_obj = true;
+            } else if(STKSND(thread).type != VM_VAL_CONST_STRING) {
+                return VM_ERR_BAD_VALUE;
+            }
+
+            vm_heap_object_t* obj1 = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
         }
         break;
         case LIBSTRING_FN_INSERT: {
+            bool is_lib_obj = false;
 
+            if (STKTRD(thread).type != VM_VAL_UINT) {
+                return VM_ERR_BAD_VALUE;
+            }
+
+            vm_heap_object_t* obj2 = vm_heap_load((*thread)->state->heap, STKSND(thread).heap_ref);
+            if(STKSND(thread).type == VM_VAL_LIB_OBJ && obj2->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) {
+                is_lib_obj = true;
+            } else if(STKSND(thread).type != VM_VAL_CONST_STRING) {
+                return VM_ERR_BAD_VALUE;
+            }
+
+            vm_heap_object_t* obj1 = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+            uint32_t pos = STKTRD(thread).number.uinteger;
         }
         break;
         case LIBSTRING_FN_DELETE: {
+            if (STKSND(thread).type != VM_VAL_UINT || STKTRD(thread).type != VM_VAL_UINT) {
+                return VM_ERR_BAD_VALUE;
+            }
 
+            uint32_t posl = STKSND(thread).number.uinteger;
+            uint32_t posr = STKTRD(thread).number.uinteger;
         }
         break;
         case LIBSTRING_FN_REPLACE: {
+            bool is_lib_obj = false;
 
+            if (STKTRD(thread).type != VM_VAL_UINT) {
+                return VM_ERR_BAD_VALUE;
+            }
+
+            vm_heap_object_t* obj2 = vm_heap_load((*thread)->state->heap, STKSND(thread).heap_ref);
+            if(STKSND(thread).type == VM_VAL_LIB_OBJ && obj2->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) {
+                is_lib_obj = true;
+            } else if(STKSND(thread).type != VM_VAL_CONST_STRING) {
+                return VM_ERR_BAD_VALUE;
+            }
+
+            vm_heap_object_t* obj1 = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+            uint32_t pos = STKTRD(thread).number.uinteger;
         }
         break;
         case LIBSTRING_FN_FIND: {
+            bool is_lib_obj = false;
 
+            if (STKTRD(thread).type != VM_VAL_UINT) {
+                return VM_ERR_BAD_VALUE;
+            }
+
+            vm_heap_object_t* obj2 = vm_heap_load((*thread)->state->heap, STKSND(thread).heap_ref);
+            if(STKSND(thread).type == VM_VAL_LIB_OBJ && obj2->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) {
+                is_lib_obj = true;
+            } else if(STKSND(thread).type != VM_VAL_CONST_STRING) {
+                return VM_ERR_BAD_VALUE;
+            }
+
+            vm_heap_object_t* obj1 = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+            uint32_t pos = STKTRD(thread).number.uinteger;
         }
         break;
         default:

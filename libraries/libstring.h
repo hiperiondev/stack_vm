@@ -21,6 +21,8 @@
 
 #include "vm.h"
 
+#define STRING_LIBRARY_IDENTIFIER 0x000000ff
+
 enum LIBSTRING_FN {
     LIBSTRING_FN_LEN,     //
     LIBSTRING_FN_LEFT,    //

@@ -77,6 +77,7 @@
 #define OP_INDIRECT(op)  (op & 0xc0)                         /**< indirect argument */
 #define STKTOP(thread)   (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
 #define STKSND(thread)   (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
+#define STKTRD(thread)   (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
 
 /**
  * @def STKDROP2
@@ -279,8 +280,9 @@ typedef struct vm_heap_object_s {
         } array;
 
         struct {
-            void *addr;       /**< library obj reference */
-            uint32_t lib_idx; /**< library entry function */
+            uint32_t identifier; /**< mark for identify library (only for use on library, not VM) */
+                void *addr;      /**< library obj reference */
+            uint32_t lib_idx;    /**< library entry function */
         } lib_obj;
     };
 } vm_heap_object_t;

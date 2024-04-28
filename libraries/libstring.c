@@ -20,29 +20,26 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
-#include <wchar.h>
 #include <stdio.h>
 
 #include "vm.h"
 #include "libstring.h"
-
-#define STR_OBJ(thread, heap_ref)  vm_heap_load((*thread)->state->heap, heap_ref) /**< string object in heap */
 
 /**
  * @def STR_NEW_OBJ
  * @brief create string object in heap
  *
  */
-#define STR_NEW_OBJ(thread, lidx)                                                                                                              \
-            {                                                                                                                                  \
-            vm_value_t _zzz_new_value;                                                                                                         \
-            _zzz_new_value.type = VM_VAL_LIB_OBJ;                                                                                              \
-            vm_heap_object_t _zzz_new_obj;                                                                                                     \
-            _zzz_new_obj.type = VM_VAL_LIB_OBJ;                                                                                                \
-            _zzz_new_obj.lib_obj.identifier = STRING_LIBRARY_IDENTIFIER;                                                                       \
-            _zzz_new_obj.lib_obj.lib_idx = lidx;                                                                                               \
-            _zzz_new_value.lib_obj.heap_ref = vm_heap_save((*thread)->state->heap, _zzz_new_obj, &((*thread)->frames[(*thread)->fc].gc_mark)); \
-            vm_do_push(thread, _zzz_new_value);                                                                                                \
+#define STR_NEW_OBJ(thread, lidx)                                                                                                                  \
+            {                                                                                                                                      \
+                vm_value_t _zzz_new_value;                                                                                                         \
+                _zzz_new_value.type = VM_VAL_LIB_OBJ;                                                                                              \
+                vm_heap_object_t _zzz_new_obj;                                                                                                     \
+                _zzz_new_obj.type = VM_VAL_LIB_OBJ;                                                                                                \
+                _zzz_new_obj.lib_obj.identifier = STRING_LIBRARY_IDENTIFIER;                                                                       \
+                _zzz_new_obj.lib_obj.lib_idx = lidx;                                                                                               \
+                _zzz_new_value.lib_obj.heap_ref = vm_heap_save((*thread)->state->heap, _zzz_new_obj, &((*thread)->frames[(*thread)->fc].gc_mark)); \
+                vm_do_push(thread, _zzz_new_value);                                                                                                \
             }
 
 ///// utils /////

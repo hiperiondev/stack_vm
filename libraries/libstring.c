@@ -45,26 +45,6 @@
             vm_do_push(thread, _zzz_new_value);                                                                                                \
             }
 
-/**
- * @fn vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, void *args)
- * @brief Function entry for strings library
- * This functions support functions:
- *       LEN: Return the length of a string.
- *      LEFT: Return the left part of a string.
- *     RIGHT: Return the right part of a string.
- *       MID: Return the middle part of a string.
- *    CONCAT: Add together (concatenate) two or more strings.
- *    INSERT: Insert one string into another string.
- *    DELETE: Delete part of a string.
- *   REPLACE: Replaces part of one string with another string.
- *      FIND: Finds the location of one string within another.
- *
- * @param thread Thread
- * @param call_type Call type
- * @param args Arguments
- * @return
- */
-
 ///// utils /////
 static uint32_t strpos(char *str, char *substr, uint32_t offset) {
     if (str == NULL || substr == NULL)

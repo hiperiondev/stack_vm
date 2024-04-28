@@ -153,7 +153,7 @@ void vm_do_pop_frame(vm_thread_t **thread) {
 #endif
 
     (*thread)->sp = (*thread)->fp;
-    vm_frame_t frame = (*thread)->frames[-- (*thread)->fc];
+    vm_frame_t frame = (*thread)->frames[--(*thread)->fc];
     (*thread)->sp -= frame.locals;
     (*thread)->fp = frame.fp;
     (*thread)->pc = frame.pc;
@@ -180,7 +180,7 @@ void vm_step(vm_thread_t **thread) {
     bool indirect = false;
     int8_t ind_inc = 0;
 
-    switch(OP_INDIRECT(state->program[(*thread)->pc])) {
+    switch (OP_INDIRECT(state->program[(*thread)->pc])) {
         case 0x40:
             indirect = true;
             break;
@@ -220,139 +220,232 @@ void vm_step(vm_thread_t **thread) {
         }
             break;
 
-        case PUSH_TRUE: {
-            vm_new_bool(val, true);
-            vm_do_push(thread, val);
-        }
-            break;
+        case PUSH_HEAP_OBJECT: {
+            vm_value_t value = STKTOP(thread);
 
-        case PUSH_FALSE: {
-            vm_new_bool(val, false);
-            vm_do_push(thread, val);
-        }
-            break;
-
-        case PUSH_INT: {
-            (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-            (*thread)->stack[(*thread)->sp].number.integer = vm_read_i32(thread, &(*thread)->pc);
-            (*thread)->sp += 1;
-        }
-            break;
-
-        case PUSH_UINT: {
-            (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
-            (*thread)->stack[(*thread)->sp].number.integer = vm_read_u32(thread, &(*thread)->pc);
-            (*thread)->sp += 1;
-        }
-            break;
-
-        case PUSH_0: {
-            (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-            (*thread)->stack[(*thread)->sp].number.integer = 0;
-            (*thread)->sp += 1;
-        }
-            break;
-
-        case PUSH_1: {
-            (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-            (*thread)->stack[(*thread)->sp].number.integer = 1;
-            (*thread)->sp += 1;
-        }
-            break;
-
-        case PUSH_CHAR: {
-            (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-            (*thread)->stack[(*thread)->sp].number.integer = (*thread)->state->program[(*thread)->pc];
-            (*thread)->sp += 1;
-            (*thread)->pc += 1;
-        }
-            break;
-
-        case PUSH_FLOAT: {
-            vm_new_float(val, vm_read_f32(thread, &(*thread)->pc));
-            vm_do_push(thread, val);
-        }
-            break;
-
-        case NEW_ARRAY: {
-            uint16_t n_fields = vm_read_u16(thread, &(*thread)->pc);
-            if (n_fields > 0) {
-                vm_heap_object_t arr;
-                arr.array.fields = malloc(sizeof(vm_value_t) * n_fields);
-                memcpy(arr.array.fields, &(*thread)->stack[(*thread)->sp - n_fields], sizeof(vm_value_t) * n_fields);
-                arr.type = VM_VAL_ARRAY;
-                arr.array.qty = n_fields;
-                uint32_t heap_id = vm_heap_save((*thread)->state->heap, arr, &((*thread)->frames[(*thread)->fc].gc_mark));
-
-                (*thread)->sp -= n_fields;
-
-                if (heap_id == 0xffffffff)
-                    err = VM_ERR_OUTOFMEMORY;
+            if (value.type != VM_VAL_UINT)
+                err = VM_ERR_BAD_VALUE;
+            else {
+                uint32_t idx = value.number.uinteger;
+                vm_heap_object_t *obj = vm_heap_load((*thread)->state->heap, idx);
+                if (obj->type == VM_VAL_NULL)
+                    err = VM_ERR_HEAPNOTEXIST;
                 else {
-                    vm_value_t val;
-                    val.type = VM_VAL_ARRAY;
-                    val.heap_ref = heap_id;
-
-                    vm_do_push(thread, val);
+                    switch (obj->type) {
+                        case VM_VAL_GENERIC:
+                            STKTOP(thread)= obj->value;
+                            break;
+                            case VM_VAL_LIB_OBJ:
+                            value.type = VM_VAL_LIB_OBJ;
+                            value.lib_obj.heap_ref = idx;
+                            value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
+                            STKTOP(thread) = value;
+                            err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, obj->lib_obj.lib_idx, idx);
+                            break;
+                            default:
+                            break;
+                        }
+                    }
                 }
-            } else
-                err = VM_ERR_BAD_VALUE;
-        }
+            }
             break;
 
-        case PUSH_ARRAY: {
-            vm_value_t heap_id = vm_do_pop(thread);
-            if (heap_id.type == VM_VAL_UINT) {
-                uint32_t ref = heap_id.number.uinteger;
-                heap_id.heap_ref = ref;
-                heap_id.type = VM_VAL_ARRAY;
-
-                vm_do_push(thread, heap_id);
-            } else
-                err = VM_ERR_BAD_VALUE;
+            case PUSH_TRUE: {
+                vm_new_bool(val, true);
+                vm_do_push(thread, val);
+            }
             break;
-        }
 
-        case GET_ARRAY_VALUE: {
-            uint16_t index = vm_read_u16(thread, &(*thread)->pc);
-            vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+            case PUSH_FALSE: {
+                vm_new_bool(val, false);
+                vm_do_push(thread, val);
+            }
+            break;
 
-            if (indirect) {
-                uint32_t _indx = index + (*thread)->indirect;
-                if (_indx > 0xffff) {
-                    err = VM_ERR_OVERFLOW;
+            case PUSH_INT: {
+                (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
+                (*thread)->stack[(*thread)->sp].number.integer = vm_read_i32(thread, &(*thread)->pc);
+                (*thread)->sp += 1;
+            }
+            break;
+
+            case PUSH_UINT: {
+                (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
+                (*thread)->stack[(*thread)->sp].number.integer = vm_read_u32(thread, &(*thread)->pc);
+                (*thread)->sp += 1;
+            }
+            break;
+
+            case PUSH_0: {
+                (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
+                (*thread)->stack[(*thread)->sp].number.integer = 0;
+                (*thread)->sp += 1;
+            }
+            break;
+
+            case PUSH_1: {
+                (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
+                (*thread)->stack[(*thread)->sp].number.integer = 1;
+                (*thread)->sp += 1;
+            }
+            break;
+
+            case PUSH_CHAR: {
+                (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
+                (*thread)->stack[(*thread)->sp].number.integer = (*thread)->state->program[(*thread)->pc];
+                (*thread)->sp += 1;
+                (*thread)->pc += 1;
+            }
+            break;
+
+            case PUSH_FLOAT: {
+                vm_new_float(val, vm_read_f32(thread, &(*thread)->pc));
+                vm_do_push(thread, val);
+            }
+            break;
+
+            case PUSH_CONST_UINT8:
+            case PUSH_CONST_INT8:
+            case PUSH_CONST_UINT16:
+            case PUSH_CONST_INT16:
+            case PUSH_CONST_UINT32:
+            case PUSH_CONST_INT32:
+            case PUSH_CONST_FLOAT:
+            case PUSH_CONST_STRING: {
+                uint8_t type = state->program[(*thread)->pc - 1] - PUSH_CONST_UINT8;
+                uint32_t const_pc = vm_read_u32(thread, &(*thread)->pc);
+
+                if (indirect) {
+                    if ((*thread)->indirect > 0xffffffff - const_pc) {
+                        err = VM_ERR_OVERFLOW;
+                        break;
+                    }
+                    const_pc += (*thread)->indirect;
+                }
+
+                uint32_t pc_tmp = (*thread)->pc;
+
+                switch (type) {
+                    case 0: // uint8
+                    (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
+                    (*thread)->stack[(*thread)->sp].number.uinteger = vm_read_byte(thread, &const_pc);
                     break;
+                    case 1:// int8
+                    (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
+                    (*thread)->stack[(*thread)->sp].number.integer = (int8_t) vm_read_byte(thread, &const_pc);
+                    break;
+                    case 2:// uint16
+                    (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
+                    (*thread)->stack[(*thread)->sp].number.uinteger = vm_read_u16(thread, &const_pc);
+                    break;
+                    case 3:// int16
+                    (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
+                    (*thread)->stack[(*thread)->sp].number.integer = vm_read_i16(thread, &const_pc);
+                    break;
+                    case 4:// uint32
+                    (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
+                    (*thread)->stack[(*thread)->sp].number.uinteger = vm_read_u32(thread, &const_pc);
+                    break;
+                    case 5:// int32
+                    (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
+                    (*thread)->stack[(*thread)->sp].number.integer = vm_read_i32(thread, &const_pc);
+                    break;
+                    case 6:// float
+                    (*thread)->stack[(*thread)->sp].type = VM_VAL_FLOAT;
+                    (*thread)->stack[(*thread)->sp].number.real = vm_read_f32(thread, &const_pc);
+                    break;
+                    case 7:// string
+                    (*thread)->stack[(*thread)->sp].type = VM_VAL_CONST_STRING;
+                    (*thread)->stack[(*thread)->sp].cstr = (char*) ((*thread)->state->program + const_pc);
+                    break;
+                    default:
+                    err = VM_ERR_CONST_BADTYPE;
                 }
-                index = _indx;
+
+                (*thread)->sp += 1;
+                (*thread)->pc = pc_tmp;
+            }
+            break;
+
+            case NEW_ARRAY: {
+                uint16_t n_fields = vm_read_u16(thread, &(*thread)->pc);
+                if (n_fields > 0) {
+                    vm_heap_object_t arr;
+                    arr.array.fields = malloc(sizeof(vm_value_t) * n_fields);
+                    memcpy(arr.array.fields, &(*thread)->stack[(*thread)->sp - n_fields], sizeof(vm_value_t) * n_fields);
+                    arr.type = VM_VAL_ARRAY;
+                    arr.array.qty = n_fields;
+                    uint32_t heap_id = vm_heap_save((*thread)->state->heap, arr, &((*thread)->frames[(*thread)->fc].gc_mark));
+
+                    (*thread)->sp -= n_fields;
+
+                    if (heap_id == 0xffffffff)
+                    err = VM_ERR_OUTOFMEMORY;
+                    else {
+                        vm_value_t val;
+                        val.type = VM_VAL_ARRAY;
+                        val.heap_ref = heap_id;
+
+                        vm_do_push(thread, val);
+                    }
+                } else
+                err = VM_ERR_BAD_VALUE;
+            }
+            break;
+
+            case PUSH_ARRAY: {
+                vm_value_t heap_id = vm_do_pop(thread);
+                if (heap_id.type == VM_VAL_UINT) {
+                    uint32_t ref = heap_id.number.uinteger;
+                    heap_id.heap_ref = ref;
+                    heap_id.type = VM_VAL_ARRAY;
+
+                    vm_do_push(thread, heap_id);
+                } else
+                err = VM_ERR_BAD_VALUE;
+                break;
             }
 
-            if (arr->type == VM_VAL_ARRAY && index >= 0 && index < arr->array.qty)
+            case GET_ARRAY_VALUE: {
+                uint16_t index = vm_read_u16(thread, &(*thread)->pc);
+                vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, STKTOP(thread).heap_ref);
+
+                if (indirect) {
+                    uint32_t _indx = index + (*thread)->indirect;
+                    if (_indx > 0xffff) {
+                        err = VM_ERR_OVERFLOW;
+                        break;
+                    }
+                    index = _indx;
+                }
+
+                if (arr->type == VM_VAL_ARRAY && index >= 0 && index < arr->array.qty)
                 vm_do_push(thread, arr->array.fields[index]);
-            else
+                else
                 err = VM_ERR_BAD_VALUE;
-        }
+            }
             break;
 
-        case SET_ARRAY_VALUE: {
-            uint16_t index = vm_read_u16(thread, &(*thread)->pc);
+            case SET_ARRAY_VALUE: {
+                uint16_t index = vm_read_u16(thread, &(*thread)->pc);
 
-            if (indirect) {
-                uint32_t _indx = index + (*thread)->indirect;
-                if (_indx > 0xffff) {
-                    err = VM_ERR_OVERFLOW;
-                    break;
+                if (indirect) {
+                    uint32_t _indx = index + (*thread)->indirect;
+                    if (_indx > 0xffff) {
+                        err = VM_ERR_OVERFLOW;
+                        break;
+                    }
+                    index = _indx;
                 }
-                index = _indx;
-            }
 
-            vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, (*thread)->stack[(*thread)->sp - 2].heap_ref);
-            vm_value_t val = vm_do_pop(thread);
+                vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, (*thread)->stack[(*thread)->sp - 2].heap_ref);
+                vm_value_t val = vm_do_pop(thread);
 
-            if (arr->type == VM_VAL_ARRAY && index >= 0 && index < arr->array.qty)
+                if (arr->type == VM_VAL_ARRAY && index >= 0 && index < arr->array.qty)
                 arr->array.fields[index] = val;
-            else
+                else
                 err = VM_ERR_BAD_VALUE;
-        }
+            }
             break;
 
 #define BIN_OP(OP, operator)                                                          \
@@ -411,388 +504,295 @@ void vm_step(vm_thread_t **thread) {
         }                                                                         \
     } break;
 
-        BIN_OP(ADD, +)
-        BIN_OP(SUB, -)
-        BIN_OP(MUL, *)
+            BIN_OP(ADD, +)
+            BIN_OP(SUB, -)
+            BIN_OP(MUL, *)
 
-        case DIV: {
-            vm_value_t *a = &(*thread)->stack[(*thread)->sp - 2];
-            vm_value_t b = (*thread)->stack[--(*thread)->sp];
-            if (b.number.uinteger == 0)
+            case DIV: {
+                vm_value_t *a = &(*thread)->stack[(*thread)->sp - 2];
+                vm_value_t b = (*thread)->stack[--(*thread)->sp];
+                if (b.number.uinteger == 0)
                 err = VM_ERR_DIVBYZERO;
-            else {
-                if (a->type == VM_VAL_INT && b.type == VM_VAL_INT) {
-                    a->number.integer = a->number.integer / b.number.integer;
-                } else if (a->type == VM_VAL_UINT && b.type == VM_VAL_UINT) {
-                    a->number.uinteger = a->number.uinteger / b.number.uinteger;
-                } else if (a->type == VM_VAL_FLOAT && b.type == VM_VAL_FLOAT) {
-                    a->number.real = a->number.real / b.number.real;
-                } else if (a->type == VM_VAL_INT) {
-                    a->type = VM_VAL_FLOAT;
-                    a->number.real = (float) a->number.integer / b.number.real;
-                } else {
-                    a->number.real = a->number.real / (float) b.number.integer;
+                else {
+                    if (a->type == VM_VAL_INT && b.type == VM_VAL_INT) {
+                        a->number.integer = a->number.integer / b.number.integer;
+                    } else if (a->type == VM_VAL_UINT && b.type == VM_VAL_UINT) {
+                        a->number.uinteger = a->number.uinteger / b.number.uinteger;
+                    } else if (a->type == VM_VAL_FLOAT && b.type == VM_VAL_FLOAT) {
+                        a->number.real = a->number.real / b.number.real;
+                    } else if (a->type == VM_VAL_INT) {
+                        a->type = VM_VAL_FLOAT;
+                        a->number.real = (float) a->number.integer / b.number.real;
+                    } else {
+                        a->number.real = a->number.real / (float) b.number.integer;
+                    }
                 }
             }
-        }
             break;
 
-        BIN_OP_INT_UINT(MOD, %)
-        BIN_OP_INT_UINT(OR, |)
-        BIN_OP_INT_UINT(AND, &)
+            BIN_OP_INT_UINT(MOD, %)
+            BIN_OP_INT_UINT(OR, |)
+            BIN_OP_INT_UINT(AND, &)
 
-        REL_OP(LT, <)
-        REL_OP(GT, >)
-        REL_OP(GTE, >=)
-        REL_OP(LTE, <=)
+            REL_OP(LT, <)
+            REL_OP(GT, >)
+            REL_OP(GTE, >=)
+            REL_OP(LTE, <=)
 
 #undef BIN_OP
 #undef BIN_OP_INT_UINT
 #undef REL_OP
 
-        case INC: {
-            switch (STKTOP(thread).type) {
-                case VM_VAL_UINT:
+            case INC: {
+                switch (STKTOP(thread).type) {
+                    case VM_VAL_UINT:
                     ++STKTOP(thread).number.uinteger;
                     break;
-                case VM_VAL_INT:
+                    case VM_VAL_INT:
                     ++STKTOP(thread).number.integer;
                     break;
-                case VM_VAL_FLOAT:
+                    case VM_VAL_FLOAT:
                     ++STKTOP(thread).number.real;
                     break;
+                }
             }
-        }
             break;
 
-        case DEC: {
-            switch (STKTOP(thread).type) {
-                case VM_VAL_UINT:
+            case DEC: {
+                switch (STKTOP(thread).type) {
+                    case VM_VAL_UINT:
                     --STKTOP(thread).number.uinteger;
                     break;
-                case VM_VAL_INT:
+                    case VM_VAL_INT:
                     --STKTOP(thread).number.integer;
                     break;
-                case VM_VAL_FLOAT:
+                    case VM_VAL_FLOAT:
                     --STKTOP(thread).number.real;
                     break;
+                }
             }
-        }
             break;
 
-        case EQU: {
-            vm_value_t b = vm_do_pop(thread);
-            vm_value_t a = vm_do_pop(thread);
+            case EQU: {
+                vm_value_t b = vm_do_pop(thread);
+                vm_value_t a = vm_do_pop(thread);
 
-            vm_new_bool(val, vm_are_values_equal(thread, a, b));
-            vm_do_push(thread, val);
-        }
-            break;
-
-        case NOT: {
-            vm_value_t a = vm_do_pop(thread);
-            if (a.type != VM_VAL_BOOL) {
-                err = VM_ERR_BAD_VALUE;
-            } else {
-                vm_new_bool(val, !a.number.boolean);
+                vm_new_bool(val, vm_are_values_equal(thread, a, b));
                 vm_do_push(thread, val);
             }
-        }
             break;
 
-        case SET_GLOBAL: {
-            uint32_t var_idx = vm_read_u32(thread, &(*thread)->pc);
-
-            if(var_idx == 0xffffffff) { // is indirect register
-                vm_value_t value = vm_do_pop(thread);
-                if(value.type != VM_VAL_UINT) {
+            case NOT: {
+                vm_value_t a = vm_do_pop(thread);
+                if (a.type != VM_VAL_BOOL) {
                     err = VM_ERR_BAD_VALUE;
+                } else {
+                    vm_new_bool(val, !a.number.boolean);
+                    vm_do_push(thread, val);
+                }
+            }
+            break;
+
+            case SET_GLOBAL: {
+                uint32_t var_idx = vm_read_u32(thread, &(*thread)->pc);
+
+                if(var_idx == 0xffffffff) { // is indirect register
+                    vm_value_t value = vm_do_pop(thread);
+                    if(value.type != VM_VAL_UINT) {
+                        err = VM_ERR_BAD_VALUE;
+                        break;
+                    }
+
+                    (*thread)->indirect = value.number.uinteger;
                     break;
                 }
 
-                (*thread)->indirect = value.number.uinteger;
-                break;
-            }
-
-            vm_heap_object_t value = {
+                vm_heap_object_t value = {
                     .type = VM_VAL_GENERIC,
                     .value = vm_do_pop(thread)
-            };
-
-            if (var_idx > VM_MAX_GLOBAL_VARS)
-                err = VM_ERR_OUTOFRANGE;
-            else {
-                if (var_idx < (*thread)->global_vars_qty) {
-                    if (!vm_heap_set((*thread)->state->heap, value, (*thread)->global_vars[var_idx]))
-                        err = VM_ERR_OUTOFRANGE;
-                } else {
-                    uint32_t heap_id = vm_heap_save((*thread)->state->heap, value, &((*thread)->frames[0].gc_mark));
-                    (*thread)->global_vars[var_idx] = heap_id;
-                    ++(*thread)->global_vars_qty;
-                }
-            }
-        }
-            break;
-
-        case GET_GLOBAL: {
-            uint32_t var_idx = vm_read_u32(thread, &(*thread)->pc);
-
-            if (var_idx == 0xffffffff) { // is indirect register
-                vm_value_t value = {
-                        .type = VM_VAL_UINT,
-                        .number.uinteger = (*thread)->indirect
                 };
 
-                vm_do_push(thread, value);
-                break;
-            }
-
-            if (var_idx > (*thread)->global_vars_qty - 1)
+                if (var_idx > VM_MAX_GLOBAL_VARS)
                 err = VM_ERR_OUTOFRANGE;
-            else {
-                vm_heap_object_t *value = vm_heap_load((*thread)->state->heap, (*thread)->global_vars[var_idx]);
-                vm_do_push(thread, value->value);
-            }
-        }
-            break;
-
-        case GOTO: {
-            uint32_t new_pc = vm_read_u32(thread, &(*thread)->pc);
-
-            if (indirect) {
-                if ((*thread)->indirect > 0xffffffff - new_pc) {
-                    err = VM_ERR_OVERFLOW;
-                    break;
-                }
-                new_pc += (*thread)->indirect;
-            }
-
-            (*thread)->pc = new_pc;
-        }
-            break;
-
-        case GOTOZ: {
-            uint32_t new_pc = vm_read_u32(thread, &(*thread)->pc);
-
-            if (indirect) {
-                if ((*thread)->indirect > 0xffffffff - new_pc) {
-                    err = VM_ERR_OVERFLOW;
-                    break;
-                }
-                new_pc += (*thread)->indirect;
-            }
-
-            vm_value_t val = vm_do_pop(thread);
-
-            if (val.type != VM_VAL_BOOL && val.type != VM_VAL_UINT && val.type != VM_VAL_UINT && val.type != VM_VAL_FLOAT) {
-                err = VM_ERR_BAD_VALUE;
-            } else if (val.number.boolean == false || val.number.integer == 0 || val.number.uinteger == 0 || val.number.real == 0)
-                (*thread)->pc = new_pc;
-        }
-            break;
-
-        case CALL: {
-            uint8_t nargs = (*thread)->state->program[(*thread)->pc++];
-            uint32_t pc_idx = vm_read_u32(thread, &(*thread)->pc);
-
-            if (indirect) {
-                if ((*thread)->indirect > 0xffffffff - pc_idx) {
-                    err = VM_ERR_OVERFLOW;
-                    break;
-                }
-                pc_idx += (*thread)->indirect;
-            }
-
-            if ((*thread)->fc < VM_THREAD_MAX_CALL_DEPTH) {
-                vm_do_push_frame(thread, nargs);
-                (*thread)->pc = pc_idx;
-            } else
-                err = VM_ERR_TOOMANYTHREADS;
-        }
-            break;
-
-        case RETURN: {
-            vm_value_t vm_value_null = { VM_VAL_NULL };
-            (*thread)->ret_val = vm_value_null;
-            if ((*thread)->fc > 0)
-                vm_do_pop_frame(thread);
-            else
-                err = VM_ERR_INVALIDRETURN;
-        }
-            break;
-
-        case RETURN_VALUE: {
-            (*thread)->ret_val = vm_do_pop(thread);
-            if ((*thread)->fc > 0)
-                vm_do_pop_frame(thread);
-            else
-                err = VM_ERR_INVALIDRETURN;
-        }
-            break;
-
-        case CALL_FOREIGN: {
-            uint8_t nargs = (*thread)->state->program[(*thread)->pc++];
-            uint32_t f_idx = vm_read_u32(thread, &(*thread)->pc);
-
-            if (indirect) {
-                if ((*thread)->indirect > 0xffffffff - f_idx) {
-                    err = VM_ERR_OVERFLOW;
-                    break;
-                }
-                f_idx += (*thread)->indirect;
-            }
-
-            if (f_idx <= (*thread)->state->foreign_functions_qty - 1) {
-                uint32_t prev_size = (*thread)->sp - nargs;
-
-                (*thread)->ret_val = (*thread)->state->foreign_functions[f_idx]((*thread), &(*thread)->stack[prev_size], nargs);
-                (*thread)->sp = prev_size;
-            } else
-                err = VM_ERR_FOREINGFNUNKN;
-        }
-            break;
-
-        case LIB_FN: {
-            if (STKTOP(thread).type == VM_VAL_LIB_OBJ) {
-                uint8_t calltype = vm_read_byte(thread, &(*thread)->pc);
-                uint32_t arg = vm_read_u32(thread, &(*thread)->pc);
-                err = (*thread)->state->lib[STKTOP(thread).lib_obj.lib_idx](thread, calltype, STKTOP(thread).lib_obj.lib_idx, arg);
-            } else
-                err = VM_ERR_BAD_VALUE;
-        }
-            break;
-
-        case GET_LOCAL_FF:
-        case GET_LOCAL: {
-            uint32_t local_idx =
-                    (state->program[(*thread)->pc - 1] == GET_LOCAL) ?
-                            vm_read_u32(thread, &(*thread)->pc) :
-                            (*thread)->state->program[(*thread)->pc++];
-
-            if (local_idx < (*thread)->frames[(*thread)->fc - 1].locals)
-                vm_do_push(thread, (*thread)->stack[(*thread)->fp - (local_idx + 1)]);
-            else
-                err = VM_ERR_LOCALNOTEXIST;
-        }
-            break;
-
-        case SET_LOCAL_FF:
-        case SET_LOCAL: {
-            uint32_t local_idx = (state->program[(*thread)->pc - 1] == SET_LOCAL) ?
-                            vm_read_u32(thread, &(*thread)->pc) :
-                            (*thread)->state->program[(*thread)->pc++];
-
-            if (local_idx < (*thread)->frames[(*thread)->fc - 1].locals) {
-                vm_value_t val = vm_do_pop(thread);
-                (*thread)->stack[(*thread)->fp - (local_idx + 1)] = val;
-            } else
-                err = VM_ERR_LOCALNOTEXIST;
-        }
-            break;
-
-        case GET_RETVAL: {
-            vm_do_push(thread, (*thread)->ret_val);
-        }
-            break;
-
-        case PUSH_CONST_UINT8:
-        case PUSH_CONST_INT8:
-        case PUSH_CONST_UINT16:
-        case PUSH_CONST_INT16:
-        case PUSH_CONST_UINT32:
-        case PUSH_CONST_INT32:
-        case PUSH_CONST_FLOAT:
-        case PUSH_CONST_STRING:{
-            uint8_t type = state->program[(*thread)->pc - 1] - PUSH_CONST_UINT8;
-            uint32_t const_pc = vm_read_u32(thread, &(*thread)->pc);
-
-            if (indirect) {
-                if ((*thread)->indirect > 0xffffffff - const_pc) {
-                    err = VM_ERR_OVERFLOW;
-                    break;
-                }
-                const_pc += (*thread)->indirect;
-            }
-
-            uint32_t pc_tmp = (*thread)->pc;
-
-            switch (type) {
-                case 0: // uint8
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
-                    (*thread)->stack[(*thread)->sp].number.uinteger = vm_read_byte(thread, &const_pc);
-                    break;
-                case 1: // int8
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-                    (*thread)->stack[(*thread)->sp].number.integer = (int8_t) vm_read_byte(thread, &const_pc);
-                    break;
-                case 2: // uint16
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
-                    (*thread)->stack[(*thread)->sp].number.uinteger = vm_read_u16(thread, &const_pc);
-                    break;
-                case 3: // int16
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-                    (*thread)->stack[(*thread)->sp].number.integer = vm_read_i16(thread, &const_pc);
-                    break;
-                case 4: // uint32
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
-                    (*thread)->stack[(*thread)->sp].number.uinteger = vm_read_u32(thread, &const_pc);
-                    break;
-                case 5: // int32
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-                    (*thread)->stack[(*thread)->sp].number.integer = vm_read_i32(thread, &const_pc);
-                    break;
-                case 6: // float
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_FLOAT;
-                    (*thread)->stack[(*thread)->sp].number.real = vm_read_f32(thread, &const_pc);
-                    break;
-                case 7: // string
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_CONST_STRING;
-                    (*thread)->stack[(*thread)->sp].cstr = (char*) ((*thread)->state->program + const_pc);
-                    break;
-                default:
-                    err = VM_ERR_CONST_BADTYPE;
-            }
-
-            (*thread)->sp += 1;
-            (*thread)->pc = pc_tmp;
-        }
-            break;
-
-        case PUSH_HEAP_OBJECT: {
-            vm_value_t value = STKTOP(thread);
-
-            if (value.type != VM_VAL_UINT)
-                err = VM_ERR_BAD_VALUE;
-            else {
-                uint32_t idx = value.number.uinteger;
-                vm_heap_object_t *obj = vm_heap_load((*thread)->state->heap, idx);
-                if (obj->type == VM_VAL_NULL)
-                    err = VM_ERR_HEAPNOTEXIST;
                 else {
-                    switch (obj->type) {
-                        case VM_VAL_GENERIC:
-                            STKTOP(thread) = obj->value;
-                            break;
-                        case VM_VAL_LIB_OBJ:
-                            value.type = VM_VAL_LIB_OBJ;
-                            value.lib_obj.heap_ref = idx;
-                            value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
-                            STKTOP(thread) = value;
-                            err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, obj->lib_obj.lib_idx, idx);
-                            break;
-                        default:
-                            break;
+                    if (var_idx < (*thread)->global_vars_qty) {
+                        if (!vm_heap_set((*thread)->state->heap, value, (*thread)->global_vars[var_idx]))
+                        err = VM_ERR_OUTOFRANGE;
+                    } else {
+                        uint32_t heap_id = vm_heap_save((*thread)->state->heap, value, &((*thread)->frames[0].gc_mark));
+                        (*thread)->global_vars[var_idx] = heap_id;
+                        ++(*thread)->global_vars_qty;
                     }
                 }
             }
-        }
             break;
 
-        case TO_TYPE: {
+            case GET_GLOBAL: {
+                uint32_t var_idx = vm_read_u32(thread, &(*thread)->pc);
+
+                if (var_idx == 0xffffffff) { // is indirect register
+                    vm_value_t value = {
+                        .type = VM_VAL_UINT,
+                        .number.uinteger = (*thread)->indirect
+                    };
+
+                    vm_do_push(thread, value);
+                    break;
+                }
+
+                if (var_idx > (*thread)->global_vars_qty - 1)
+                err = VM_ERR_OUTOFRANGE;
+                else {
+                    vm_heap_object_t *value = vm_heap_load((*thread)->state->heap, (*thread)->global_vars[var_idx]);
+                    vm_do_push(thread, value->value);
+                }
+            }
+            break;
+
+            case GOTO: {
+                uint32_t new_pc = vm_read_u32(thread, &(*thread)->pc);
+
+                if (indirect) {
+                    if ((*thread)->indirect > 0xffffffff - new_pc) {
+                        err = VM_ERR_OVERFLOW;
+                        break;
+                    }
+                    new_pc += (*thread)->indirect;
+                }
+
+                (*thread)->pc = new_pc;
+            }
+            break;
+
+            case GOTOZ: {
+                uint32_t new_pc = vm_read_u32(thread, &(*thread)->pc);
+
+                if (indirect) {
+                    if ((*thread)->indirect > 0xffffffff - new_pc) {
+                        err = VM_ERR_OVERFLOW;
+                        break;
+                    }
+                    new_pc += (*thread)->indirect;
+                }
+
+                vm_value_t val = vm_do_pop(thread);
+
+                if (val.type != VM_VAL_BOOL && val.type != VM_VAL_UINT && val.type != VM_VAL_UINT && val.type != VM_VAL_FLOAT) {
+                    err = VM_ERR_BAD_VALUE;
+                } else if (val.number.boolean == false || val.number.integer == 0 || val.number.uinteger == 0 || val.number.real == 0)
+                (*thread)->pc = new_pc;
+            }
+            break;
+
+            case CALL: {
+                uint8_t nargs = (*thread)->state->program[(*thread)->pc++];
+                uint32_t pc_idx = vm_read_u32(thread, &(*thread)->pc);
+
+                if (indirect) {
+                    if ((*thread)->indirect > 0xffffffff - pc_idx) {
+                        err = VM_ERR_OVERFLOW;
+                        break;
+                    }
+                    pc_idx += (*thread)->indirect;
+                }
+
+                if ((*thread)->fc < VM_THREAD_MAX_CALL_DEPTH) {
+                    vm_do_push_frame(thread, nargs);
+                    (*thread)->pc = pc_idx;
+                } else
+                err = VM_ERR_TOOMANYTHREADS;
+            }
+            break;
+
+            case RETURN: {
+                vm_value_t vm_value_null = {VM_VAL_NULL};
+                (*thread)->ret_val = vm_value_null;
+                if ((*thread)->fc > 0)
+                vm_do_pop_frame(thread);
+                else
+                err = VM_ERR_INVALIDRETURN;
+            }
+            break;
+
+            case RETURN_VALUE: {
+                (*thread)->ret_val = vm_do_pop(thread);
+                if ((*thread)->fc > 0)
+                vm_do_pop_frame(thread);
+                else
+                err = VM_ERR_INVALIDRETURN;
+            }
+            break;
+
+            case CALL_FOREIGN: {
+                uint8_t nargs = (*thread)->state->program[(*thread)->pc++];
+                uint32_t f_idx = vm_read_u32(thread, &(*thread)->pc);
+
+                if (indirect) {
+                    if ((*thread)->indirect > 0xffffffff - f_idx) {
+                        err = VM_ERR_OVERFLOW;
+                        break;
+                    }
+                    f_idx += (*thread)->indirect;
+                }
+
+                if (f_idx <= (*thread)->state->foreign_functions_qty - 1) {
+                    uint32_t prev_size = (*thread)->sp - nargs;
+
+                    (*thread)->ret_val = (*thread)->state->foreign_functions[f_idx]((*thread), &(*thread)->stack[prev_size], nargs);
+                    (*thread)->sp = prev_size;
+                } else
+                err = VM_ERR_FOREINGFNUNKN;
+            }
+            break;
+
+            case LIB_FN: {
+                if (STKTOP(thread).type == VM_VAL_LIB_OBJ) {
+                    uint8_t calltype = vm_read_byte(thread, &(*thread)->pc);
+                    uint32_t arg = vm_read_u32(thread, &(*thread)->pc);
+                    err = (*thread)->state->lib[STKTOP(thread).lib_obj.lib_idx](thread, calltype, STKTOP(thread).lib_obj.lib_idx, arg);
+                } else
+                err = VM_ERR_BAD_VALUE;
+            }
+            break;
+
+            case GET_LOCAL_FF:
+            case GET_LOCAL: {
+                uint32_t local_idx =
+                (state->program[(*thread)->pc - 1] == GET_LOCAL) ?
+                vm_read_u32(thread, &(*thread)->pc) :
+                (*thread)->state->program[(*thread)->pc++];
+
+                if (local_idx < (*thread)->frames[(*thread)->fc - 1].locals)
+                vm_do_push(thread, (*thread)->stack[(*thread)->fp - (local_idx + 1)]);
+                else
+                err = VM_ERR_LOCALNOTEXIST;
+            }
+            break;
+
+            case SET_LOCAL_FF:
+            case SET_LOCAL: {
+                uint32_t local_idx = (state->program[(*thread)->pc - 1] == SET_LOCAL) ?
+                vm_read_u32(thread, &(*thread)->pc) :
+                (*thread)->state->program[(*thread)->pc++];
+
+                if (local_idx < (*thread)->frames[(*thread)->fc - 1].locals) {
+                    vm_value_t val = vm_do_pop(thread);
+                    (*thread)->stack[(*thread)->fp - (local_idx + 1)] = val;
+                } else
+                err = VM_ERR_LOCALNOTEXIST;
+            }
+            break;
+
+            case GET_RETVAL: {
+                vm_do_push(thread, (*thread)->ret_val);
+            }
+            break;
+
+            case TO_TYPE: {
 #ifdef VM_ENABLE_TOTYPES
-            uint8_t type = (*thread)->state->program[(*thread)->pc++];
-            if (STKTOP(thread).type == type)
-                    return;
+                uint8_t type = (*thread)->state->program[(*thread)->pc++];
+                if (STKTOP(thread).type == type)
+                return;
 
                 vm_value_t tmp;
                 switch (type) {
@@ -803,16 +803,16 @@ void vm_step(vm_thread_t **thread) {
                                 STKTOP(thread).number.uinteger = tmp.number.uinteger;
                                 STKTOP(thread).type = VM_VAL_UINT;
                             }
-                                break;
+                            break;
                             case VM_VAL_FLOAT: {
                                 tmp.number.uinteger = STKTOP(thread).number.real;
                                 STKTOP(thread).number.uinteger = tmp.number.uinteger;
                                 STKTOP(thread).type = VM_VAL_UINT;
                             }
-                                break;
+                            break;
                         }
                     }
-                        break;
+                    break;
                     case VM_VAL_INT: {
                         switch (STKTOP(thread).type) {
                             case VM_VAL_UINT: {
@@ -820,16 +820,16 @@ void vm_step(vm_thread_t **thread) {
                                 STKTOP(thread).number.integer = tmp.number.integer;
                                 STKTOP(thread).type = VM_VAL_INT;
                             }
-                                break;
+                            break;
                             case VM_VAL_FLOAT: {
                                 tmp.number.integer = STKTOP(thread).number.real;
                                 STKTOP(thread).number.integer = tmp.number.integer;
                                 STKTOP(thread).type = VM_VAL_INT;
                             }
-                                break;
+                            break;
                         }
                     }
-                        break;
+                    break;
                     case VM_VAL_FLOAT: {
                         switch (STKTOP(thread).type) {
                             case VM_VAL_UINT: {
@@ -837,42 +837,41 @@ void vm_step(vm_thread_t **thread) {
                                 STKTOP(thread).number.real = tmp.number.real;
                                 STKTOP(thread).type = VM_VAL_FLOAT;
                             }
-                                break;
+                            break;
                             case VM_VAL_INT: {
 
                                 tmp.number.real = STKTOP(thread).number.integer;
                                 STKTOP(thread).number.real = tmp.number.real;
                                 STKTOP(thread).type = VM_VAL_FLOAT;
                             }
-                                break;
+                            break;
                         }
                     }
-                        break;
+                    break;
                 }
 #else
                 ++(*thread)->pc;
 #endif
-        }
+            }
 
             break;
 
-        case DROP: {
-            --(*thread)->sp;
-        }
+            case DROP: {
+                --(*thread)->sp;
+            }
             break;
 
-        case HALT: {
-            (*thread)->exit_value = (*thread)->state->program[(*thread)->pc];
-            err = VM_ERR_HALT;
-        }
+            case HALT: {
+                (*thread)->exit_value = (*thread)->state->program[(*thread)->pc];
+                err = VM_ERR_HALT;
+            }
             break;
 
-        default:
+            default:
             err = VM_ERR_UNKNOWNOP;
-    }
+        }
 
     (*thread)->indirect += ind_inc;
-
 
     (*thread)->status = err;
     (*thread)->halted = (err != VM_ERR_OK);
@@ -908,6 +907,13 @@ void vm_create_thread(vm_thread_t **thread) {
 void vm_destroy_thread(vm_thread_t **thread) {
     vm_heap_gc_collect((*thread)->state->heap, &((*thread)->frames[0].gc_mark), true, thread);
     vm_heap_destroy((*thread)->state->heap, thread);
+    if ((*thread)->state->lib_qty > 0)
+        free((*thread)->state->lib);
+    if ((*thread)->state->foreign_functions_qty > 0)
+        free((*thread)->state->foreign_functions);
+    for (uint32_t n = 0; n < VM_THREAD_STACK_SIZE; ++n)
+        if ((*thread)->stack[n].type == VM_VAL_CONST_STRING)
+            free((*thread)->stack[n].cstr);
     free((*thread)->state);
     free((*thread));
 }

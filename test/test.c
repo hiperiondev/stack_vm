@@ -28,6 +28,7 @@
 #include "vm_assembler.h"
 #include "vm_assembler_utils.h"
 #include "vm_disassembler.h"
+#include "libstring.h"
 
 //Regular text
 #define BLK "\e[0;30m"
@@ -753,8 +754,6 @@ void test_opcodes(void) {
     assert(vm_value.number.integer == 55);
     OP_TEST_END();
 
-    free(thread->state->foreign_functions);
-
     END_TEST();
     ///////////////////////////////////
     START_TEST(SET_LOCAL / GET_LOCAL,
@@ -877,23 +876,21 @@ void test_opcodes(void) {
 
     END_TEST();
 
-#ifdef VM_ENABLE_STRINGS
-    START_TEST(PUSH_CONST_STRING,
-                "PUSH_CONST_STRING _data\n"
-                "HALT 0\n"
-                ".label _data\n"
-                ".string \"string test\"\n"
-                );
+    /*
+    START_TEST(PUSH_CONST_STRING, "PUSH_CONST_STRING _data\n"
+            "HALT 0\n"
+            ".label _data\n"
+            ".string \"string test\"\n");
 
-        TEST_EXECUTE;
-        OP_TEST_START(6, 1, 0);
-        vm_value = vm_do_pop(&thread);
-        assert(vm_value.type == VM_VAL_CONST_STRING);
-        assert(strcmp(vm_value.cstr, "string test") == 0);
-        OP_TEST_END();
+    TEST_EXECUTE;
+    OP_TEST_START(6, 1, 0);
+    vm_value = vm_do_pop(&thread);
+    assert(vm_value.type == VM_VAL_CONST_STRING);
+    assert(strcmp(vm_value.cstr, "string test") == 0);
+    OP_TEST_END();
 
-        END_TEST();
-#endif
+    END_TEST();
+    */
     ///////////////////////////////////
 #ifdef VM_ENABLE_TOTYPES
     START_TEST(TO_TYPE,
@@ -957,17 +954,30 @@ void test_opcodes(void) {
     OP_TEST_END();
     END_TEST();
     ///////////////////////////////////
-    /*
-    START_TEST(LIBRARY,//
-            "\n"
+    START_TEST(STRING LIBRARY: TO_CSTR,//
+            "PUSH_CONST_STRING str\n"
+            "PUSH_UINT 0\n"
+            "PUSH_NEW_HEAP_OBJ\n"
+            "SET_GLOBAL 0\n"
+            "PUSH_INT 99\n"
+            "GET_GLOBAL 0\n"
+            "LIB_FN 9 0\n"
+            "HALT 99\n"
+            ".label str\n"
+            ".string \"string test\"\n"
             );
 
-    TEST_EXECUTE;
-    OP_TEST_START(1, 0, 0);
+    thread->state->lib = calloc(1, sizeof(lib_entry));
+    thread->state->lib[0] = lib_entry_strings;
+    ++thread->state->lib_qty;
 
+    TEST_EXECUTE;
+    OP_TEST_START(33, 2, 0);
+    vm_value = vm_do_pop(&thread);
+    assert(vm_value.type == VM_VAL_CONST_STRING);
+    assert(strcmp(vm_value.cstr, "string test") == 0);
     OP_TEST_END();
     END_TEST();
-    */
     ///////////////////////////////////
     printf("---( tests: %u / fails: %u )---\n", tests_qty, tests_fails);
     printf("---[ END TEST OPCODES ]---\n");

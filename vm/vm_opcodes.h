@@ -29,7 +29,7 @@ enum VM_OPCODE {
 //|   opcode              |  id  |  arg1 |  arg2  | description
     PUSH_NULL,         // | 0x00 |   -   |   -    | push NULL value
     PUSH_NULL_N,       // | 0x01 |   u8  |   -    | pushes N null values onto the stack
-    PUSH_NEW_HEAP_OBJ, // | 0x02 |  u32  |   -    | create a new heap object referenced to library
+    PUSH_NEW_HEAP_OBJ, // | 0x02 |   -   |   -    | create a new heap object referenced to library
     PUSH_TRUE,         // | 0x03 |   -   |   -    | push boolean true value
     PUSH_FALSE,        // | 0x04 |   -   |   -    | push boolean false value
     PUSH_INT,          // | 0x05 |  i32  |   -    | push integer value

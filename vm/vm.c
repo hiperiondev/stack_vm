@@ -356,7 +356,8 @@ void vm_step(vm_thread_t **thread) {
                     break;
                     case 7:// string
                     (*thread)->stack[(*thread)->sp].type = VM_VAL_CONST_STRING;
-                    (*thread)->stack[(*thread)->sp].cstr = (char*) ((*thread)->state->program + const_pc);
+                    (*thread)->stack[(*thread)->sp].cstr.addr = (char*) ((*thread)->state->program + const_pc);
+                    (*thread)->stack[(*thread)->sp].cstr.is_program = true;
                     break;
                     default:
                     err = VM_ERR_CONST_BADTYPE;
@@ -366,6 +367,19 @@ void vm_step(vm_thread_t **thread) {
                 (*thread)->pc = pc_tmp;
             }
             break;
+
+            case PUSH_ARRAY: {
+                vm_value_t heap_id = vm_do_pop(thread);
+                if (heap_id.type == VM_VAL_UINT) {
+                    uint32_t ref = heap_id.number.uinteger;
+                    heap_id.heap_ref = ref;
+                    heap_id.type = VM_VAL_ARRAY;
+
+                    vm_do_push(thread, heap_id);
+                } else
+                err = VM_ERR_BAD_VALUE;
+                break;
+            }
 
             case NEW_ARRAY: {
                 uint16_t n_fields = vm_read_u16(thread, &(*thread)->pc);
@@ -392,19 +406,6 @@ void vm_step(vm_thread_t **thread) {
                 err = VM_ERR_BAD_VALUE;
             }
             break;
-
-            case PUSH_ARRAY: {
-                vm_value_t heap_id = vm_do_pop(thread);
-                if (heap_id.type == VM_VAL_UINT) {
-                    uint32_t ref = heap_id.number.uinteger;
-                    heap_id.heap_ref = ref;
-                    heap_id.type = VM_VAL_ARRAY;
-
-                    vm_do_push(thread, heap_id);
-                } else
-                err = VM_ERR_BAD_VALUE;
-                break;
-            }
 
             case GET_ARRAY_VALUE: {
                 uint16_t index = vm_read_u16(thread, &(*thread)->pc);
@@ -912,8 +913,8 @@ void vm_destroy_thread(vm_thread_t **thread) {
     if ((*thread)->state->foreign_functions_qty > 0)
         free((*thread)->state->foreign_functions);
     for (uint32_t n = 0; n < VM_THREAD_STACK_SIZE; ++n)
-        if ((*thread)->stack[n].type == VM_VAL_CONST_STRING)
-            free((*thread)->stack[n].cstr);
+        if ((*thread)->stack[n].type == VM_VAL_CONST_STRING && (*thread)->stack[n].cstr.is_program == false)
+            free((*thread)->stack[n].cstr.addr);
     free((*thread)->state);
     free((*thread));
 }

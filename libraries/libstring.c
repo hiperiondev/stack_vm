@@ -74,7 +74,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         // vm cases
         case VM_EDFAT_NEW: {
             NEW_HEAP_REF(obj, arg);
-            obj->lib_obj.addr = strdup(STKSND(thread).cstr);
+            obj->lib_obj.addr = strdup(STKSND(thread).cstr.addr);
             obj->lib_obj.identifier = STRING_LIBRARY_IDENTIFIER;
             obj->lib_obj.lib_idx = lib_idx;
             STKDROPSND(thread);
@@ -158,8 +158,8 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
                 new_obj->lib_obj.addr = calloc(strlen(obj->lib_obj.addr) + strlen(obj2->lib_obj.addr) + 1, sizeof(char));
                 sprintf(new_obj->lib_obj.addr, "%s%s", (char*)obj->lib_obj.addr, (char*)obj2->lib_obj.addr);
             } else {
-                new_obj->lib_obj.addr = calloc(strlen(obj->lib_obj.addr) + strlen(STKSND(thread).cstr) + 1, sizeof(char));
-                sprintf(new_obj->lib_obj.addr, "%s%s", (char*)obj->lib_obj.addr, STKSND(thread).cstr);
+                new_obj->lib_obj.addr = calloc(strlen(obj->lib_obj.addr) + strlen(STKSND(thread).cstr.addr) + 1, sizeof(char));
+                sprintf(new_obj->lib_obj.addr, "%s%s", (char*)obj->lib_obj.addr, STKSND(thread).cstr.addr);
             }
             STKDROPSND(tread);
         }
@@ -205,7 +205,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             if(is_lib_obj) {
                 strins((char**)&(new_obj->lib_obj.addr), obj2->lib_obj.addr, pos);
             } else {
-                strins((char**)&(new_obj->lib_obj.addr), STKTRD(thread).cstr, pos);
+                strins((char**)&(new_obj->lib_obj.addr), STKTRD(thread).cstr.addr, pos);
             }
             STKDROPSTF(thread);
         }
@@ -234,8 +234,8 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
                 uint32_t len = strlen(obj2->lib_obj.addr) < strlen(obj1->lib_obj.addr) - pos ? strlen(obj2->lib_obj.addr) : strlen(obj1->lib_obj.addr) - pos;
                 memcpy(new_obj->lib_obj.addr + pos, obj2->lib_obj.addr, len);
             } else {
-                uint32_t len = strlen(obj2->lib_obj.addr) < strlen(STKTRD(thread).cstr) - pos ? strlen(STKTRD(thread).cstr) : strlen(STKTRD(thread).cstr) - pos;
-                memcpy(new_obj->lib_obj.addr + pos, STKTRD(thread).cstr, len);
+                uint32_t len = strlen(obj2->lib_obj.addr) < strlen(STKTRD(thread).cstr.addr) - pos ? strlen(STKTRD(thread).cstr.addr) : strlen(STKTRD(thread).cstr.addr) - pos;
+                memcpy(new_obj->lib_obj.addr + pos, STKTRD(thread).cstr.addr, len);
             }
             STKDROPSTF(thread);
         }
@@ -261,7 +261,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             if(is_lib_obj) {
                 find_pos.number.uinteger = strpos(obj1->lib_obj.addr, obj2->lib_obj.addr, offset);
             } else {
-                find_pos.number.uinteger = strpos(obj1->lib_obj.addr, STKSND(thread).cstr, offset);
+                find_pos.number.uinteger = strpos(obj1->lib_obj.addr, STKSND(thread).cstr.addr, offset);
             }
 
             STKDROP3(thread);
@@ -271,7 +271,8 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         case LIBSTRING_FN_TO_CSTR: {
             NEW_HEAP_REF(obj, STKTOP(thread).lib_obj.heap_ref);
             STKTOP(thread).type = VM_VAL_CONST_STRING;
-            STKTOP(thread).cstr = strdup(obj->lib_obj.addr);
+            STKTOP(thread).cstr.addr = strdup(obj->lib_obj.addr);
+            STKTOP(thread).cstr.is_program = false;
         }
         break;
         default:

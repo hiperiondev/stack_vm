@@ -156,9 +156,9 @@ void test_opcodes(void) {
         printf("      -- pc: %u, sp: %u, fp: %u\n", thread->pc, thread->sp, thread->fp)
 
 #define END_TEST()                  \
+        vm_destroy_thread(&thread); \
         free(str);                  \
         free(hex);                  \
-        vm_destroy_thread(&thread); \
         printf("\n")
 
 #define OP_TEST_START(_pc, _sp, _fp)  \
@@ -876,8 +876,8 @@ void test_opcodes(void) {
 
     END_TEST();
 
-    /*
-    START_TEST(PUSH_CONST_STRING, "PUSH_CONST_STRING _data\n"
+    START_TEST(PUSH_CONST_STRING,
+            "PUSH_CONST_STRING _data\n"
             "HALT 0\n"
             ".label _data\n"
             ".string \"string test\"\n");
@@ -886,11 +886,10 @@ void test_opcodes(void) {
     OP_TEST_START(6, 1, 0);
     vm_value = vm_do_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
-    assert(strcmp(vm_value.cstr, "string test") == 0);
+    assert(strcmp(vm_value.cstr.addr, "string test") == 0);
     OP_TEST_END();
 
     END_TEST();
-    */
     ///////////////////////////////////
 #ifdef VM_ENABLE_TOTYPES
     START_TEST(TO_TYPE,
@@ -975,7 +974,7 @@ void test_opcodes(void) {
     OP_TEST_START(33, 2, 0);
     vm_value = vm_do_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
-    assert(strcmp(vm_value.cstr, "string test") == 0);
+    assert(strcmp(vm_value.cstr.addr, "string test") == 0);
     OP_TEST_END();
     END_TEST();
     ///////////////////////////////////

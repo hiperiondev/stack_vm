@@ -218,7 +218,10 @@ typedef struct vm_value_s {
             uint32_t lib_idx;  /**< library entry function */
         } lib_obj;
 
-              char *cstr;    /**< VM_VAL_CONST_STRING */
+        struct {
+              bool is_program; /**< is a reference to constant in program area */
+              char *addr;      /**< VM_VAL_CONST_STRING */
+        } cstr;
           uint32_t heap_ref; /**< VM_VAL_HEAP_REF */
     };
 } vm_value_t;

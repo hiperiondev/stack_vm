@@ -33,6 +33,7 @@ enum LIBSTRING_FN {
     LIBSTRING_FN_DELETE,  //
     LIBSTRING_FN_REPLACE, //
     LIBSTRING_FN_FIND,    //
+    LIBSTRING_FN_TO_CSTR, //
 };
 
 /**
@@ -48,6 +49,7 @@ enum LIBSTRING_FN {
  *    DELETE: Delete part of a string.
  *   REPLACE: Replaces part of one string with another string.
  *      FIND: Finds the location of one string within another.
+ *   TO_CSTR: Make a copy as constant string
  *
  * @param thread Thread
  * @param call_type Call type

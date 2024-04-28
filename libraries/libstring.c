@@ -268,6 +268,12 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             vm_do_push(thread, find_pos);
         }
         break;
+        case LIBSTRING_FN_TO_CSTR: {
+            NEW_HEAP_REF(obj, STKTOP(thread).lib_obj.heap_ref);
+            STKTOP(thread).type = VM_VAL_CONST_STRING;
+            STKTOP(thread).cstr = strdup(obj->lib_obj.addr);
+        }
+        break;
         default:
         res = VM_ERR_FAIL;
     }

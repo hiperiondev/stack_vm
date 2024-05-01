@@ -1132,6 +1132,32 @@ void test_opcodes(void) {
     assert(strcmp(vm_value.cstr.addr, "str other stringing test") == 0);
     OP_TEST_END();
     END_TEST();
+    START_TEST(STRING LIBRARY: REPLACE,   //
+            "PUSH_UINT 3\n"              // pos for REPLACE
+            "PUSH_CONST_STRING str2\n"   // push constant string
+            "PUSH_CONST_STRING str\n"    // push constant string
+            "PUSH_UINT 0\n"              // LIBSTRING
+            "PUSH_NEW_HEAP_OBJ\n"        // push new LIBSTRING object
+            "LIB_FN 7 0\n"               // LIBSTRING_FN_REPLACE
+            "LIB_FN 9 0\n"               // LIBSTRING_FN_TO_CSTR
+            "HALT 99\n"                  // end
+            ".label str\n"               //
+            ".string \"string test\"\n"  //
+            ".label str2\n"              //
+            ".string \" other string\"\n"//
+            );
+
+    thread->state->lib = calloc(1, sizeof(lib_entry));
+    thread->state->lib[0] = lib_entry_strings;
+    ++thread->state->lib_qty;
+
+    TEST_EXECUTE;
+    OP_TEST_START(34, 1, 0);
+    vm_value = vm_do_pop(&thread);
+    assert(vm_value.type == VM_VAL_CONST_STRING);
+    assert(strcmp(vm_value.cstr.addr, "str other s") == 0);
+    OP_TEST_END();
+    END_TEST();
     ///////////////////////////////////
     printf("---( tests: %u / fails: %u )---\n", tests_qty, tests_fails);
     printf("---[ END TEST OPCODES ]---\n");

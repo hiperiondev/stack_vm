@@ -207,30 +207,32 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         }
         break;
         case LIBSTRING_FN_INSERT: {
-            bool is_lib_obj = false;
-
             if (STKTRD(thread).type != VM_VAL_UINT) {
                 return VM_ERR_BAD_VALUE;
             }
 
-            NEW_HEAP_REF(obj2, STKSND(thread).lib_obj.heap_ref);
-            if(STKSND(thread).type == VM_VAL_LIB_OBJ && obj2->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) { // WARNING: could be false
-                is_lib_obj = true;
-            } else if(STKSND(thread).type != VM_VAL_CONST_STRING) {
+            if(STKTRD(thread).type != VM_VAL_UINT ||
+                    (STKSND(thread).type != VM_VAL_LIB_OBJ && (HEAP_OBJ(STKSND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) ||
+                    STKSND(thread).type != VM_VAL_CONST_STRING) {
                 return VM_ERR_BAD_VALUE;
             }
 
-            NEW_HEAP_REF(obj1, STKTOP(thread).lib_obj.heap_ref);
+            NEW_HEAP_REF(obj, STKTOP(thread).lib_obj.heap_ref);
+            char *string1 = (char*)obj->lib_obj.addr;
+            char *string2 = NULL;
+            if(STKSND(thread).type == VM_VAL_LIB_OBJ) {
+                NEW_HEAP_REF(obj2, STKSND(thread).lib_obj.heap_ref);
+                string2 = (char*)obj2->lib_obj.addr;
+            } else {
+                string2 = STKSND(thread).cstr.addr;
+            }
+
             uint32_t pos = STKTRD(thread).number.uinteger;
             STR_NEW_OBJ(thread, lib_idx);
             NEW_HEAP_REF(new_obj, STKTOP(thread).lib_obj.heap_ref);
-            new_obj->lib_obj.addr = strdup(obj1->lib_obj.addr);
+            new_obj->lib_obj.addr = strdup(string1);
 
-            if(is_lib_obj) {
-                libstring_strins((char**)&(new_obj->lib_obj.addr), obj2->lib_obj.addr, pos);
-            } else {
-                libstring_strins((char**)&(new_obj->lib_obj.addr), STKTRD(thread).cstr.addr, pos);
-            }
+            libstring_strins((char**)&(new_obj->lib_obj.addr), string2, pos);
             STKDROPSTF(thread);
         }
         break;

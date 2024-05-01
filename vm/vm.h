@@ -78,7 +78,7 @@
 #define STKTOP(thread)    (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
 #define STKSND(thread)    (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
 #define STKTRD(thread)    (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
-#define STKFTH(thread)    (*thread)->stack[(*thread)->sp - 3] /**< fourth element of stack */
+#define STKFTH(thread)    (*thread)->stack[(*thread)->sp - 4] /**< fourth element of stack */
 
 // WARNING: free cstr
 #define STKDROP(thread)   --((*thread)->sp)                   /**< drop top of stack */
@@ -112,6 +112,14 @@
 #define STKDROPSTF(thread)               \
         STKFTH(thread) = STKTOP(thread); \
         (*thread)->sp -= 3
+
+/**
+ * @def HEAP_OBJ
+ * @brief Heap object by reference
+ *
+ */
+#define HEAP_OBJ(ref)  vm_heap_load((*thread)->state->heap, ref)
+
 /**
  * @def NEW_HEAP_REF
  * @brief Create a new variable pointer referenced heap object

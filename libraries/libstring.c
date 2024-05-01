@@ -248,29 +248,24 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         break;
 
         case LIBSTRING_FN_FIND: {
-            bool is_lib_obj = false;
-
-            if (STKTRD(thread).type != VM_VAL_UINT) {
+            if(STKTRD(thread).type != VM_VAL_UINT ||
+                    (STKSND(thread).type != VM_VAL_LIB_OBJ && (HEAP_OBJ(STKSND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) ||
+                    STKSND(thread).type != VM_VAL_CONST_STRING) {
                 return VM_ERR_BAD_VALUE;
             }
 
-            NEW_HEAP_REF(obj2, STKSND(thread).lib_obj.heap_ref);
-            if(STKSND(thread).type == VM_VAL_LIB_OBJ && obj2->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) { // WARNING: could be false
-                is_lib_obj = true;
-            } else if(STKSND(thread).type != VM_VAL_CONST_STRING) {
-                return VM_ERR_BAD_VALUE;
+            NEW_HEAP_REF(obj, STKTOP(thread).lib_obj.heap_ref);
+            char *string1 = (char*)obj->lib_obj.addr;
+            char *string2 = NULL;
+            if(STKSND(thread).type == VM_VAL_LIB_OBJ) {
+                NEW_HEAP_REF(obj2, STKSND(thread).lib_obj.heap_ref);
+                string2 = (char*)obj2->lib_obj.addr;
+            } else {
+                string2 = STKSND(thread).cstr.addr;
             }
-
-            NEW_HEAP_REF(obj1, STKTOP(thread).lib_obj.heap_ref);
-            uint32_t offset = STKTRD(thread).number.uinteger;
 
             vm_value_t find_pos = {VM_VAL_UINT};
-            if(is_lib_obj) {
-                find_pos.number.uinteger = libstring_strpos(obj1->lib_obj.addr, obj2->lib_obj.addr, offset);
-            } else {
-                find_pos.number.uinteger = libstring_strpos(obj1->lib_obj.addr, STKSND(thread).cstr.addr, offset);
-            }
-
+            find_pos.number.uinteger = libstring_strpos(string1, string2, STKTRD(thread).number.uinteger);
             STKDROP3(thread);
             vm_do_push(thread, find_pos);
         }

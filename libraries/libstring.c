@@ -139,14 +139,22 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             }
 
             NEW_HEAP_REF(obj, STKTOP(thread).lib_obj.heap_ref);
-            uint32_t posl = STKSND(thread).number.uinteger;
-            uint32_t posr = STKTRD(thread).number.uinteger;
+            uint32_t posr = STKSND(thread).number.uinteger;
+            uint32_t posl = STKTRD(thread).number.uinteger;
             STKDROP3(thread);
+            char *string = (char*)obj->lib_obj.addr;
+
+            if(posl > posr || posl > strlen(string) - 1 || posl > strlen(string) - 1) {
+                posl = 0;
+                posr = strlen(string) - 1;
+            }
+
             STR_NEW_OBJ(thread, lib_idx);
             NEW_HEAP_REF(new_obj, STKTOP(thread).lib_obj.heap_ref);
 
-            new_obj->lib_obj.addr = calloc(posr - posl + 1, sizeof(char));
-            memcpy(new_obj->lib_obj.addr, obj->lib_obj.addr, posr - posl);
+            uint32_t size = posr - posl + 1;
+            new_obj->lib_obj.addr = calloc(size + 1, sizeof(char));
+            memcpy(new_obj->lib_obj.addr, string + posl, size);
         }
         break;
         case LIBSTRING_FN_CONCAT: {

@@ -158,29 +158,28 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         }
         break;
         case LIBSTRING_FN_CONCAT: {
-            bool is_lib_obj = false;
-
-            NEW_HEAP_REF(obj2, STKSND(thread).lib_obj.heap_ref);
-            if(STKSND(thread).type == VM_VAL_LIB_OBJ && obj2->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) { // WARNING: could be false
-                is_lib_obj = true;
-            } else if(STKSND(thread).type != VM_VAL_CONST_STRING) {
+            if((STKSND(thread).type != VM_VAL_LIB_OBJ && (vm_heap_load((*thread)->state->heap, STKSND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER)
+                    || STKSND(thread).type != VM_VAL_CONST_STRING) {
                 return VM_ERR_BAD_VALUE;
             }
 
+            char *string2 = NULL;
             NEW_HEAP_REF(obj, STKTOP(thread).lib_obj.heap_ref);
+            if(STKSND(thread).type == VM_VAL_LIB_OBJ) {
+                NEW_HEAP_REF(obj2, STKSND(thread).lib_obj.heap_ref);
+                string2 = (char*)obj2->lib_obj.addr;
+            } else {
+                string2 = STKSND(thread).cstr.addr;
+            }
+
+            char *string1 = (char*)obj->lib_obj.addr;
             STR_NEW_OBJ(thread, lib_idx);
-            STKDROPST(thread);
             NEW_HEAP_REF(new_obj, STKTOP(thread).lib_obj.heap_ref);
 
-            if(is_lib_obj) {
-                vm_heap_object_t *obj2 = vm_heap_load((*thread)->state->heap, STKSND(thread).heap_ref);
-                new_obj->lib_obj.addr = calloc(strlen(obj->lib_obj.addr) + strlen(obj2->lib_obj.addr) + 1, sizeof(char));
-                sprintf(new_obj->lib_obj.addr, "%s%s", (char*)obj->lib_obj.addr, (char*)obj2->lib_obj.addr);
-            } else {
-                new_obj->lib_obj.addr = calloc(strlen(obj->lib_obj.addr) + strlen(STKSND(thread).cstr.addr) + 1, sizeof(char));
-                sprintf(new_obj->lib_obj.addr, "%s%s", (char*)obj->lib_obj.addr, STKSND(thread).cstr.addr);
-            }
-            STKDROPSND(tread);
+            uint32_t size = strlen(string1) + strlen(string2);
+            new_obj->lib_obj.addr = calloc(size + 1, sizeof(char));
+            sprintf(new_obj->lib_obj.addr, "%s%s", string1, string2);
+            STKDROPST(thread);
         }
         break;
         case LIBSTRING_FN_DELETE: {

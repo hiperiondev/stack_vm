@@ -115,7 +115,7 @@
  * @brief Create a new variable pointer referenced heap object
  *
  */
-#define NEW_HEAP_REF(obj, ref)  vm_heap_object_t *obj = vm_heap_load((*thread)->state->heap, ref)
+#define NEW_HEAP_REF(_refobj_, ref)  vm_heap_object_t *_refobj_ = vm_heap_load((*thread)->state->heap, ref)
 
 //////////////////// internals ////////////////////
 

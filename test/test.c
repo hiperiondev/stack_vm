@@ -977,6 +977,81 @@ void test_opcodes(void) {
     assert(strcmp(vm_value.cstr.addr, "string test") == 0);
     OP_TEST_END();
     END_TEST();
+
+    START_TEST(STRING LIBRARY: LEN, //
+            "PUSH_CONST_STRING str\n"//
+            "PUSH_UINT 0\n"//
+            "PUSH_NEW_HEAP_OBJ\n"//
+            "SET_GLOBAL 0\n"//
+            "PUSH_INT 99\n"//
+            "GET_GLOBAL 0\n"//
+            "LIB_FN 0 0\n"//
+            "HALT 99\n"//
+            ".label str\n"//
+            ".string \"string test\"\n"//
+            ); //
+
+    thread->state->lib = calloc(1, sizeof(lib_entry));
+    thread->state->lib[0] = lib_entry_strings;
+    ++thread->state->lib_qty;
+
+    TEST_EXECUTE;
+    OP_TEST_START(33, 2, 0);
+    vm_value = vm_do_pop(&thread);
+    assert(vm_value.type == VM_VAL_UINT);
+    assert(vm_value.number.uinteger == 11);
+    OP_TEST_END();
+    END_TEST();
+
+    START_TEST(STRING LIBRARY: LEFT,//
+            "PUSH_UINT 5\n"              // pos for LEFT
+            "PUSH_CONST_STRING str\n"    // push constant string
+            "PUSH_UINT 0\n"              // LIBSTRING
+            "PUSH_NEW_HEAP_OBJ\n"        // push new LIBSTRING object
+            "LIB_FN 1 0\n"               // LIBSTRING_FN_LEFT
+            "LIB_FN 9 0\n"               // LIBSTRING_FN_TO_CSTR
+            "HALT 99\n"                  // end
+            ".label str\n"               //
+            ".string \"string test\"\n"  //
+            ".string \"other string\"\n" //
+            );
+
+    thread->state->lib = calloc(1, sizeof(lib_entry));
+    thread->state->lib[0] = lib_entry_strings;
+    ++thread->state->lib_qty;
+
+    TEST_EXECUTE;
+    OP_TEST_START(29, 1, 0);
+    vm_value = vm_do_pop(&thread);
+    assert(vm_value.type == VM_VAL_CONST_STRING);
+    assert(strcmp(vm_value.cstr.addr, "string") == 0);
+    OP_TEST_END();
+    END_TEST();
+
+    START_TEST(STRING LIBRARY: RIGHT,//
+            "PUSH_UINT 7\n"              // pos for RIGHT
+            "PUSH_CONST_STRING str\n"    // push constant string
+            "PUSH_UINT 0\n"              // LIBSTRING
+            "PUSH_NEW_HEAP_OBJ\n"        // push new LIBSTRING object
+            "LIB_FN 2 0\n"               // LIBSTRING_FN_RIGHT
+            "LIB_FN 9 0\n"               // LIBSTRING_FN_TO_CSTR
+            "HALT 99\n"                  // end
+            ".label str\n"               //
+            ".string \"string test\"\n"  //
+            ".string \"other string\"\n" //
+            );
+
+    thread->state->lib = calloc(1, sizeof(lib_entry));
+    thread->state->lib[0] = lib_entry_strings;
+    ++thread->state->lib_qty;
+
+    TEST_EXECUTE;
+    OP_TEST_START(29, 1, 0);
+    vm_value = vm_do_pop(&thread);
+    assert(vm_value.type == VM_VAL_CONST_STRING);
+    assert(strcmp(vm_value.cstr.addr, "test") == 0);
+    OP_TEST_END();
+    END_TEST();
     ///////////////////////////////////
     printf("---( tests: %u / fails: %u )---\n", tests_qty, tests_fails);
     printf("---[ END TEST OPCODES ]---\n");

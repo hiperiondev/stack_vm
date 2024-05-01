@@ -211,8 +211,16 @@ void vm_step(vm_thread_t **thread) {
             if (lib_idx.type != VM_VAL_UINT || lib_idx.number.uinteger > (*thread)->state->lib_qty)
                 err = VM_ERR_BAD_VALUE;
 
-            vm_value_t ref = { VM_VAL_LIB_OBJ };
-            vm_heap_object_t obj = { VM_VAL_LIB_OBJ };
+            vm_value_t ref = {
+                    .type = VM_VAL_LIB_OBJ
+            };
+            vm_heap_object_t obj = {
+                    .type = VM_VAL_LIB_OBJ,
+                    .lib_obj.identifier = 0,
+                    .lib_obj.addr = NULL,
+                    .lib_obj.lib_idx = lib_idx.number.uinteger,
+
+            };
             uint32_t heap_ref = vm_heap_save((*thread)->state->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
             ref.lib_obj.heap_ref = heap_ref;
             vm_do_push(thread, ref);
@@ -356,7 +364,7 @@ void vm_step(vm_thread_t **thread) {
                     break;
                     case 7:// string
                     (*thread)->stack[(*thread)->sp].type = VM_VAL_CONST_STRING;
-                    (*thread)->stack[(*thread)->sp].cstr.addr = (char*) ((*thread)->state->program + const_pc);
+                    (*thread)->stack[(*thread)->sp].cstr.addr = (char*)((*thread)->state->program + const_pc);
                     (*thread)->stack[(*thread)->sp].cstr.is_program = true;
                     break;
                     default:

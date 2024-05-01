@@ -80,8 +80,10 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             STKDROPSND(thread);
         }
             break;
+
         case VM_EDFAT_PUSH:
             break;
+
         case VM_EDFAT_CMP: {
             NEW_HEAP_REF(obj1, STKTOP(thread).lib_obj.heap_ref);
             NEW_HEAP_REF(obj2, STKSND(thread).lib_obj.heap_ref);
@@ -89,6 +91,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
                 res = VM_ERR_FAIL;
         }
             break;
+
         case VM_EDFAT_GC: {
             free(vm_heap_load((*thread)->state->heap, arg)->lib_obj.addr);
         }
@@ -101,6 +104,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             STKTOP(thread).number.uinteger = strlen((char*)obj->lib_obj.addr);
         }
         break;
+
         case LIBSTRING_FN_LEFT:
         case LIBSTRING_FN_RIGHT: {
             if(STKSND(thread).type != VM_VAL_UINT) {
@@ -133,6 +137,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             }
         }
         break;
+
         case LIBSTRING_FN_MID: {
             if(STKSND(thread).type != VM_VAL_UINT || STKTRD(thread).type != VM_VAL_UINT) {
                 return VM_ERR_BAD_VALUE;
@@ -157,6 +162,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             memcpy(new_obj->lib_obj.addr, string + posl, size);
         }
         break;
+
         case LIBSTRING_FN_CONCAT: {
             if((STKSND(thread).type != VM_VAL_LIB_OBJ && (vm_heap_load((*thread)->state->heap, STKSND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER)
                     || STKSND(thread).type != VM_VAL_CONST_STRING) {
@@ -182,6 +188,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             STKDROPST(thread);
         }
         break;
+
         case LIBSTRING_FN_DELETE: {
             if (STKSND(thread).type != VM_VAL_UINT || STKTRD(thread).type != VM_VAL_UINT) {
                 return VM_ERR_BAD_VALUE;
@@ -206,36 +213,8 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             memcpy(new_obj->lib_obj.addr + posl + 1, string + posr, strlen(string) - posr);
         }
         break;
-        case LIBSTRING_FN_INSERT: {
-            if (STKTRD(thread).type != VM_VAL_UINT) {
-                return VM_ERR_BAD_VALUE;
-            }
 
-            if(STKTRD(thread).type != VM_VAL_UINT ||
-                    (STKSND(thread).type != VM_VAL_LIB_OBJ && (HEAP_OBJ(STKSND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) ||
-                    STKSND(thread).type != VM_VAL_CONST_STRING) {
-                return VM_ERR_BAD_VALUE;
-            }
-
-            NEW_HEAP_REF(obj, STKTOP(thread).lib_obj.heap_ref);
-            char *string1 = (char*)obj->lib_obj.addr;
-            char *string2 = NULL;
-            if(STKSND(thread).type == VM_VAL_LIB_OBJ) {
-                NEW_HEAP_REF(obj2, STKSND(thread).lib_obj.heap_ref);
-                string2 = (char*)obj2->lib_obj.addr;
-            } else {
-                string2 = STKSND(thread).cstr.addr;
-            }
-
-            uint32_t pos = STKTRD(thread).number.uinteger;
-            STR_NEW_OBJ(thread, lib_idx);
-            NEW_HEAP_REF(new_obj, STKTOP(thread).lib_obj.heap_ref);
-            new_obj->lib_obj.addr = strdup(string1);
-
-            libstring_strins((char**)&(new_obj->lib_obj.addr), string2, pos);
-            STKDROPSTF(thread);
-        }
-        break;
+        case LIBSTRING_FN_INSERT:
         case LIBSTRING_FN_REPLACE: {
             if (STKTRD(thread).type != VM_VAL_UINT) {
                 return VM_ERR_BAD_VALUE;
@@ -262,12 +241,16 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             NEW_HEAP_REF(new_obj, STKTOP(thread).lib_obj.heap_ref);
             new_obj->lib_obj.addr = strdup(string1);
 
-
+            if(call_type == LIBSTRING_FN_REPLACE) {
             uint32_t len = strlen(string2) > strlen(string1) - pos ? strlen(string1) - pos : strlen(string2);
             memcpy(new_obj->lib_obj.addr + pos, string2, len);
+            } else {
+                libstring_strins((char**)&(new_obj->lib_obj.addr), string2, pos);
+            }
             STKDROPSTF(thread);
         }
         break;
+
         case LIBSTRING_FN_FIND: {
             bool is_lib_obj = false;
 
@@ -296,6 +279,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             vm_do_push(thread, find_pos);
         }
         break;
+
         case LIBSTRING_FN_TO_CSTR: {
             NEW_HEAP_REF(obj, STKTOP(thread).lib_obj.heap_ref);
             STKTOP(thread).type = VM_VAL_CONST_STRING;

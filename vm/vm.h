@@ -386,6 +386,16 @@ void vm_do_push(vm_thread_t **thread, vm_value_t value);
 vm_value_t vm_do_pop(vm_thread_t **thread);
 
 /**
+ * @fn vm_errors_t void vm_do_drop2(uint32_t pos, uint32_t qty)
+ * @brief Drop elements from stack (not top)
+ *
+ * @param thread Thread
+ * @param pos Initial pos
+ * @param qty Quantity
+ */
+vm_errors_t vm_do_drop2(vm_thread_t **thread, uint32_t pos, uint32_t qty);
+
+/**
  * @fn void vm_push_frame(vm_thread_t **thread, uint8_t nargs)
  * @brief Push frame (for call)
  *

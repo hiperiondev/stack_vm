@@ -136,6 +136,20 @@ vm_value_t vm_do_pop(vm_thread_t **thread) {
     return (*thread)->stack[--(*thread)->sp];
 }
 
+vm_errors_t vm_do_drop2(vm_thread_t **thread, uint32_t pos, uint32_t qty) {
+    if (pos < 2 || pos < 1 || pos + qty > (*thread)->sp)
+        return VM_ERR_BAD_VALUE;
+
+    for (uint32_t n = 0; n < qty; n++) {
+        if ((*thread)->stack[pos + n].type == VM_VAL_CONST_STRING && (*thread)->stack[pos + n].cstr.is_program == false)
+            free((*thread)->stack[pos + n].cstr.addr);
+    }
+
+    (*thread)->stack[pos + qty] = STKTOP(thread);
+
+    return VM_ERR_OK;
+}
+
 void vm_do_push_frame(vm_thread_t **thread, uint8_t locals) {
     (*thread)->frames[(*thread)->fc].pc = (*thread)->pc;
     (*thread)->frames[(*thread)->fc].fp = (*thread)->fp;
@@ -866,6 +880,9 @@ void vm_step(vm_thread_t **thread) {
             break;
 
             case DROP: {
+                if (STKTOP(thread).type == VM_VAL_CONST_STRING && STKTOP(thread).cstr.is_program == false)
+                    free(STKTOP(thread).cstr.addr);
+
                 --(*thread)->sp;
             }
             break;

@@ -216,10 +216,6 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
 
         case LIBSTRING_FN_INSERT:
         case LIBSTRING_FN_REPLACE: {
-            if (STKTRD(thread).type != VM_VAL_UINT) {
-                return VM_ERR_BAD_VALUE;
-            }
-
             if(STKTRD(thread).type != VM_VAL_UINT ||
                     (STKSND(thread).type != VM_VAL_LIB_OBJ && (HEAP_OBJ(STKSND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) ||
                     STKSND(thread).type != VM_VAL_CONST_STRING) {

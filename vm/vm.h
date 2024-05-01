@@ -79,6 +79,8 @@
 #define STKSND(thread)    (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
 #define STKTRD(thread)    (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
 #define STKFTH(thread)    (*thread)->stack[(*thread)->sp - 3] /**< fourth element of stack */
+
+// WARNING: free cstr
 #define STKDROP(thread)   --((*thread)->sp)                   /**< drop top of stack */
 #define STKDROP2(thread)  (*thread)->sp -= 2                  /**< drop 2 top elements of stack */
 #define STKDROP3(thread)  (*thread)->sp -= 3                  /**< drop 3 top elements of stack */

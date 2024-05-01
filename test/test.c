@@ -1079,12 +1079,13 @@ void test_opcodes(void) {
     OP_TEST_END();
     END_TEST();
 
-    START_TEST(STRING LIBRARY: CONCAT,   //
-            "PUSH_CONST_STRING str2\n"   // push constant string
+    START_TEST(STRING LIBRARY: DELETE,   //
+            "PUSH_UINT 2\n"              // posl for DELETE
+            "PUSH_UINT 8\n"              // posr for DELETE
             "PUSH_CONST_STRING str\n"    // push constant string
             "PUSH_UINT 0\n"              // LIBSTRING
             "PUSH_NEW_HEAP_OBJ\n"        // push new LIBSTRING object
-            "LIB_FN 4 0\n"               // LIBSTRING_FN_CONCAT
+            "LIB_FN 6 0\n"               // LIBSTRING_FN_DELETE
             "LIB_FN 9 0\n"               // LIBSTRING_FN_TO_CSTR
             "HALT 99\n"                  // end
             ".label str\n"               //
@@ -1098,10 +1099,10 @@ void test_opcodes(void) {
     ++thread->state->lib_qty;
 
     TEST_EXECUTE;
-    OP_TEST_START(29, 1, 0);
+    OP_TEST_START(34, 1, 0);
     vm_value = vm_do_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
-    assert(strcmp(vm_value.cstr.addr, "string test other string") == 0);
+    assert(strcmp(vm_value.cstr.addr, "strest") == 0);
     OP_TEST_END();
     END_TEST();
     ///////////////////////////////////

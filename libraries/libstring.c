@@ -187,17 +187,23 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
                 return VM_ERR_BAD_VALUE;
             }
 
-            uint32_t posl = STKSND(thread).number.uinteger;
-            uint32_t posr = STKTRD(thread).number.uinteger;
-            STKDROPST(tread);
+            uint32_t posr = STKSND(thread).number.uinteger;
+            uint32_t posl = STKTRD(thread).number.uinteger;
             NEW_HEAP_REF(obj, STKTOP(thread).lib_obj.heap_ref);
+            char *string = obj->lib_obj.addr;
+            STKDROP3(thread);
+            if(posl > posr || posl > strlen(string) - 1 || posl > strlen(string) - 1) {
+                posl = 0;
+                posr = 0;
+            }
+
             STR_NEW_OBJ(thread, lib_idx);
-            STKDROPST(thread);
             NEW_HEAP_REF(new_obj, STKTOP(thread).lib_obj.heap_ref);
 
-            new_obj->lib_obj.addr = calloc(strlen(obj->lib_obj.addr) - (posr-posl) + 1, sizeof(char));
-            memcpy(new_obj->lib_obj.addr, obj->lib_obj.addr, posl + 1);
-            memcpy(new_obj->lib_obj.addr + posl + 1, obj->lib_obj.addr + posr + 1, strlen(obj->lib_obj.addr) - posr + 1);
+            uint32_t size = strlen(string) - (posr - posl) + 1;
+            new_obj->lib_obj.addr = calloc(size + 1, sizeof(char));
+            memcpy(new_obj->lib_obj.addr, string, posl + 1);
+            memcpy(new_obj->lib_obj.addr + posl + 1, string + posr, strlen(string) - posr);
         }
         break;
         case LIBSTRING_FN_INSERT: {

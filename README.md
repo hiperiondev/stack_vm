@@ -159,7 +159,7 @@ Also the use of native data types has generic options for use as well as the def
  .string: Insert string text.
 
 NOTE 1: All content after ; is considered comment.
-NOTE 2: Value $HERE$ represent actual address pointer, can be 
+NOTE 2: Value $HERE represent actual address pointer, can be 
         offsetted ex: .equ label $HERE + 3
 NOTE 3: Labels can be offsetted when referenced ex: GOTO label + 5 
 ```

@@ -129,7 +129,7 @@ Also the use of native data types has generic options for use as well as the def
 
 <!-- USAGE -->
 ## Usage
-> See test.c
+See [Documentation](https://stack-vm.readthedocs.io)
 
 <div align="right">
   <a href="#readme-top">

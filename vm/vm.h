@@ -63,7 +63,7 @@
 
 /**
  * @def VM_HEAP_SHRINK_AFTER_GC
- * @brief Delete all upper heap objects allocated but not used
+ * @brief Delete all upper heap objects allocated but not used after every gc
  *
  */
 #define VM_HEAP_SHRINK_AFTER_GC
@@ -77,10 +77,10 @@
 
 ////////////// END VM CONFIGURATION //////////////
 
-#define OP_INDIRECT(op)   (op & 0xc0)                         /**< indirect argument */
+#define OP_INDIRECT(op)   (op & 0xc0)                             /**< indirect argument */
 
 #define STK_OBJ(thread, pos)  (*thread)->stack[pos]               /**< generic access to stack */
-#define STK_NEW(thread)       (*thread)->stack[(*thread)->sp]     /**< new stack stack object (over sp) */
+#define STK_NEW(thread)       (*thread)->stack[(*thread)->sp]     /**< new stack stack object (over top) */
 #define STK_TOP(thread)       (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
 #define STK_SND(thread)       (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
 #define STK_TRD(thread)       (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
@@ -121,7 +121,7 @@
 
 /**
  * @def STKDROPSND
- * @brief drop second element of stack
+ * @brief Drop second element of stack
  *
  */
 #define STKDROPSND(tread)                      \
@@ -132,7 +132,7 @@
 
 /**
  * @def STKDROPST
- * @brief drop second and third element of stack
+ * @brief Drop second and third element of stack
  *
  */
 #define STKDROPST(tread)                       \
@@ -144,7 +144,7 @@
 
 /**
  * @def STKDROPSTF
- * @brief drop second, third and fourth element of stack
+ * @brief Drop second, third and fourth element of stack
  *
  */
 #define STKDROPSTF(thread)                     \
@@ -273,7 +273,7 @@ typedef struct vm_value_s {
               bool is_program; /**< is a reference to constant in program area */
               char *addr;      /**< VM_VAL_CONST_STRING */
         } cstr;
-          uint32_t heap_ref; /**< VM_VAL_HEAP_REF */
+          uint32_t heap_ref;   /**< VM_VAL_HEAP_REF */
     };
 } vm_value_t;
 

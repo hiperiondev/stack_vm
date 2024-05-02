@@ -9,7 +9,7 @@
 <h3 align="center">Stack VM</h3>
 
   <p align="center">
-    Generic VM for scripting
+    Generic Stack VM for Scripting Languages
     <br />   
   </p>
 </div>

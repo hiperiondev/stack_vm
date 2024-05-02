@@ -10,7 +10,6 @@
  *   please contact their authors for more information.
  *
  * @author Emiliano Gonzalez (egonzalez . hiperion @ gmail . com))
- * @version 2.0
  * @date 2024
  * @copyright MIT License
  * @see https://github.com/hiperiondev/stack_vm
@@ -23,6 +22,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+#define VM_VERSION_MAYOR 2
+#define VM_VERSION_MINOR 1
+#define VM_VERSION_PATCH 0
 
 //////////////// VM CONFIGURATION ////////////////
 

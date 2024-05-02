@@ -1,5 +1,5 @@
-project = 'Stack-VM'
-copyright = '2024, Emiliano Augusto Gonzalez (egonzalez-hiperion@gmail.com)'
+project = 'Stack VM'
+copyright = '2024, Emiliano Augusto Gonzalez (egonzalez.hiperion@gmail.com)'
 author = 'Emiliano Augusto Gonzalez (LU3VEA)'
 release = '2.1.1'
 
@@ -53,8 +53,8 @@ cpp_paren_attributes = ["VM_API"]
 #import sys
 #def setup(sphinx):
 #    sys.path.insert(0, os.path.abspath('../tools/highlighters/Pygments'))
-#    from berry import BerryLexer
-#    sphinx.add_lexer("lexerfile", BerryLexer)
+#    from stack_vm import StackVMLexer
+#    sphinx.add_lexer("lexerfile", StackVMLexer)
 #
 #try:
 #    import sphinxawesome_theme

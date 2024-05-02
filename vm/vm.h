@@ -80,11 +80,17 @@
 #define STK_TRD(thread)   (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
 #define STK_FTH(thread)   (*thread)->stack[(*thread)->sp - 4] /**< fourth element of stack */
 
+/**
+ * @def STK_SWAP
+ * @brief Swap top/second elements of stack
+ *
+ */
 #define STK_SWAP(thread)                           \
         vm_value_t __tmp_swap__ = STK_SND(thread); \
         STK_SND(thread) = STK_TOP(thread);         \
         STK_TOP(thread) = __tmp_swap__;
 
+ /**< (internal util) free cstr on stack */
 #define STK_FREECSTR(thread, pos)                                            \
         if (pos.type == VM_VAL_CONST_STRING && pos.cstr.is_program == false) \
             free(pos.cstr.addr)

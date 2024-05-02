@@ -881,10 +881,7 @@ void vm_step(vm_thread_t **thread) {
             break;
 
             case DROP: {
-                if (STK_TOP(thread).type == VM_VAL_CONST_STRING && STK_TOP(thread).cstr.is_program == false)
-                    free(STK_TOP(thread).cstr.addr);
-
-                --(*thread)->sp;
+                STK_DROP(thread);
             }
             break;
 

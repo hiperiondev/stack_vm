@@ -63,7 +63,7 @@ uint32_t vm_heap_save(vm_heap_t *heap, vm_heap_object_t value, uint32_t **gc_mar
 
     // search free heap position
     while (++allocated_word <= HEAP_ALLOC_WORD(heap->size - 1)) {
-        if (heap->allocated[allocated_word] == 0xffffffff) { // block is full allocated, try next
+        if (heap->allocated[allocated_word] == 0xffffffff) { // block is fully allocated, try next
             continue;
         } else {
             for (uint8_t b = 0; b < 32; b++) {
@@ -146,7 +146,14 @@ void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_
                     switch (heap->data[HEAP_POS(allocated_word, b)].type) {
                         case VM_VAL_LIB_OBJ: {
                             uint32_t idx = HEAP_POS(allocated_word, b);
-                            (*thread)->state->lib[heap->data[HEAP_POS(allocated_word, b)].lib_obj.lib_idx](thread, VM_EDFAT_GC, heap->data[HEAP_POS(allocated_word, b)].lib_obj.lib_idx, idx);
+                            (*thread)->state->lib[heap->data[HEAP_POS(allocated_word, b)].lib_obj.lib_idx](thread, VM_EDFAT_GC,
+                                    heap->data[HEAP_POS(allocated_word, b)].lib_obj.lib_idx, idx);
+                        }
+                            break;
+                        case VM_VAL_GENERIC: {
+                            if (heap->data[HEAP_POS(allocated_word, b)].value.type
+                                    == VM_VAL_CONST_STRING&& heap->data[HEAP_POS(allocated_word, b)].value.cstr.is_program == false)
+                                free(heap->data[HEAP_POS(allocated_word, b)].value.cstr.addr);
                         }
                             break;
                         case VM_VAL_ARRAY:

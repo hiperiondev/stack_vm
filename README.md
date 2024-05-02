@@ -16,7 +16,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-Stack-vm is a virtual machine oriented towards scripting languages, especially glue ones, prioritizing low memory consumption and predictability.
+Stack VM is a virtual machine oriented towards scripting languages, especially glue ones, prioritizing low memory consumption and predictability.
 The size is about 20k.
 
 It has very useful features for use in microcontrollers such as: Fixed stack size, gc per frame with optional shrink and management of both local variables in the stack and a generic heap.

@@ -25,7 +25,7 @@
 
 #define VM_VERSION_MAYOR 2
 #define VM_VERSION_MINOR 1
-#define VM_VERSION_PATCH 0
+#define VM_VERSION_PATCH 1
 
 //////////////// VM CONFIGURATION ////////////////
 

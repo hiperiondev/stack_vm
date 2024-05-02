@@ -179,10 +179,12 @@ Run a single cycle of the vm
 ```C
 void vm_step(vm_thread_t **thread);
 ```
+
 Create new thread
 ```C
 void vm_create_thread(vm_thread_t **thread);
 ```
+
 Destroy thread
 ```C
 void vm_destroy_thread(vm_thread_t **thread);
@@ -191,42 +193,57 @@ Push value
 ```C
 void vm_do_push(vm_thread_t **thread, vm_value_t value);
 ```
+
 Pop value
 ```C
 vm_value_t vm_do_pop(vm_thread_t **thread);
 ```
+
+Drop elements n elements from stack
+```C
+vm_errors_t vm_do_drop_n(vm_thread_t **thread, uint32_t qty);
+```
+
 Push frame (for call)
 ```C
 void vm_push_frame(vm_thread_t **thread, uint8_t nargs);
 ```
+
 Pop frame (for return from call)
 ```C
 void vm_pop_frame(vm_thread_t **thread);
 ```
+
 Read byte from program
 ```C
 uint8_t vm_read_byte(vm_thread_t **thread, uint32_t *pc);
 ```
+
 Read 16 bit integer from program
 ```C
 int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc);
 ```
+
 Read 16 bit unsigned integer from program
 ```C
 uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc);
 ```
+
 Read 32 bit integer from program
 ```C
 int32_t vm_read_i32(vm_thread_t **thread, uint32_t *pc);
 ```
+
 Read 32 bit unsigned integer from program
 ```C
 uint32_t vm_read_u32(vm_thread_t **thread, uint32_t *pc);
 ```
+
 Read 32 bit float from program
 ```C
 float vm_read_f32(vm_thread_t **thread, uint32_t *pc);
 ```
+
 ### HEAP
 Create heap
 ```C

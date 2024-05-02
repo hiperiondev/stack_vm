@@ -23,7 +23,7 @@
 #include <stdio.h>
 
 #include "vm.h"
-#include "libstring.h"
+#include "vm_libstring.h"
 
 /**
  * @def STR_NEW_OBJ

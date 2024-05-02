@@ -27,7 +27,7 @@
 #include "vm_assembler.h"
 #include "vm_assembler_utils.h"
 #include "vm_disassembler.h"
-#include "libstring.h"
+#include "vm_libstring.h"
 
 //Regular text
 #define BLK "\e[0;30m"

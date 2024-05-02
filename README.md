@@ -71,9 +71,9 @@ Also the use of native data types has generic options for use as well as the def
 |****PUSH_FALSE****        | 0x04 | none  | none   | push boolean false value
 |****PUSH_INT****          | 0x05 |  i32  | none   | push integer value
 |****PUSH_UINT****         | 0x06 |  u32  | none   | push unsigned integer value
-|****PUSH_0****            | 0x07 | none  | none   | push integer 0
-|****PUSH_1****            | 0x08 | none  | none   | push integer 1
-|****PUSH_CHAR****         | 0x09 |   u8  | none   | push integer value of char
+|****PUSH_0****            | 0x07 | none  | none   | push unsigned integer 0
+|****PUSH_1****            | 0x08 | none  | none   | push unsigned integer 1
+|****PUSH_CHAR****         | 0x09 |   u8  | none   | push unsigned integer value of char
 |****PUSH_FLOAT****        | 0x0a |  f32  | none   | push float value
 |****PUSH_CONST_UINT8****  | 0x0b | @u32  | none   | push constant uint8 value from program address
 |****PUSH_CONST_INT8****   | 0x0c | @u32  | none   | push constant int8 value from program address

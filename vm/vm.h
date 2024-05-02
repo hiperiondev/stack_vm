@@ -75,32 +75,58 @@
 ////////////// END VM CONFIGURATION //////////////
 
 #define OP_INDIRECT(op)   (op & 0xc0)                         /**< indirect argument */
-#define STKTOP(thread)    (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
-#define STKSND(thread)    (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
-#define STKTRD(thread)    (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
-#define STKFTH(thread)    (*thread)->stack[(*thread)->sp - 4] /**< fourth element of stack */
+#define STK_TOP(thread)   (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
+#define STK_SND(thread)   (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
+#define STK_TRD(thread)   (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
+#define STK_FTH(thread)   (*thread)->stack[(*thread)->sp - 4] /**< fourth element of stack */
 
-// WARNING: free cstr
-#define STKDROP(thread)   --((*thread)->sp)                   /**< drop top of stack */
-#define STKDROP2(thread)  (*thread)->sp -= 2                  /**< drop 2 top elements of stack */
-#define STKDROP3(thread)  (*thread)->sp -= 3                  /**< drop 3 top elements of stack */
+#define STK_SWAP(thread)                           \
+        vm_value_t __tmp_swap__ = STK_SND(thread); \
+        STK_SND(thread) = STK_TOP(thread);         \
+        STK_TOP(thread) = __tmp_swap__;
+
+#define STK_FREECSTR(thread, pos)                                            \
+        if (pos.type == VM_VAL_CONST_STRING && pos.cstr.is_program == false) \
+            free(pos.cstr.addr)
+
+ /**< drop top of stack */
+#define STK_DROP(thread)                       \
+        STK_FREECSTR(thread, STK_TOP(thread)); \
+        --((*thread)->sp)
+
+/**< drop 2 top elements of stack */
+#define STK_DROP2(thread)                      \
+        STK_FREECSTR(thread, STK_TOP(thread)); \
+        STK_FREECSTR(thread, STK_SND(thread)); \
+        (*thread)->sp -= 2
+
+/**< drop 3 top elements of stack */
+#define STK_DROP3(thread)                      \
+        STK_FREECSTR(thread, STK_TOP(thread)); \
+        STK_FREECSTR(thread, STK_SND(thread)); \
+        STK_FREECSTR(thread, STK_TRD(thread)); \
+        (*thread)->sp -= 3
 
 /**
  * @def STKDROPSND
  * @brief drop second element of stack
  *
  */
-#define STKDROPSND(tread)                \
-        STKSND(thread) = STKTOP(thread); \
+#define STKDROPSND(tread)                      \
+        STK_FREECSTR(thread, STK_SND(thread)); \
+        STK_SND(thread) = STK_TOP(thread);     \
         --((*thread)->sp)
+
 
 /**
  * @def STKDROPST
  * @brief drop second and third element of stack
  *
  */
-#define STKDROPST(tread)                 \
-        STKTRD(thread) = STKTOP(thread); \
+#define STKDROPST(tread)                       \
+        STK_FREECSTR(thread, STK_SND(thread)); \
+        STK_FREECSTR(thread, STK_TRD(thread)); \
+        STK_TRD(thread) = STK_TOP(thread);     \
         (*thread)->sp -= 2
 
 
@@ -109,8 +135,11 @@
  * @brief drop second, third and fourth element of stack
  *
  */
-#define STKDROPSTF(thread)               \
-        STKFTH(thread) = STKTOP(thread); \
+#define STKDROPSTF(thread)                     \
+        STK_FREECSTR(thread, STK_SND(thread)); \
+        STK_FREECSTR(thread, STK_TRD(thread)); \
+        STK_FREECSTR(thread, STK_FTH(thread)); \
+        STK_FTH(thread) = STK_TOP(thread);     \
         (*thread)->sp -= 3
 
 /**
@@ -386,14 +415,13 @@ void vm_do_push(vm_thread_t **thread, vm_value_t value);
 vm_value_t vm_do_pop(vm_thread_t **thread);
 
 /**
- * @fn vm_errors_t void vm_do_drop2(uint32_t pos, uint32_t qty)
- * @brief Drop elements from stack (not top)
+ * @fn vm_errors_t vm_do_drop_n(vm_thread_t **thread, uint32_t qty)
+ * @brief Drop elements n elements from stack
  *
  * @param thread Thread
- * @param pos Initial pos
  * @param qty Quantity
  */
-vm_errors_t vm_do_drop2(vm_thread_t **thread, uint32_t pos, uint32_t qty);
+vm_errors_t vm_do_drop_n(vm_thread_t **thread, uint32_t qty);
 
 /**
  * @fn void vm_push_frame(vm_thread_t **thread, uint8_t nargs)

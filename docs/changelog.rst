@@ -30,3 +30,16 @@ Explore
 
          how-to/install/index
          how-to/customize/index
+                  
+   .. tab-item:: Internals
+
+      In the **Internals** section.
+
+      .. toctree::
+         :caption: Internals
+         :titlesonly:
+
+         opcodes/index
+         api/index
+ 
+         

@@ -14,3 +14,19 @@ About
    Miscellaneous information about the Stack VM.
 
 ----
+
+Explore
+-------
+
+.. tab-set::
+
+   .. tab-item:: How To
+
+      In the **How-to** section.
+
+      .. toctree::
+         :caption: How To
+         :titlesonly:
+
+         how-to/install/index
+         how-to/customize/index

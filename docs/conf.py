@@ -36,21 +36,35 @@ nitpicky = True
 
 default_role = "literal"
 
-intersphinx_mapping = {
-    "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
-}
+# Global substitutions for reStructuredText files
+#substitutions = [
+#    ":tocdepth: 3",
+#    " ",
+#    ".. meta::",
+#    "   :author: Emiliano Augusto Gonzalez (LU3VEA)",
+#    "   :keywords: Documentation,StackVM,Scripting,Language",
+#    ".. |rst| replace:: reStructuredText",
+#    ".. |product| replace:: Stack VM",
+#    ".. |conf| replace:: File: conf.py",
+#    f".. |current| replace:: {__version__}",
+#]
+#rst_prolog = "\n".join(substitutions)
 
-extlinks = {
-    "gh": ("https://github.com/kai687/sphinxawesome-theme/blob/main/%s", "%s"),
-    "ghdir": ("https://github.com/kai687/sphinxawesome-theme/tree/main/%s", "%s"),
-    "sphinxdocs": ("https://www.sphinx-doc.org/en/master/%s", "%s"),
-}
+#intersphinx_mapping = {
+#    "sphinx": ("https://www.sphinx-doc.org/en/master/", None),
+#}
+
+#extlinks = {
+#    "gh": ("https://github.com/kai687/sphinxawesome-theme/blob/main/%s", "%s"),
+#    "ghdir": ("https://github.com/kai687/sphinxawesome-theme/tree/main/%s", "%s"),
+#    "sphinxdocs": ("https://www.sphinx-doc.org/en/master/%s", "%s"),
+#}
 
 add_module_names = False
 
 # -- Options for HTML output ---
 
-html_title = project
+html_title = "Stack VM"
 html_theme = "sphinxawesome_theme"
 html_last_updated_fmt = ""
 html_use_index = False  # Don't create index
@@ -67,7 +81,7 @@ html_context = {
 }
 
 html_sidebars: dict[str, list[str]] = {
-    "about": ["sidebar_main_nav_links.html"],
+    "about/*": ["sidebar_main_nav_links.html"],
     "changelog/*": ["sidebar_main_nav_links.html"],
 }
 
@@ -80,13 +94,13 @@ html_css_files = ["feedback.css"]
 html_js_files = [("feedback.js", {"defer": "defer"})]
 
 # DocSearch
-docsearch_app_id = os.getenv("DOCSEARCH_APP_ID", "")
-docsearch_api_key = os.getenv("DOCSEARCH_API_KEY", "")
-docsearch_index_name = os.getenv("DOCSEARCH_INDEX_NAME", "")
-docsearch_placeholder = "Search these docs"
-docsearch_missing_results_url = (
-    "https://github.com/hiperiondev/stack_vm/issues/new?title=${query}"
-)
+#docsearch_app_id = os.getenv("DOCSEARCH_APP_ID", "")
+#docsearch_api_key = os.getenv("DOCSEARCH_API_KEY", "")
+#docsearch_index_name = os.getenv("DOCSEARCH_INDEX_NAME", "")
+#docsearch_placeholder = "Search these docs"
+#docsearch_missing_results_url = (
+#    "https://github.com/hiperiondev/stack_vm/issues/new?title=${query}"
+#)
 
 theme_options = ThemeOptions(
     show_prev_next=True,

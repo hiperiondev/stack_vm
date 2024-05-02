@@ -174,6 +174,82 @@ All opcodes are defined on vm_opcodes_def.c and can be modified according to cha
 
 <!-- API -->
 ## API
+### MACRO UTILS
+generic access to stack
+```C
+STK_OBJ(thread, pos)
+```
+
+new stack stack object (over top)
+```C
+STK_NEW(thread)
+```
+
+top of stack
+```C
+STK_TOP(thread)
+```
+
+second element of stack
+```C
+STK_SND(thread)
+```
+
+third element of stack
+```C
+STK_TRD(thread)
+```
+
+fourth element of stack
+```C
+STK_FTH(thread)
+```
+
+Swap top/second elements of stack
+```C
+STK_SWAP(thread)
+```
+
+Drop top of stack
+```C
+STK_DROP(thread)
+```
+
+Drop 2 top elements of stack
+```C
+STK_DROP2(thread) 
+```
+
+Drop 3 top elements of stack
+```C
+STK_DROP3(thread)
+```
+
+Drop second element of stack
+```C
+STKDROPSND(tread)
+```
+
+Drop second and third element of stack
+```C
+STKDROPST(tread) 
+```
+
+Drop second, third and fourth element of stack
+```C
+STKDROPSTF(thread) 
+```
+
+Heap object by reference
+```C
+HEAP_OBJ(ref)
+```
+
+Create a new variable pointer referenced heap object
+```C
+NEW_HEAP_REF(_refobj_, ref)
+```
+
 ### VM
 Run a single cycle of the vm
 ```C

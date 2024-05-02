@@ -75,10 +75,13 @@
 ////////////// END VM CONFIGURATION //////////////
 
 #define OP_INDIRECT(op)   (op & 0xc0)                         /**< indirect argument */
-#define STK_TOP(thread)   (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
-#define STK_SND(thread)   (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
-#define STK_TRD(thread)   (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
-#define STK_FTH(thread)   (*thread)->stack[(*thread)->sp - 4] /**< fourth element of stack */
+
+#define STK_OBJ(thread, pos)  (*thread)->stack[pos]               /**< generic access to stack */
+#define STK_NEW(thread)       (*thread)->stack[(*thread)->sp]     /**< new stack stack object (over sp) */
+#define STK_TOP(thread)       (*thread)->stack[(*thread)->sp - 1] /**< top of stack */
+#define STK_SND(thread)       (*thread)->stack[(*thread)->sp - 2] /**< second element of stack */
+#define STK_TRD(thread)       (*thread)->stack[(*thread)->sp - 3] /**< third element of stack */
+#define STK_FTH(thread)       (*thread)->stack[(*thread)->sp - 4] /**< fourth element of stack */
 
 /**
  * @def STK_SWAP

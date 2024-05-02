@@ -129,11 +129,11 @@ float vm_read_f32(vm_thread_t **thread, uint32_t *pc) {
 
 // stack
 void vm_do_push(vm_thread_t **thread, vm_value_t value) {
-    (*thread)->stack[(*thread)->sp++] = value;
+    STK_OBJ(thread, (*thread)->sp++) = value;
 }
 
 vm_value_t vm_do_pop(vm_thread_t **thread) {
-    return (*thread)->stack[--(*thread)->sp];
+    return STK_OBJ(thread, --(*thread)->sp);
 }
 
 vm_errors_t vm_do_drop_n(vm_thread_t **thread, uint32_t qty) {
@@ -216,7 +216,7 @@ void vm_step(vm_thread_t **thread) {
         case PUSH_NULL_N: {
             uint8_t n = (state->program[(*thread)->pc - 1] == PUSH_NULL) ? 1 : (*thread)->state->program[(*thread)->pc++];
 
-            memset(&(*thread)->stack[(*thread)->sp], 0, sizeof(vm_value_t) * n);
+            memset(&STK_NEW(thread), 0, sizeof(vm_value_t) * n);
             (*thread)->sp += n;
         }
             break;
@@ -286,36 +286,36 @@ void vm_step(vm_thread_t **thread) {
             break;
 
             case PUSH_INT: {
-                (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-                (*thread)->stack[(*thread)->sp].number.integer = vm_read_i32(thread, &(*thread)->pc);
+                STK_NEW(thread).type = VM_VAL_INT;
+                STK_NEW(thread).number.integer = vm_read_i32(thread, &(*thread)->pc);
                 (*thread)->sp += 1;
             }
             break;
 
             case PUSH_UINT: {
-                (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
-                (*thread)->stack[(*thread)->sp].number.integer = vm_read_u32(thread, &(*thread)->pc);
+                STK_NEW(thread).type = VM_VAL_UINT;
+                STK_NEW(thread).number.integer = vm_read_u32(thread, &(*thread)->pc);
                 (*thread)->sp += 1;
             }
             break;
 
             case PUSH_0: {
-                (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-                (*thread)->stack[(*thread)->sp].number.integer = 0;
+                STK_NEW(thread).type = VM_VAL_UINT;
+                STK_NEW(thread).number.integer = 0;
                 (*thread)->sp += 1;
             }
             break;
 
             case PUSH_1: {
-                (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-                (*thread)->stack[(*thread)->sp].number.integer = 1;
+                STK_NEW(thread).type = VM_VAL_UINT;
+                STK_NEW(thread).number.integer = 1;
                 (*thread)->sp += 1;
             }
             break;
 
             case PUSH_CHAR: {
-                (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-                (*thread)->stack[(*thread)->sp].number.integer = (*thread)->state->program[(*thread)->pc];
+                STK_NEW(thread).type = VM_VAL_UINT;
+                STK_NEW(thread).number.integer = (*thread)->state->program[(*thread)->pc];
                 (*thread)->sp += 1;
                 (*thread)->pc += 1;
             }
@@ -349,38 +349,46 @@ void vm_step(vm_thread_t **thread) {
                 uint32_t pc_tmp = (*thread)->pc;
 
                 switch (type) {
-                    case 0: // uint8
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
-                    (*thread)->stack[(*thread)->sp].number.uinteger = vm_read_byte(thread, &const_pc);
+                    case 0: { // uint8
+                        STK_NEW(thread).type = VM_VAL_UINT;
+                        STK_NEW(thread).number.uinteger = vm_read_byte(thread, &const_pc);
+                    }
                     break;
-                    case 1:// int8
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-                    (*thread)->stack[(*thread)->sp].number.integer = (int8_t) vm_read_byte(thread, &const_pc);
+                    case 1: { // int8
+                        STK_NEW(thread).type = VM_VAL_INT;
+                        STK_NEW(thread).number.integer = (int8_t) vm_read_byte(thread, &const_pc);
+                    }
                     break;
-                    case 2:// uint16
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
-                    (*thread)->stack[(*thread)->sp].number.uinteger = vm_read_u16(thread, &const_pc);
+                    case 2: { // uint16
+                        STK_NEW(thread).type = VM_VAL_UINT;
+                        STK_NEW(thread).number.uinteger = vm_read_u16(thread, &const_pc);
+                    }
                     break;
-                    case 3:// int16
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-                    (*thread)->stack[(*thread)->sp].number.integer = vm_read_i16(thread, &const_pc);
+                    case 3: { // int16
+                        STK_NEW(thread).type = VM_VAL_INT;
+                        STK_NEW(thread).number.integer = vm_read_i16(thread, &const_pc);
+                    }
                     break;
-                    case 4:// uint32
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_UINT;
-                    (*thread)->stack[(*thread)->sp].number.uinteger = vm_read_u32(thread, &const_pc);
+                    case 4: { // uint32
+                        STK_NEW(thread).type = VM_VAL_UINT;
+                        STK_NEW(thread).number.uinteger = vm_read_u32(thread, &const_pc);
+                    }
                     break;
-                    case 5:// int32
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_INT;
-                    (*thread)->stack[(*thread)->sp].number.integer = vm_read_i32(thread, &const_pc);
+                    case 5: { // int32
+                        STK_NEW(thread).type = VM_VAL_INT;
+                        STK_NEW(thread).number.integer = vm_read_i32(thread, &const_pc);
+                    }
                     break;
-                    case 6:// float
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_FLOAT;
-                    (*thread)->stack[(*thread)->sp].number.real = vm_read_f32(thread, &const_pc);
+                    case 6: { // float
+                        STK_NEW(thread).type = VM_VAL_FLOAT;
+                        STK_NEW(thread).number.real = vm_read_f32(thread, &const_pc);
+                    }
                     break;
-                    case 7:// string
-                    (*thread)->stack[(*thread)->sp].type = VM_VAL_CONST_STRING;
-                    (*thread)->stack[(*thread)->sp].cstr.addr = (char*)((*thread)->state->program + const_pc);
-                    (*thread)->stack[(*thread)->sp].cstr.is_program = true;
+                    case 7: { // string
+                        STK_NEW(thread).type = VM_VAL_CONST_STRING;
+                        STK_NEW(thread).cstr.addr = (char*)((*thread)->state->program + const_pc);
+                        STK_NEW(thread).cstr.is_program = true;
+                    }
                     break;
                     default:
                     err = VM_ERR_CONST_BADTYPE;
@@ -409,7 +417,7 @@ void vm_step(vm_thread_t **thread) {
                 if (n_fields > 0) {
                     vm_heap_object_t arr;
                     arr.array.fields = malloc(sizeof(vm_value_t) * n_fields);
-                    memcpy(arr.array.fields, &(*thread)->stack[(*thread)->sp - n_fields], sizeof(vm_value_t) * n_fields);
+                    memcpy(arr.array.fields, &STK_OBJ(thread, (*thread)->sp - n_fields), sizeof(vm_value_t) * n_fields);
                     arr.type = VM_VAL_ARRAY;
                     arr.array.qty = n_fields;
                     uint32_t heap_id = vm_heap_save((*thread)->state->heap, arr, &((*thread)->frames[(*thread)->fc].gc_mark));
@@ -462,7 +470,7 @@ void vm_step(vm_thread_t **thread) {
                     index = _indx;
                 }
 
-                vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, (*thread)->stack[(*thread)->sp - 2].heap_ref);
+                vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, STK_SND(thread).heap_ref);
                 vm_value_t val = vm_do_pop(thread);
 
                 if (arr->type == VM_VAL_ARRAY && index >= 0 && index < arr->array.qty)
@@ -474,8 +482,9 @@ void vm_step(vm_thread_t **thread) {
 
 #define BIN_OP(OP, operator)                                                          \
     case OP: {                                                                        \
-        vm_value_t *a = &(*thread)->stack[(*thread)->sp - 2];                         \
-        vm_value_t b = (*thread)->stack[--(*thread)->sp];                             \
+        vm_value_t *a = &STK_SND(thread);                                             \
+        --(*thread)->sp;                                                              \
+        vm_value_t b = STK_NEW(thread);                                               \
         if (a->type == VM_VAL_INT && b.type == VM_VAL_INT) {                          \
             a->number.integer = a->number.integer operator b.number.integer;          \
         } else if (a->type == VM_VAL_UINT && b.type == VM_VAL_UINT) {                 \
@@ -505,8 +514,9 @@ void vm_step(vm_thread_t **thread) {
 
 #define REL_OP(OP, operator)                                                      \
     case OP: {                                                                    \
-        vm_value_t *a = &(*thread)->stack[(*thread)->sp - 2];                     \
-        vm_value_t b = (*thread)->stack[--(*thread)->sp];                         \
+        vm_value_t *a = &STK_SND(thread);                                         \
+        --(*thread)->sp;                                                          \
+        vm_value_t b = STK_NEW(thread);                                           \
         if (a->type == VM_VAL_FLOAT && b.type == VM_VAL_FLOAT) {                  \
             a->type = VM_VAL_BOOL;                                                \
             a->number.boolean = a->number.real operator b.number.real;            \
@@ -533,8 +543,9 @@ void vm_step(vm_thread_t **thread) {
             BIN_OP(MUL, *)
 
             case DIV: {
-                vm_value_t *a = &(*thread)->stack[(*thread)->sp - 2];
-                vm_value_t b = (*thread)->stack[--(*thread)->sp];
+                vm_value_t *a = &STK_SND(thread);
+                --(*thread)->sp;
+                vm_value_t b = STK_NEW(thread);
                 if (b.number.uinteger == 0)
                 err = VM_ERR_DIVBYZERO;
                 else {

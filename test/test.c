@@ -277,7 +277,7 @@ void test_opcodes(void) {
     TEST_EXECUTE;
     OP_TEST_START(1, 1, 0);
     vm_value = vm_do_pop(&thread);
-    assert(vm_value.type == VM_VAL_INT);
+    assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.integer == 0);
     OP_TEST_END();
 
@@ -290,7 +290,7 @@ void test_opcodes(void) {
     TEST_EXECUTE;
     OP_TEST_START(1, 1, 0);
     vm_value = vm_do_pop(&thread);
-    assert(vm_value.type == VM_VAL_INT);
+    assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.integer == 1);
     OP_TEST_END();
 
@@ -303,7 +303,7 @@ void test_opcodes(void) {
     TEST_EXECUTE;
     OP_TEST_START(2, 1, 0);
     vm_value = vm_do_pop(&thread);
-    assert(vm_value.type == VM_VAL_INT);
+    assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.integer == 43);
     OP_TEST_END();
 

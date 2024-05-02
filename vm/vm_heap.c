@@ -150,8 +150,8 @@ void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_
                         }
                             break;
                         case VM_VAL_GENERIC: {
-                            if (heap->data[HEAP_POS(allocated_word, b)].value.type
-                                    == VM_VAL_CONST_STRING&& heap->data[HEAP_POS(allocated_word, b)].value.cstr.is_program == false)
+                            if (heap->data[HEAP_POS(allocated_word, b)].value.type == VM_VAL_CONST_STRING
+                                    && heap->data[HEAP_POS(allocated_word, b)].value.cstr.is_program == false)
                                 free(heap->data[HEAP_POS(allocated_word, b)].value.cstr.addr);
                         }
                             break;

@@ -164,7 +164,8 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         break;
 
         case LIBSTRING_FN_CONCAT: {
-            if((STK_SND(thread).type != VM_VAL_LIB_OBJ && (vm_heap_load((*thread)->state->heap, STK_SND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER)
+            if((STK_SND(thread).type != VM_VAL_LIB_OBJ
+                    && (vm_heap_load((*thread)->state->heap, STK_SND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER)
                     || STK_SND(thread).type != VM_VAL_CONST_STRING) {
                 return VM_ERR_BAD_VALUE;
             }
@@ -216,9 +217,9 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
 
         case LIBSTRING_FN_INSERT:
         case LIBSTRING_FN_REPLACE: {
-            if(STK_TRD(thread).type != VM_VAL_UINT ||
-                    (STK_SND(thread).type != VM_VAL_LIB_OBJ && (HEAP_OBJ(STK_SND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) ||
-                    STK_SND(thread).type != VM_VAL_CONST_STRING) {
+            if(STK_TRD(thread).type != VM_VAL_UINT
+                    || (STK_SND(thread).type != VM_VAL_LIB_OBJ && (HEAP_OBJ(STK_SND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER)
+                    || STK_SND(thread).type != VM_VAL_CONST_STRING) {
                 return VM_ERR_BAD_VALUE;
             }
 
@@ -248,9 +249,9 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         break;
 
         case LIBSTRING_FN_FIND: {
-            if(STK_TRD(thread).type != VM_VAL_UINT ||
-                    (STK_SND(thread).type != VM_VAL_LIB_OBJ && (HEAP_OBJ(STK_SND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER) ||
-                    STK_SND(thread).type != VM_VAL_CONST_STRING) {
+            if(STK_TRD(thread).type != VM_VAL_UINT
+                    || (STK_SND(thread).type != VM_VAL_LIB_OBJ && (HEAP_OBJ(STK_SND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER)
+                    || STK_SND(thread).type != VM_VAL_CONST_STRING) {
                 return VM_ERR_BAD_VALUE;
             }
 

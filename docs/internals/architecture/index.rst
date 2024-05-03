@@ -50,6 +50,6 @@ Heap
 | This index also grows as needed.
 | Each Frame maintains its own usage index, when VM returns from a CALL the GC marks all elements created locally in the subroutine as free
 | *The objects in the heap are not deleted, only their availability is marked.*
-| When a GC is performed (see GARBAGE COLLECTOR) the string constants that were dynamically allocated are also freed.
+| When a GC is performed the string constants that were dynamically allocated are also freed.
 | The heap does not automatically release the real reserved space, for this the *vm_heap_shrink* function must be invoked (see API) which releases all the space prior to the highest used index (no index relocation is performed).
 | You can also configure this function to be automatically invoked at each output of a Frame (See Configuration).

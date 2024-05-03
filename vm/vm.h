@@ -124,7 +124,7 @@
  * @brief Drop second element of stack
  *
  */
-#define STKDROPSND(tread)                      \
+#define STKDROPSND(thread)                     \
         STK_FREECSTR(thread, STK_SND(thread)); \
         STK_SND(thread) = STK_TOP(thread);     \
         --((*thread)->sp)
@@ -135,7 +135,7 @@
  * @brief Drop second and third element of stack
  *
  */
-#define STKDROPST(tread)                       \
+#define STKDROPST(thread)                      \
         STK_FREECSTR(thread, STK_SND(thread)); \
         STK_FREECSTR(thread, STK_TRD(thread)); \
         STK_TRD(thread) = STK_TOP(thread);     \

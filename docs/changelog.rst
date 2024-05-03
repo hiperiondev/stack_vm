@@ -54,5 +54,6 @@ Explore
          :caption: Internals
          :titlesonly:
 
-         opcodes/index
-         api/index 
+         internals/architecture/index
+         internals/opcodes/index
+         internals/api/index 

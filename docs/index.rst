@@ -55,6 +55,16 @@ Explore
 
          how-to/install/index
          how-to/customize/index
+         
+ .. tab-item:: Use
+
+      .. toctree::
+         :caption: Use
+         :titlesonly:
+
+         use/embed/index
+         use/ffi/index 
+         use/libraries/index
 
  .. tab-item:: Assembler / Disassembler
 

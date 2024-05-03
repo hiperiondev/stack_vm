@@ -7,7 +7,8 @@ API
 
 .. rst-class:: lead
 
-**MACRO UTILS**
+MACRO UTILS
+^^^^^^^^^^^
 
 .. code-block::
    :caption: Generic access to stack
@@ -86,7 +87,8 @@ API
 
 .. rst-class:: lead
 
-**VM INTERNALS**
+VM INTERNALS
+^^^^^^^^^^^^
 
 .. code-block::
    :caption: Run a single cycle of the vm
@@ -160,7 +162,8 @@ API
 
 .. rst-class:: lead
 
-**HEAP**
+HEAP
+^^^^
 
 .. code-block::
    :caption: Create heap

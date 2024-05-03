@@ -36,6 +36,7 @@ Explore
          :titlesonly:
 
          assembler/index
+         disassembler/index
          
  .. tab-item:: Internals
 

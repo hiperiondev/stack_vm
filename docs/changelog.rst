@@ -20,7 +20,7 @@ Explore
 
 .. tab-set::
 
-   .. tab-item:: How To
+ .. tab-item:: How To
 
       In the **How-to** section.
 
@@ -30,8 +30,18 @@ Explore
 
          how-to/install/index
          how-to/customize/index
-                  
-   .. tab-item:: Internals
+
+ .. tab-item:: Assembler
+
+      In the **How-to** section.
+
+      .. toctree::
+         :caption: Assembler
+         :titlesonly:
+
+         assembler/index
+         
+ .. tab-item:: Internals
 
       In the **Internals** section.
 
@@ -40,6 +50,4 @@ Explore
          :titlesonly:
 
          opcodes/index
-         api/index
- 
-         
+         api/index 

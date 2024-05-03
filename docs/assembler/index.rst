@@ -2,12 +2,8 @@
    :description: Generic Stack VM for Scripting Languages.
    :twitter:description: Generic Stack VM for Scripting Languages.
 
-Stack VM Assembler
-==================
-
-.. rst-class:: lead
-
-   Stack VM Assembler
+Assembler
+=========
 
 ========== =============================================================
 Directives             Description

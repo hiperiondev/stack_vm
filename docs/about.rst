@@ -45,8 +45,6 @@ Explore
 
  .. tab-item:: How To
 
-      In the **How-to** section.
-
       .. toctree::
          :caption: How To
          :titlesonly:
@@ -54,19 +52,15 @@ Explore
          how-to/install/index
          how-to/customize/index
 
- .. tab-item:: Assembler
-
-      In the **How-to** section.
+ .. tab-item:: Assembler / Disassembler
 
       .. toctree::
-         :caption: Assembler
+         :caption: Assembler / Disassembler
          :titlesonly:
 
          assembler/index
          
  .. tab-item:: Internals
-
-      In the **Internals** section.
 
       .. toctree::
          :caption: Internals

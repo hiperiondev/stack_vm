@@ -2,8 +2,8 @@
    :description: Generic Stack VM for Scripting Languages.
    :twitter:description: Generic Stack VM for Scripting Languages.
 
-Stack VM API
-=================
+API
+===
 
 .. rst-class:: lead
 

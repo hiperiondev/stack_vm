@@ -2,12 +2,8 @@
    :description: Generic Stack VM for Scripting Languages.
    :twitter:description: Generic Stack VM for Scripting Languages.
 
-Stack VM opcodes
+Opcodes
 =================
-
-.. rst-class:: lead
-
-   Stack VM opcodes.
    
 **op format: iiOOOOOO**
 

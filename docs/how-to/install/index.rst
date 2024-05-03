@@ -2,8 +2,8 @@
    :description: Generic Stack VM for Scripting Languages.
    :twitter:description: Generic Stack VM for Scripting Languages.
 
-Install Stack VM
-=================
+Install
+=======
 
 .. rst-class:: lead
 

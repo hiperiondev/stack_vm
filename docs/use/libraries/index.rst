@@ -20,7 +20,7 @@ Libraries are a more sophisticated way to create objects and functions that do n
        vm_errors_t (*lib_entry)(vm_thread_t **thread, uint8_t call_type, uint32_t lib_idx, uint32_t args)
 
 | Where thread is the current thread, call_type is the internal call function, lib_idx is the internal identificator and args is an arbitrary number for internal use.
-| The library entry function must be added to lib_entry *lib in state.
+| The library entry function must be added to  lib array in state.
 
 Call type
 -------------

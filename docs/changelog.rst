@@ -19,15 +19,6 @@ Explore
 -------
 
 .. tab-set::
-
- .. tab-item:: How To
-
-      .. toctree::
-         :caption: How To
-         :titlesonly:
-
-         how-to/install/index
-         how-to/customize/index
          
  .. tab-item:: Use
 
@@ -35,6 +26,7 @@ Explore
          :caption: Use
          :titlesonly:
 
+         use/customize/index
          use/embed/index
          use/data_types/index
          use/ffi/index 

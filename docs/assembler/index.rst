@@ -11,11 +11,11 @@ Assembler create a real code from mnemonic representation of code
 
 ------
 
-| Is a very complete assembler with a lot of directives (see DIRECTVES table)
-| Instructions can be extended easily on vm_opcodes_def.c
-| For that you can edit one of the not use instructions (Usually after the HALT instruction)
-| Up to 8 arguments can be specified. The assembler stop to search after the first ARG_NON in the list
-| When read the program it's ensure that the data type is correct and emit the code into the program
+| Is a very complete assembler with a lot of directives (see DIRECTVES table).
+| Instructions can be extended easily on vm_opcodes_def.c.
+| For that you can edit one of the not use instructions (Usually after the HALT instruction).
+| Up to 8 arguments can be specified. The assembler stop to search after the first ARG_NON in the list.
+| When read the program it's ensure that the data type is correct and emit the code into the program.
 | The possible arguments types are:
 
 * ARG_NON: Non arguments. All arguments defined after this are ignored.
@@ -26,8 +26,8 @@ Assembler create a real code from mnemonic representation of code
 * ARG_I16: Signed 16 bits number.
 * ARG_I32: Signed 32 bits number.
 * ARG_F32: Float 32 bits number.
-* ARG_STR: String
-* ARG_NVL: Have n values from previous argument, next argument is type. This type is not actually supported by the VM but exist for future expansions
+* ARG_STR: String.
+* ARG_NVL: Have n values from previous argument, next argument is type. This type is not actually supported by the VM but exist for future expansions.
 
 | 
 | *In program all numbers can be expressed as decimal or hexadecimal*

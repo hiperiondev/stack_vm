@@ -53,3 +53,13 @@ Heap
 | When a GC is performed the string constants that were dynamically allocated are also freed.
 | The heap does not automatically release the real reserved space, for this the *vm_heap_shrink* function must be invoked (see API) which releases all the space prior to the highest used index (no index relocation is performed).
 | You can also configure this function to be automatically invoked at each output of a Frame (See Configuration).
+
+Stack
+-----
+
+| *The Stack is the main data structure in the VM*
+| Is a statically assigned space for arbitrary data.
+| The stack pointer (SP) ever point to the next free space, not to TOP of the stack, then the top of stack is SP - 1
+
+
+

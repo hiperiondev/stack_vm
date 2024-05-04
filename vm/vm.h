@@ -77,7 +77,7 @@
 
 ////////////// END VM CONFIGURATION //////////////
 
-#define OP_INDIRECT(op)   (op & 0xc0)                             /**< indirect argument */
+#define OP_INDIRECT(op)       (op & 0xc0)                         /**< indirect argument */
 
 #define STK_OBJ(thread, pos)  (*thread)->stack[pos]               /**< generic access to stack */
 #define STK_NEW(thread)       (*thread)->stack[(*thread)->sp]     /**< new stack stack object (over top) */
@@ -230,7 +230,6 @@ typedef enum VM_VALUE_TYPE {
     VM_VAL_INT,          /**< Value INT */
     VM_VAL_FLOAT,        /**< Value FLOAT */
     VM_VAL_CONST_STRING, /**< Value CONST_STRING */
-    VM_VAL_NATIVE,       /**< Value NATIVE */
     VM_VAL_ARRAY,        /**< Value ARRAY */
     VM_VAL_GENERIC,      /**< Value GENERIC */
     VM_VAL_HEAP_REF,     /**< Value HEAP REFERENCE */

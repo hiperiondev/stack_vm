@@ -63,6 +63,7 @@ Explore
          :titlesonly:
 
          use/embed/index
+         use/data_types/index
          use/ffi/index 
          use/libraries/index
 

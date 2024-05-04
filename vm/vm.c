@@ -254,21 +254,23 @@ void vm_step(vm_thread_t **thread) {
                     err = VM_ERR_HEAPNOTEXIST;
                 else {
                     switch (obj->type) {
-                        case VM_VAL_GENERIC:
+                        case VM_VAL_GENERIC: {
                             STK_TOP(thread)= obj->value;
-                            break;
-                            case VM_VAL_LIB_OBJ:
+                        }
+                        break;
+                        case VM_VAL_LIB_OBJ: {
                             value.type = VM_VAL_LIB_OBJ;
                             value.lib_obj.heap_ref = idx;
                             value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
                             STK_TOP(thread) = value;
                             err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, obj->lib_obj.lib_idx, idx);
-                            break;
-                            default:
-                            break;
                         }
+                        break;
+                        default:
+                        break;
                     }
                 }
+            }
             }
             break;
 

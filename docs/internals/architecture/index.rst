@@ -61,5 +61,10 @@ Stack
 | Is a statically assigned space for arbitrary data.
 | The stack pointer (SP) ever point to the next free space, not to TOP of the stack, then the top of stack is SP - 1
 
+Indirect register
+-----------------
 
+| Some VM instructions argument can be offsetted by an internal indirect register. This behavior is indicated with @ in the assembler program.
+| This register can be accessed as the global variable 0xffffffff and can be manipulated with SET_GLOBAL and GET_GLOBAL
+| When +@ or -@ is specified in instruction indicate that indirect register will be automatically incremented or decremented after use 
 

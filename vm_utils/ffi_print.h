@@ -18,6 +18,10 @@
 #ifndef FFI_PRINT_H_
 #define FFI_PRINT_H_
 
+#include <stdint.h>
 
+#include "vm.h"
+
+vm_value_t ffi_print(vm_thread_t **thread, uint32_t fn);
 
 #endif /* FFI_PRINT_H_ */

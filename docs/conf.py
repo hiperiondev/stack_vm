@@ -105,7 +105,7 @@ html_js_files = [("feedback.js", {"defer": "defer"})]
 theme_options = ThemeOptions(
     show_prev_next=True,
     awesome_external_links=True,
-    main_nav_links={"Docs": "index", "About": "about", "Changelog": "changelog"},
+    main_nav_links={"Docs": "index", "Changelog": "changelog"},
     extra_header_link_icons={
         "repository on GitHub": {
             "link": "https://github.com/hiperiondev/stack_vm",

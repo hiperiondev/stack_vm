@@ -63,14 +63,14 @@
 
 /**
  * @def VM_HEAP_SHRINK_AFTER_GC
- * @brief Delete all upper heap objects allocated but not used after every gc
+ * @brief Dealloc all upper heap objects allocated but not used after every gc
  *
  */
 #define VM_HEAP_SHRINK_AFTER_GC
 
 /**
  * @def VM_ENABLE_TOTYPES
- * @brief Enable TO_TYPES op
+ * @brief Enable TO_TYPES instruction
  *
  */
 #define VM_ENABLE_TOTYPES

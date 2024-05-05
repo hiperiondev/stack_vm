@@ -7,6 +7,6 @@ Embed
 
 .. rst-class:: lead
 
-   Embed.
+See examples/example.c for a full example of use
 
    

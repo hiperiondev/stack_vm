@@ -7,7 +7,7 @@ Customize
 
 .. rst-class:: lead
 
-   Things you can adjust on Stack VM.
+   Internal VM settings.
 
 Compile conditions
 ------------------

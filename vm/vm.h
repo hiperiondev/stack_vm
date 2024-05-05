@@ -253,14 +253,14 @@ typedef struct vm_heap_s vm_heap_t;
  *
  */
 typedef struct vm_value_s {
-    uint8_t type;
+    uint8_t type;              /**< value type */
     union {
         union {
-                bool boolean;                                         /**< VM_VAL_BOOL */
-             int32_t integer;                                         /**< VM_VAL_INT */
-            uint32_t uinteger;                                        /**< VM_VAL_UINT */
-               float real;                                            /**< VM_VAL_FLOAT */
-             uint8_t byte[4];                                         /**< for serialize */
+                bool boolean;  /**< VM_VAL_BOOL */
+             int32_t integer;  /**< VM_VAL_INT */
+            uint32_t uinteger; /**< VM_VAL_UINT */
+               float real;     /**< VM_VAL_FLOAT */
+             uint8_t byte[4];  /**< for serialize */
         } number;
 
         struct {
@@ -277,15 +277,14 @@ typedef struct vm_value_s {
 } vm_value_t;
 
 /**
- * @fn vm_value_t (*vm_foreign_function_t)(vm_state_thread_t *thread, const vm_value_t *args, uint32_t count)
+ * @fn vm_value_t (*vm_foreign_function_t)(vm_state_thread_t **thread, uint32_t fn)
  * @brief Foreign function prototype
  *
  * @param thread Thread
- * @param args Arguments
- * @param count Arguments quantity
+ * @param fn Internal function
  * @return Any value to ret-val
  */
-typedef vm_value_t (*vm_foreign_function_t)(vm_thread_t *thread, const vm_value_t *args, uint32_t count);
+typedef vm_value_t (*vm_foreign_function_t)(vm_thread_t **thread, uint32_t fn);
 
 /**
  * @fn vm_errors_t (*lib_entry)(vm_thread_t **thread, uint8_t call_type, void *args)

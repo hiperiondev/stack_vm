@@ -760,7 +760,7 @@ void vm_step(vm_thread_t **thread) {
             break;
 
             case CALL_FOREIGN: {
-                uint8_t nargs = (*thread)->state->program[(*thread)->pc++];
+                uint8_t fn = (*thread)->state->program[(*thread)->pc++];
                 uint32_t f_idx = vm_read_u32(thread, &(*thread)->pc);
 
                 if (indirect) {
@@ -772,10 +772,7 @@ void vm_step(vm_thread_t **thread) {
                 }
 
                 if (f_idx <= (*thread)->state->foreign_functions_qty - 1) {
-                    uint32_t prev_size = (*thread)->sp - nargs;
-
-                    (*thread)->ret_val = (*thread)->state->foreign_functions[f_idx]((*thread), &(*thread)->stack[prev_size], nargs);
-                    (*thread)->sp = prev_size;
+                    (*thread)->ret_val = (*thread)->state->foreign_functions[f_idx](thread, fn);
                 } else
                 err = VM_ERR_FOREINGFNUNKN;
             }

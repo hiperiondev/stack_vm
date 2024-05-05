@@ -736,10 +736,10 @@ void test_opcodes(void) {
             "GET_RETVAL\n"       //
             );                   //
 
-    vm_value_t foreign_function_test(vm_thread_t *thread, const vm_value_t *args, uint32_t count) {
+    vm_value_t foreign_function_test(vm_thread_t **thread, uint32_t fn) {
         vm_value_t ret;
         ret.type = VM_VAL_INT;
-        ret.number.integer = args[0].number.integer + args[1].number.integer;
+        ret.number.integer = STK_TOP(thread).number.integer + STK_SND(thread).number.integer;
         return ret;
     }
 
@@ -747,7 +747,7 @@ void test_opcodes(void) {
     thread->state->foreign_functions_qty = 1;
     thread->state->foreign_functions[0] = foreign_function_test;
     TEST_EXECUTE;
-    OP_TEST_START(17, 1, 0);
+    OP_TEST_START(17, 3, 0);
     vm_value = vm_do_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 55);

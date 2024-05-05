@@ -15,6 +15,7 @@
  * @see https://github.com/hiperiondev/stack_vm
  */
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "vm.h"
 
@@ -38,10 +39,14 @@ vm_value_t ffi_print(vm_thread_t **thread, uint32_t fn) {
             break;
         case VM_VAL_CONST_STRING:
             printf("%s\n", val.cstr.addr);
+            if (!val.cstr.is_program)
+                free(val.cstr.addr);
             break;
         default:
-            printf("__ error: non printable object (type=%u)\n", val.type);
+            printf("(error) non printable object [type: %u]\n", val.type);
     }
+
+    val.type = VM_VAL_NULL;
 
     return val;
 }

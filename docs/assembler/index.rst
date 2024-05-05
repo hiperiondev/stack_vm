@@ -11,7 +11,7 @@ Assembler create a real code from mnemonic representation of code
 
 ------
 
-| Is a very complete assembler with a lot of directives (see DIRECTVES table).
+| Stack VM has a very complete assembler with a lot of directives (see DIRECTIVES table).
 | Instructions can be extended easily on vm_opcodes_def.c.
 | For that you can edit one of the not use instructions (Usually after the HALT instruction).
 | Up to 8 arguments can be specified. The assembler stop to search after the first ARG_NON in the list.

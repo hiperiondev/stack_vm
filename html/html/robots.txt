@@ -1,3 +1,0 @@
-User-agent: *
-
-Sitemap: https://github.com/hiperiondev/stack_vm//sitemap.xml

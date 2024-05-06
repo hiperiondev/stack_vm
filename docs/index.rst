@@ -27,7 +27,7 @@ Also the use of native data types has generic options for use as well as the def
 
 Features
 --------
-* Fully commented code in Doxygen forma
+* Fully commented code in Doxygen format
 * 6 bits op (easily extendable)
 * An indirection register with automatic increment/decrement
 * Heap with automatic growth and optional shrink. Allocation management by bit mask (simple and fast)

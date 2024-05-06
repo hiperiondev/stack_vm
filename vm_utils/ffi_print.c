@@ -25,23 +25,29 @@ vm_value_t ffi_print(vm_thread_t **thread, uint32_t fn) {
         case VM_VAL_NULL:
             printf("(null)\n");
             break;
+
         case VM_VAL_BOOL:
             printf("%s\n", val.number.boolean ? "true" : "false");
             break;
+
         case VM_VAL_UINT:
             printf("%u\n", val.number.uinteger);
             break;
+
         case VM_VAL_INT:
             printf("%d\n", val.number.integer);
             break;
+
         case VM_VAL_FLOAT:
             printf("%f\n", val.number.real);
             break;
+
         case VM_VAL_CONST_STRING:
             printf("%s\n", val.cstr.addr);
             if (!val.cstr.is_program)
                 free(val.cstr.addr);
             break;
+
         default:
             printf("(error) non printable object [type: %u]\n", val.type);
     }

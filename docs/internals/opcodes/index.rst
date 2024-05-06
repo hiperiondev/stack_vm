@@ -2,8 +2,8 @@
    :description: Generic Stack VM for Scripting Languages.
    :twitter:description: Generic Stack VM for Scripting Languages.
 
-Opcodes
-=================
+Instructions
+============
    
 **op format: iiOOOOOO**
 
@@ -19,7 +19,7 @@ Opcodes
 *NOTE: @arg -> support indirect*
 
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
-|        opcode        |  id  |  arg1 |  arg2  | description                                                                                   |
+|     instruction      |  id  |  arg1 |  arg2  | description                                                                                   |
 +======================+======+=======+========+===============================================================================================+
 |**PUSH_NULL**         | 0x00 | none  | none   | push NULL value                                                                               |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
@@ -133,3 +133,288 @@ Opcodes
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
 |**HALT**              | 0x37 |   u8  | none   | stop vm                                                                                       |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
+
+Instruction Description
+-----------------------
+
+.. describe:: PUSH_NULL  
+
+| *Push NULL value*
+|
+| no parameters
+
+
+.. describe:: PUSH_NULL_N
+
+| *Pushes N null values onto the stack*
+|
+ 
+.. describe:: PUSH_NEW_HEAP_OBJ
+
+| *Create a new heap object referenced to library*
+|
+ 
+.. describe:: PUSH_TRUE
+
+| *Push boolean true value*
+|
+
+.. describe:: PUSH_FALSE
+
+| *Push boolean false value*
+|
+ 
+.. describe:: PUSH_INT
+
+| *Push integer value*
+|
+
+.. describe:: PUSH_UINT
+
+| *Push unsigned integer value*
+|
+ 
+.. describe:: PUSH_0
+
+| *Push unsigned integer 0*
+|
+
+.. describe:: PUSH_1
+
+| *Push unsigned integer 1*
+|
+
+.. describe:: PUSH_CHAR
+
+| *Push unsigned integer value of char*
+|
+
+.. describe:: PUSH_FLOAT
+
+| *Push float value*
+|
+
+.. describe:: PUSH_CONST_UINT8
+
+| *Push constant uint8 value from program address*
+|
+
+.. describe:: PUSH_CONST_INT8
+
+| *Push constant int8 value from program address*
+|
+
+.. describe:: PUSH_CONST_UINT16
+
+| *Push constant uint16 value from program address*
+| 
+
+.. describe:: PUSH_CONST_INT16
+
+| *Push constant int16 value from program address*
+|
+
+.. describe:: PUSH_CONST_UINT32
+
+| *Push constant uint32 value from program address*
+|
+
+.. describe:: PUSH_CONST_INT32
+
+| *Push constant int32 value from program address*
+|
+
+.. describe:: PUSH_CONST_FLOAT
+
+| *Push constant float value from program address*
+|
+
+.. describe:: PUSH_CONST_STRING
+
+| *Push constant string value from program address*
+|
+
+.. describe:: PUSH_HEAP_OBJECT
+
+| *Push a heap object*
+|
+
+.. describe:: NEW_ARRAY
+
+| *Create new array in heap and fill with n elements from stack. Push heap index*
+|
+
+.. describe:: PUSH_ARRAY
+
+| *Push array to stack*
+|
+
+.. describe:: GET_ARRAY_VALUE
+
+| *Get value from array*
+|
+
+.. describe:: SET_ARRAY_VALUE
+
+| *Set value on array*
+|
+
+.. describe:: ADD
+
+| *Add top and second element from stack*
+|
+
+.. describe:: SUB
+
+| *Subtract top and second element from stack*
+|
+
+.. describe:: MUL
+
+| *Multiply top and second element from stack*
+|
+
+.. describe:: DIV
+
+| *Divide top and second element from stack*
+|
+
+.. describe:: MOD
+
+| *Module from top and second element of stack*
+|
+
+.. describe:: OR
+
+| *Logical OR from top and second element of stack*
+|
+
+.. describe:: AND
+
+| *Logical AND from top and second element of stack*
+|
+
+.. describe:: LT
+
+| *Lesser*
+|
+
+.. describe:: LTE
+
+| *Lesser or equal*
+|
+
+.. describe:: GT
+
+| *Greater*
+|
+
+.. describe:: GTE
+
+| *Greater or equal*
+|
+
+.. describe:: INC
+
+| *Increment*
+|
+
+.. describe:: DEC
+
+| *Decrement*
+|
+
+.. describe:: EQU
+
+| *Equality*
+|
+
+.. describe:: NOT
+
+| *Binary negation*
+|
+
+.. describe:: SET_GLOBAL
+
+| *Set global variable*
+|
+
+.. describe:: GET_GLOBAL
+
+| *Get global variable*
+|
+
+.. describe:: GOTO
+
+| *Jump*
+|
+
+.. describe:: GOTOZ
+
+| *Jump if top stack is zero*
+|
+
+.. describe:: CALL
+
+| *Call function*
+|
+
+.. describe:: RETURN
+
+| *Return from function without values*
+|
+
+.. describe:: RETURN_VALUE
+
+| *Return from function with value*
+|
+
+.. describe:: CALL_FOREIGN
+
+| *Call foreign function*
+|
+
+.. describe:: LIB_FN
+
+| *Call library function*
+|
+
+.. describe:: GET_LOCAL
+
+| *Get local variable*
+|
+
+.. describe:: GET_LOCAL_FF
+
+| *Get local variable (first 255)*
+|
+
+.. describe:: SET_LOCAL
+
+| *Set local variable*
+|
+
+.. describe:: SET_LOCAL_FF
+
+| *Set local variable (first 255)*
+|
+
+.. describe:: GET_RETVAL
+
+| *Push in stack value from function return*
+|
+
+.. describe:: TO_TYPE
+
+| *Convert value to new type*
+|
+
+.. describe:: DROP
+
+| *Drop top of stack*
+|
+
+.. describe:: HALT
+
+| *Stop VM*
+|

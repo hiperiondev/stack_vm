@@ -30,26 +30,35 @@
 #include "vm_libstring.h"
 #include "ffi_print.h"
 
-#define EP(x) [x] = #x
-const char *vm_err[] = {
-        EP(VM_ERR_OK),
-        EP(VM_ERR_HALT),
-        EP(VM_ERR_UNKNOWNOP),
-        EP(VM_ERR_CONST_BADTYPE),
-        EP(VM_ERR_PRG_END),
-        EP(VM_ERR_OUTOFRANGE),
-        EP(VM_ERR_BAD_VALUE),
-        EP(VM_ERR_DIVBYZERO),
-        EP(VM_ERR_TOOMANYTHREADS),
-        EP(VM_ERR_INVALIDRETURN),
-        EP(VM_ERR_FOREINGFNUNKN),
-        EP(VM_ERR_OUTOFMEMORY),
-        EP(VM_ERR_LOCALNOTEXIST),
-        EP(VM_ERR_HEAPNOTEXIST),
-        EP(VM_ERR_INDUNDERZERO),
-        EP(VM_ERR_OVERFLOW),
-        EP(VM_ERR_FAIL),
+#define EP(x) #x
+
+typedef struct vm_err_str_s {
+    char *tag;
+    char *description;
+} vm_err_str_t;
+
+// VM errors
+const vm_err_str_t vm_err[] = {
+      //|         error            | description                                         |
+        { EP(VM_ERR_OK)            , "ok"                                                },
+        { EP(VM_ERR_HALT)          , "end with halt"                                     },
+        { EP(VM_ERR_UNKNOWNOP)     , "op unknown"                                        },
+        { EP(VM_ERR_CONST_BADTYPE) , "bad type in constant"                              },
+        { EP(VM_ERR_PRG_END)       , "end program or pc beyond program length"           },
+        { EP(VM_ERR_OUTOFRANGE)    , "value out of range"                                },
+        { EP(VM_ERR_BAD_VALUE)     , "value type not allowed"                            },
+        { EP(VM_ERR_DIVBYZERO)     , "division by zero"                                  },
+        { EP(VM_ERR_TOOMANYTHREADS), "calls exceed VM_THREAD_MAX_CALL_DEPTH"             },
+        { EP(VM_ERR_INVALIDRETURN) , "return not associated with call"                   },
+        { EP(VM_ERR_FOREINGFNUNKN) , "foreign function unknown"                          },
+        { EP(VM_ERR_OUTOFMEMORY)   , "can't allocate heap"                               },
+        { EP(VM_ERR_LOCALNOTEXIST) , "local variable not exist or out of range"          },
+        { EP(VM_ERR_HEAPNOTEXIST)  , "referenced heap not used or not exist"             },
+        { EP(VM_ERR_INDUNDERZERO)  , "indirect register has been decremented under zero" },
+        { EP(VM_ERR_OVERFLOW)      , "overflow"                                          },
+        { EP(VM_ERR_FAIL)          , "generic fail"                                      },
 };
+
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -82,7 +91,7 @@ int main(int argc, char *argv[]) {
     thread->state->lib[0] = lib_entry_strings;
     ++thread->state->lib_qty;
 
-    // empty code space
+    // create empty code space
     hex = malloc(sizeof(uint8_t));
 
     // load program
@@ -107,8 +116,8 @@ int main(int argc, char *argv[]) {
         vm_step(&thread);
 
     // print internal end result
-    printf("---------- execute result: %s [(%u) %s] (exit value: %u)\n", thread->status == VM_ERR_OK ? "ok" : "fail", thread->status, vm_err[thread->status],
-            thread->exit_value);
+    printf("---------- execute result: %s [(%u) %s: %s] (exit value: %u)\n", thread->status == VM_ERR_OK ? "ok" : "fail", thread->status,
+            vm_err[thread->status].tag, vm_err[thread->status].description, thread->exit_value);
     printf("-------------- pc: %u, sp: %u, fp: %u\n", thread->pc, thread->sp, thread->fp);
 
     // destroy VM thread

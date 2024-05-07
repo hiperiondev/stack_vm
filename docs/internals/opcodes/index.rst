@@ -291,15 +291,17 @@ Instruction Description
 
 | *Create new array in heap and fill with n elements from stack. Push heap index*
 |
+| ``Create a new array in Heap, fill with stack elements and return an array object``
 | ``Program: u16``
-| ``Stack: ( - )``
+| ``Stack: ( value ...(n) value - array )``
 
 .. describe:: PUSH_ARRAY
 
 | *Push array to stack*
 |
+| ``Return an array object of Heap idx index``
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( idx - array )``
 
 .. describe:: GET_ARRAY_VALUE
 

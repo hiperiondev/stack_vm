@@ -308,153 +308,153 @@ Instruction Description
 | *Get value from array*
 |
 | ``Program: @u16``
-| ``Stack: ``( - )``
+| ``Stack: ( - value )``
 
 .. describe:: SET_ARRAY_VALUE
 
 | *Set value on array*
 |
 | ``Program: @u16``
-| ``Stack: ( - )``
+| ``Stack: ( value - )``
 
 .. describe:: ADD
 
 | *Add top and second element from stack*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - value )``
 
 .. describe:: SUB
 
 | *Subtract top and second element from stack*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - value )``
 
 .. describe:: MUL
 
 | *Multiply top and second element from stack*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - value )``
 
 .. describe:: DIV
 
 | *Divide top and second element from stack*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - value )``
 
 .. describe:: MOD
 
 | *Module from top and second element of stack*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - value )``
 
 .. describe:: OR
 
 | *Logical OR from top and second element of stack*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - value )``
 
 .. describe:: AND
 
 | *Logical AND from top and second element of stack*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - true/false )``
 
 .. describe:: LT
 
 | *Lesser*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - true/false )``
 
 .. describe:: LTE
 
 | *Lesser or equal*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - true/false )``
 
 .. describe:: GT
 
 | *Greater*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - true/false )``
 
 .. describe:: GTE
 
 | *Greater or equal*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - true/false )``
 
 .. describe:: INC
 
 | *Increment*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value - value )``
 
 .. describe:: DEC
 
 | *Decrement*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value - value )``
 
 .. describe:: EQU
 
 | *Equality*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value value - true/false )``
 
 .. describe:: NOT
 
 | *Binary negation*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( bool - bool )``
 
 .. describe:: SET_GLOBAL
 
 | *Set global variable*
 |
 | ``Program: u32``
-| ``Stack: ( - )``
+| ``Stack: ( value - )``
 
 .. describe:: GET_GLOBAL
 
 | *Get global variable*
 |
 | ``Program: u32``
-| ``Stack: ( - )``
+| ``Stack: ( - value )``
 
 .. describe:: GOTO
 
-| *Jump*
+| *Jump to program position*
 |
 | ``Program: @u32``
 | ``Stack: ( - )``
 
 .. describe:: GOTOZ
 
-| *Jump if top stack is zero*
+| *Jump to program position if top stack is zero*
 |
 | ``Program: @u32``
-| ``Stack: ( - )``
+| ``Stack: ( value - )``
 
 .. describe:: CALL
 
-| *Call function*
+| *Call function in program position*
 |
-| ``Program: u8 @u32``
+| ``Program: u8: reserved space for local variables, @u32: program position``
 | ``Stack: ( - )``
 
 .. describe:: RETURN
@@ -467,7 +467,7 @@ Instruction Description
 .. describe:: RETURN_VALUE
 
 | *Return from function with value*
-|
+| ``Value returned is saved on ret_val register``
 | ``Program: none``
 | ``Stack: ( - )``
 
@@ -475,68 +475,70 @@ Instruction Description
 
 | *Call foreign function*
 |
-| ``Program: u8 @u32``
+| ``Program: u8: internal function (see FFI), @u32: Foreign function id``
 | ``Stack: ( - )``
 
 .. describe:: LIB_FN
 
 | *Call library function*
 |
-| ``Program: u8 @u32``
+| ``Program: u8: internal function (see LIBRARIES), @u32: Library id``
 | ``Stack: ( - )``
 
 .. describe:: GET_LOCAL
 
 | *Get local variable*
 |
-| ``Program: u32``
-| ``Stack: ( - )``
+| ``Program: u32: local index``
+| ``Stack: ( - value )``
 
 .. describe:: GET_LOCAL_FF
 
 | *Get local variable (first 255)*
 |
-| ``Program: u8``
-| ``Stack: ( - )``
+| ``Program: u8: local index``
+| ``Stack: ( - value )``
 
 .. describe:: SET_LOCAL
 
 | *Set local variable*
 |
-| ``Program: u32``
-| ``Stack: ( - )``
+| ``Program: u32: local index``
+| ``Stack: ( value - )``
 
 .. describe:: SET_LOCAL_FF
 
 | *Set local variable (first 255)*
 |
-| ``Program: u8``
-| ``Stack: ( - )``
+| ``Program: u8: local index``
+| ``Stack: ( value - )``
 
 .. describe:: GET_RETVAL
 
 | *Push in stack value from function return*
 |
+| ``Retrieve value for return register``
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( - value )``
 
 .. describe:: TO_TYPE
 
 | *Convert value to new type*
 |
-| ``Program: u8``
-| ``Stack: ( - )``
+| ``Program: u8: new type``
+| ``Stack: ( value - value )``
 
 .. describe:: DROP
 
 | *Drop top of stack*
 |
 | ``Program: none``
-| ``Stack: ( - )``
+| ``Stack: ( value - )``
 
 .. describe:: HALT
 
 | *Stop VM*
 |
-| ``Program: none``
+| ``Returns a value for internal uses``
+| ``Program: u8``
 | ``Stack: ( - )``

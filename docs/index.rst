@@ -34,7 +34,7 @@ Features
 * Call with frame placement and stack space reservation for local variables
 * Heap management per frame with automatic release at the exit of the frame
 * Native external data management (via custom function)
-* Primitives for strings
+* Libraries for custom data types
 * Simple external functions (FFI)
 * Global variables and arrays allocated in heap
 

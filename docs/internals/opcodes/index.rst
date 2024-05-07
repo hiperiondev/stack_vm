@@ -141,280 +141,391 @@ Instruction Description
 
 | *Push NULL value*
 |
-| no parameters
+| Program: no parameters
+| Stack: ``( - NULL)``
 
 
 .. describe:: PUSH_NULL_N
 
 | *Pushes N null values onto the stack*
 |
+| Program: u8 = N
+| Stack: ``( - NULL ..(n) NULL)``
  
 .. describe:: PUSH_NEW_HEAP_OBJ
 
 | *Create a new heap object referenced to library*
 |
+| Program: 
+| Stack: ``()``
  
 .. describe:: PUSH_TRUE
 
 | *Push boolean true value*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_FALSE
 
 | *Push boolean false value*
 |
+| Program: 
+| Stack: ``()``
  
 .. describe:: PUSH_INT
 
 | *Push integer value*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_UINT
 
 | *Push unsigned integer value*
 |
+| Program: 
+| Stack: ``()``
  
 .. describe:: PUSH_0
 
 | *Push unsigned integer 0*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_1
 
 | *Push unsigned integer 1*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_CHAR
 
 | *Push unsigned integer value of char*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_FLOAT
 
 | *Push float value*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_CONST_UINT8
 
 | *Push constant uint8 value from program address*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_CONST_INT8
 
 | *Push constant int8 value from program address*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_CONST_UINT16
 
 | *Push constant uint16 value from program address*
-| 
+|
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_CONST_INT16
 
 | *Push constant int16 value from program address*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_CONST_UINT32
 
 | *Push constant uint32 value from program address*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_CONST_INT32
 
 | *Push constant int32 value from program address*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_CONST_FLOAT
 
 | *Push constant float value from program address*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_CONST_STRING
 
 | *Push constant string value from program address*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_HEAP_OBJECT
 
 | *Push a heap object*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: NEW_ARRAY
 
 | *Create new array in heap and fill with n elements from stack. Push heap index*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: PUSH_ARRAY
 
 | *Push array to stack*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: GET_ARRAY_VALUE
 
 | *Get value from array*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: SET_ARRAY_VALUE
 
 | *Set value on array*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: ADD
 
 | *Add top and second element from stack*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: SUB
 
 | *Subtract top and second element from stack*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: MUL
 
 | *Multiply top and second element from stack*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: DIV
 
 | *Divide top and second element from stack*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: MOD
 
 | *Module from top and second element of stack*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: OR
 
 | *Logical OR from top and second element of stack*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: AND
 
 | *Logical AND from top and second element of stack*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: LT
 
 | *Lesser*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: LTE
 
 | *Lesser or equal*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: GT
 
 | *Greater*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: GTE
 
 | *Greater or equal*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: INC
 
 | *Increment*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: DEC
 
 | *Decrement*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: EQU
 
 | *Equality*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: NOT
 
 | *Binary negation*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: SET_GLOBAL
 
 | *Set global variable*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: GET_GLOBAL
 
 | *Get global variable*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: GOTO
 
 | *Jump*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: GOTOZ
 
 | *Jump if top stack is zero*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: CALL
 
 | *Call function*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: RETURN
 
 | *Return from function without values*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: RETURN_VALUE
 
 | *Return from function with value*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: CALL_FOREIGN
 
 | *Call foreign function*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: LIB_FN
 
 | *Call library function*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: GET_LOCAL
 
 | *Get local variable*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: GET_LOCAL_FF
 
 | *Get local variable (first 255)*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: SET_LOCAL
 
 | *Set local variable*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: SET_LOCAL_FF
 
 | *Set local variable (first 255)*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: GET_RETVAL
 
 | *Push in stack value from function return*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: TO_TYPE
 
 | *Convert value to new type*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: DROP
 
 | *Drop top of stack*
 |
+| Program: 
+| Stack: ``()``
 
 .. describe:: HALT
 
 | *Stop VM*
 |
+| Program: 
+| Stack: ``()``

@@ -37,7 +37,7 @@ Also the use of native data types has generic options for use as well as the def
 - [x] Call with frame placement and stack space reservation for local variables
 - [x] Heap management per frame with automatic release at the exit of the frame
 - [x] Native external data management (via custom function)
-- [x] Primitives for strings
+- [x] Libraries for custom data types
 - [x] Simple external functions (FFI)
 - [x] Global variables and arrays allocated in heap
   - [x] Can allocate local arrays 

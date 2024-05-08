@@ -28,10 +28,11 @@ Call type
 | *The call type argument is a reference of a method in an library object.*
 | Exist fourth internal methods that must be implemented in the entry function and are called by the VM:
 
-* VM_EDFAT_NEW: Called when a new library object is created
-* VM_EDFAT_PUSH: Called when a library object is pushed to the stack
-* VM_EDFAT_CMP: Called when a comparison is performed
-* VM_EDFAT_GC: Called in the garbage collector unit
+* VM_EDFAT_NEW: Called when a new library object is created.
+* VM_EDFAT_PUSH: Called when a library object is pushed to the stack.
+* VM_EDFAT_CMP: Called when a comparison is performed.
+* VM_EDFAT_GC: Called in the garbage collector unit.
+* VM_EDFAT_TOTYPE: Called when TO_TYPE is performed.
 
 | 
 | Any other value can be used by the library for its internal methods

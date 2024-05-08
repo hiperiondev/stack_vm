@@ -1,4 +1,4 @@
 #! /bin/bash
 
-valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose Release/stack_vm
+valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose Release/stack_vm $1
 rm vgcore*

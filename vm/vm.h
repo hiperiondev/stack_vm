@@ -241,6 +241,7 @@ typedef enum VM_EXTERNAL_DATA_FUNCTION_ARG_TYPE {
     VM_EDFAT_PUSH,        //
     VM_EDFAT_CMP,         //
     VM_EDFAT_GC,          //
+    VM_EDFAT_TOTYPE,      //
 } vm_edf_arg_type_t;
 
 typedef struct vm_heap_object_s vm_heap_object_t;

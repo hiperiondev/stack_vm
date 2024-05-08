@@ -97,6 +97,9 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
         }
             break;
 
+        case VM_EDFAT_TOTYPE:
+            break;
+
             // internal cases
         case LIBSTRING_FN_LEN: {
             NEW_HEAP_REF(obj, STK_TOP(thread).lib_obj.heap_ref);

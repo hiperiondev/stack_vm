@@ -23,6 +23,19 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+typedef union {
+     uint8_t u8;      //
+    uint16_t u16;     //
+    uint32_t u32;     //
+      int8_t i8;      //
+     int16_t i16;     //
+     int32_t i32;     //
+       float f32;     //
+        char *str;    //
+     uint8_t byte[4]; //
+} d_t;
+
+
 #define VM_VERSION_MAYOR 2 // indicate a really big change that can cause a lot of incompatibilities with previous versions
 #define VM_VERSION_MINOR 2 // indicate some change on API or opcode
 #define VM_VERSION_PATCH 2 // indicate some minor change or correction

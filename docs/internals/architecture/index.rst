@@ -30,6 +30,10 @@ Local Variables
 | Functions GET_LOCAL_FF and SET_LOCAL_FF can only access the first 255 local variables.
 | Physically, they are references to the positions in the stack starting from the actual stack pointer, in reverse order, and they overwrite these positions, which is why must be reserved before making a subroutine call (see FRAMES).
  
+.. warning::
+
+   Local variables cannot be used in Frame 0 
+ 
 Frames
 ------
  

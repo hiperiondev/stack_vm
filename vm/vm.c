@@ -67,60 +67,34 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
     return false;
 }
 
-// data program
-uint8_t vm_read_byte(vm_thread_t **thread, uint32_t *pc) {
-    return (*thread)->state->program[(*pc)++];
-}
-
 int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc) {
-    vm_value_t val;
-    val.number.byte[0] = (*thread)->state->program[*pc];
-    val.number.byte[1] = (*thread)->state->program[*pc + 1];
+    uint32_t *val = (uint32_t*)((*thread)->state->program + *pc);
     *pc += 2;
-
-    return val.number.integer;
+    return (int16_t)*val;
 }
 
 uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc) {
-    vm_value_t val;
-    val.number.byte[0] = (*thread)->state->program[*pc];
-    val.number.byte[1] = (*thread)->state->program[*pc + 1];
+    uint32_t *val = (uint32_t*)((*thread)->state->program + *pc);
     *pc += 2;
-
-    return val.number.uinteger;
+    return (uint16_t)*val;
 }
 
 int32_t vm_read_i32(vm_thread_t **thread, uint32_t *pc) {
-    vm_value_t val;
-    val.number.byte[0] = (*thread)->state->program[*pc];
-    val.number.byte[1] = (*thread)->state->program[*pc + 1];
-    val.number.byte[2] = (*thread)->state->program[*pc + 2];
-    val.number.byte[3] = (*thread)->state->program[*pc + 3];
+    uint32_t *val = (uint32_t*)((*thread)->state->program + *pc);
     *pc += 4;
-
-    return val.number.integer;
+    return (int32_t)*val;
 }
 
 uint32_t vm_read_u32(vm_thread_t **thread, uint32_t *pc) {
-    vm_value_t val;
-    val.number.byte[0] = (uint32_t) (*thread)->state->program[*pc];
-    val.number.byte[1] = (uint32_t) (*thread)->state->program[*pc + 1];
-    val.number.byte[2] = (uint32_t) (*thread)->state->program[*pc + 2];
-    val.number.byte[3] = (uint32_t) (*thread)->state->program[*pc + 3];
+    uint32_t *val = (uint32_t*) ((*thread)->state->program + *pc);
     *pc += 4;
-
-    return val.number.integer;
+    return (uint32_t) *val;
 }
 
 float vm_read_f32(vm_thread_t **thread, uint32_t *pc) {
-    vm_value_t val;
-    val.number.byte[0] = (*thread)->state->program[*pc];
-    val.number.byte[1] = (*thread)->state->program[*pc + 1];
-    val.number.byte[2] = (*thread)->state->program[*pc + 2];
-    val.number.byte[3] = (*thread)->state->program[*pc + 3];
+    float *val = (float*) ((*thread)->state->program + *pc);
     *pc += 4;
-
-    return val.number.real;
+    return *val;
 }
 
 // stack

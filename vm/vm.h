@@ -472,7 +472,8 @@ void vm_pop_frame(vm_thread_t **thread);
  * @param pc Program counter
  * @return a uint8 value from program
  */
-uint8_t vm_read_byte(vm_thread_t **thread, uint32_t *pc);
+//uint8_t vm_read_byte(vm_thread_t **thread, uint32_t *pc);
+#define vm_read_byte(thread, pc) (*thread)->state->program[(*pc)++]
 
 /**
  * @fn int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc)
@@ -483,6 +484,15 @@ uint8_t vm_read_byte(vm_thread_t **thread, uint32_t *pc);
  * @return a int16 value from program
  */
 int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc);
+/*
+#define vm_read_i16(thread, pc) \
+{ \
+	vm_value_t val; \
+	    val.number.byte[0] = (*thread)->state->program[*pc]; \
+	    val.number.byte[1] = (*thread)->state->program[*pc + 1]; \
+	    *pc += 2; \
+	    }
+*/
 
 /**
  * @fn uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc)

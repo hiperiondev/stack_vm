@@ -26,45 +26,50 @@
 
 // values
 static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_value_t b) {
-    bool both_strings = (a.type == VM_VAL_CONST_STRING && b.type == VM_VAL_CONST_STRING);
+    bool result = false;
 
-    if (a.type != b.type && !both_strings) {
+    if (a.type != b.type) {
         return false;
     }
 
-    if (a.type == VM_VAL_NULL) {
-        return true;
+    switch (a.type) {
+        case VM_VAL_NULL:
+            result = true;
+            break;
+
+        case VM_VAL_BOOL:
+            result = a.number.boolean == b.number.boolean;
+            break;
+
+        case VM_VAL_INT:
+            result = a.number.integer == b.number.integer;
+            break;
+
+        case VM_VAL_UINT:
+            result = a.number.uinteger == b.number.uinteger;
+            break;
+
+        case VM_VAL_FLOAT:
+            result = a.number.real == b.number.real;
+            break;
+
+        case VM_VAL_LIB_OBJ:
+            if (!((*thread)->state->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, a.lib_obj.lib_idx, 2) != VM_ERR_OK))
+                result = true;
+            break;
+
+        case VM_VAL_ARRAY:
+            vm_heap_object_t *a1 = vm_heap_load((*thread)->state->heap, a.heap_ref);
+            vm_heap_object_t *a2 = vm_heap_load((*thread)->state->heap, b.heap_ref);
+            result = a1->array.fields == a2->array.fields;
+            break;
+
+        case VM_VAL_CONST_STRING:
+            result = (strcmp(a.cstr.addr, b.cstr.addr) == 0);
+            break;
     }
 
-    if (a.type == VM_VAL_BOOL) {
-        return a.number.boolean == b.number.boolean;
-    }
-
-    if (a.type == VM_VAL_INT) {
-        return a.number.integer == b.number.integer;
-    }
-
-    if (a.type == VM_VAL_UINT) {
-        return a.number.uinteger == b.number.uinteger;
-    }
-
-    if (a.type == VM_VAL_FLOAT) {
-        return a.number.real == b.number.real;
-    }
-
-    if (a.type == VM_VAL_LIB_OBJ) {
-        if ((*thread)->state->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, a.lib_obj.lib_idx, 2) != VM_ERR_OK)
-            return false;
-        return true;
-    }
-
-    if (a.type == VM_VAL_ARRAY) {
-        vm_heap_object_t *a1 = vm_heap_load((*thread)->state->heap, a.heap_ref);
-        vm_heap_object_t *a2 = vm_heap_load((*thread)->state->heap, b.heap_ref);
-        return a1->array.fields == a2->array.fields;
-    }
-
-    return false;
+    return result;
 }
 
 int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc) {

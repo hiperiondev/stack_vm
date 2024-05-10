@@ -482,7 +482,10 @@ void vm_pop_frame(vm_thread_t **thread);
  * @param pc Program counter
  * @return a int16 value from program
  */
-int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc);
+inline int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc) {
+    *pc += 2;
+    return (int16_t)*((uint32_t*)((*thread)->state->program + *pc - 2));
+}
 
 /**
  * @fn uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc)
@@ -492,7 +495,10 @@ int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc);
  * @param pc Program counter
  * @return a uint16 value from program
  */
-uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc);
+inline uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc) {
+    *pc += 2;
+    return (uint16_t)*((uint32_t*)((*thread)->state->program + *pc - 2));
+}
 
 /**
  * @fn int32_t vm_read_i32(vm_thread_t **thread, uint32_t *pc)
@@ -502,7 +508,10 @@ uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc);
  * @param pc Program counter
  * @return a int32 value from program
  */
-int32_t vm_read_i32(vm_thread_t **thread, uint32_t *pc);
+inline int32_t vm_read_i32(vm_thread_t **thread, uint32_t *pc) {
+    *pc += 4;
+    return (int32_t)*((uint32_t*)((*thread)->state->program + *pc - 4));
+}
 
 /**
  * @fn uint32_t vm_read_u32(vm_thread_t **thread, uint32_t *pc)
@@ -512,7 +521,10 @@ int32_t vm_read_i32(vm_thread_t **thread, uint32_t *pc);
  * @param pc Program counter
  * @return a uint32 value from program
  */
-uint32_t vm_read_u32(vm_thread_t **thread, uint32_t *pc);
+inline uint32_t vm_read_u32(vm_thread_t **thread, uint32_t *pc) {
+    *pc += 4;
+    return (uint32_t) *((uint32_t*) ((*thread)->state->program + *pc - 4));
+}
 
 /**
  * @fn float vm_read_f32(vm_thread_t **thread, uint32_t *pc)
@@ -522,7 +534,10 @@ uint32_t vm_read_u32(vm_thread_t **thread, uint32_t *pc);
  * @param pc Program counter
  * @return a float value from program
  */
-float vm_read_f32(vm_thread_t **thread, uint32_t *pc);
+inline float vm_read_f32(vm_thread_t **thread, uint32_t *pc) {
+    *pc += 4;
+    return *((float*) ((*thread)->state->program + *pc - 4));
+}
 
 /////////// heap ////////
 

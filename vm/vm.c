@@ -54,8 +54,7 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
             break;
 
         case VM_VAL_LIB_OBJ:
-            if (!((*thread)->state->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, a.lib_obj.lib_idx, 2) != VM_ERR_OK))
-                result = true;
+            result = (*thread)->state->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, a.lib_obj.lib_idx, 2) == VM_ERR_OK;
             break;
 
         case VM_VAL_ARRAY:

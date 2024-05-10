@@ -72,33 +72,28 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
 }
 
 int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc) {
-    uint32_t *val = (uint32_t*)((*thread)->state->program + *pc);
     *pc += 2;
-    return (int16_t)*val;
+    return (int16_t)*((uint32_t*)((*thread)->state->program + *pc - 2));
 }
 
 uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc) {
-    uint32_t *val = (uint32_t*)((*thread)->state->program + *pc);
     *pc += 2;
-    return (uint16_t)*val;
+    return (uint16_t)*((uint32_t*)((*thread)->state->program + *pc - 2));
 }
 
 int32_t vm_read_i32(vm_thread_t **thread, uint32_t *pc) {
-    uint32_t *val = (uint32_t*)((*thread)->state->program + *pc);
     *pc += 4;
-    return (int32_t)*val;
+    return (int32_t)*((uint32_t*)((*thread)->state->program + *pc - 4));
 }
 
 uint32_t vm_read_u32(vm_thread_t **thread, uint32_t *pc) {
-    uint32_t *val = (uint32_t*) ((*thread)->state->program + *pc);
     *pc += 4;
-    return (uint32_t) *val;
+    return (uint32_t) *((uint32_t*) ((*thread)->state->program + *pc - 4));
 }
 
 float vm_read_f32(vm_thread_t **thread, uint32_t *pc) {
-    float *val = (float*) ((*thread)->state->program + *pc);
     *pc += 4;
-    return *val;
+    return *((float*) ((*thread)->state->program + *pc - 4));
 }
 
 // stack

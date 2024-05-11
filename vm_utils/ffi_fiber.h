@@ -1,5 +1,5 @@
 /*
- * @ffi_print.h
+ * @ffi_fiber.h
  *
  * @brief Stack VM
  * @details
@@ -22,7 +22,8 @@ typedef enum {
     FFI_FIBER_ENQUEUE, // enqueue this frame
     FFI_FIBER_DEQUEUE, // dequeue this fame
     FFI_FIBER_CURRENT, // fiber id for this frame
-    FFI_FIBER_RESUME   // resume fiber id
+    FFI_FIBER_RESUME,  // resume fiber id
+    FFI_FIBER_YIELD,   // return to scheduler
 } ffi_fiber_fn_t;
 
 vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn);

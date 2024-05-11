@@ -214,24 +214,24 @@
  *
  */
 typedef enum VM_ERRORS {
-    VM_ERR_OK,             /**< ok */                                               ///< VM_ERR_OK
-    VM_ERR_HALT,           /**< end with halt */                                    ///< VM_ERR_HALT
-    VM_ERR_UNKNOWNOP,      /**< op unknown */                                       ///< VM_ERR_UNKNOWNOP
-    VM_ERR_CONST_BADTYPE,  /**< bad type in constant */                             ///< VM_ERR_CONST_BADTYPE
-    VM_ERR_PRG_END,        /**< end program or pc beyond program length */          ///< VM_ERR_PRG_END
-    VM_ERR_OUTOFRANGE,     /**< value out of range */                               ///< VM_ERR_OUTOFRANGE
-    VM_ERR_BAD_VALUE,      /**< value type not allowed */                           ///< VM_ERR_BAD_VALUE
-    VM_ERR_DIVBYZERO,      /**< division by zero */                                 ///< VM_ERR_DIVBYZERO
-    VM_ERR_TOOMANYTHREADS, /**< calls exceed VM_THREAD_MAX_CALL_DEPTH */            ///< VM_ERR_TOOMANYTHREADS
-    VM_ERR_INVALIDRETURN,  /**< return not associated with call */                  ///< VM_ERR_INVALIDRETURN
-    VM_ERR_FOREINGFNUNKN,  /**< foreign function unknown */                         ///< VM_ERR_FOREINGFNUNKN
-    VM_ERR_OUTOFMEMORY,    /**< can't allocate heap */                              ///< VM_ERR_OUTOFMEMORY
-    VM_ERR_LOCALNOTEXIST,  /**< local variable not exist or out of range */         ///< VM_ERR_LOCALNOTEXIST
-    VM_ERR_HEAPNOTEXIST,   /**< referenced heap not used or not exist */            ///< VM_ERR_HEAPNOTEXIST
-    VM_ERR_INDUNDERZERO,   /**< indirect register has been decremented under zero *////< VM_ERR_INDUNDERZERO
-    VM_ERR_OVERFLOW,       /**< overflow */                                         ///< VM_ERR_OVERFLOW
+    VM_ERR_OK,             /**< ok */
+    VM_ERR_HALT,           /**< end with halt */
+    VM_ERR_UNKNOWNOP,      /**< op unknown */
+    VM_ERR_CONST_BADTYPE,  /**< bad type in constant */
+    VM_ERR_PRG_END,        /**< end program or pc beyond program length */
+    VM_ERR_OUTOFRANGE,     /**< value out of range */
+    VM_ERR_BAD_VALUE,      /**< value type not allowed */
+    VM_ERR_DIVBYZERO,      /**< division by zero */
+    VM_ERR_TOOMANYTHREADS, /**< calls exceed VM_THREAD_MAX_CALL_DEPTH */
+    VM_ERR_INVALIDRETURN,  /**< return not associated with call */
+    VM_ERR_FOREINGFNUNKN,  /**< foreign function unknown */
+    VM_ERR_OUTOFMEMORY,    /**< can't allocate heap */
+    VM_ERR_LOCALNOTEXIST,  /**< local variable not exist or out of range */
+    VM_ERR_HEAPNOTEXIST,   /**< referenced heap not used or not exist */
+    VM_ERR_INDUNDERZERO,   /**< indirect register has been decremented under zero */
+    VM_ERR_OVERFLOW,       /**< overflow */
     //[...]//
-    VM_ERR_FAIL            /**< generic fail */                                     ///< VM_ERR_FAIL
+    VM_ERR_FAIL            /**< generic fail */
 } vm_errors_t;
 
 /**

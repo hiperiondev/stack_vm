@@ -1,5 +1,5 @@
 /*
- * @ffi_print.h
+ * @ffi_fiber.h
  *
  * @brief Stack VM
  * @details
@@ -14,7 +14,4 @@
  * @copyright MIT License
  * @see https://github.com/hiperiondev/stack_vm
  */
-
-
-
 

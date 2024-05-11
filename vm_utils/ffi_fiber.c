@@ -21,22 +21,43 @@
 #include "ffi_fiber.h"
 
 typedef struct {
-    uint32_t frame;   //
+    uint32_t frame;    //
     uint32_t yield_pc; //
-        bool in_use;  //
+        bool in_use;   //
 } ffi_fiber_t;
 
 ffi_fiber_t scheduler_queue[FFI_MAX_FIBERS];
 uint32_t scheduler_pos;
 
-vm_value_t ffi_fiber_yield(vm_thread_t **thread) {
-    vm_value_t ret = { VM_VAL_NULL };
+static vm_value_t ffi_fiber_yield(vm_thread_t **thread) {
+    vm_value_t ret;
+    ret.type = VM_VAL_BOOL;
+    ret.number.boolean = false;
+
+    uint32_t first_pos = scheduler_pos;
+    do {
+        if (scheduler_pos > FFI_MAX_FIBERS)
+            scheduler_pos = 0;
+
+        if(!scheduler_queue[scheduler_pos].in_use)
+            continue;
+
+        if(!vm_wordpos_isset_bit((*thread)->frame_exist, scheduler_queue[scheduler_pos].frame)) { // frame is scheduled but not exist anymore, then dequeue.
+            scheduler_queue[scheduler_pos].in_use = false;
+            continue;
+        }
+
+        // TODO: Implement
+
+    } while (++scheduler_pos != first_pos);
+
 
     return ret;
 }
 
 vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn) {
     vm_value_t ret = { VM_VAL_NULL };
+
     switch (fn) {
         case FFI_FIBER_ENQUEUE: {
             bool have_pos = false;
@@ -67,8 +88,10 @@ vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn) {
             if (ret.type == VM_VAL_UINT && ret.number.uinteger < FFI_MAX_FIBERS) {
                 scheduler_pos = ret.number.uinteger;
                 ret = ffi_fiber_yield(thread);
-            } else
-                ret.type = VM_VAL_NULL;
+            } else {
+                ret.type = VM_VAL_BOOL;
+                ret.number.boolean = false;
+            }
             break;
 
         case FFI_FIBER_YIELD:

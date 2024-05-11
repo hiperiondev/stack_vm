@@ -123,7 +123,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(1, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_NULL);
     OP_TEST_END();
 
@@ -135,11 +135,11 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(2, 3, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_NULL);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_NULL);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_NULL);
     OP_TEST_END();
 
@@ -151,7 +151,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(1, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_BOOL);
     assert(vm_value.number.boolean == true);
     OP_TEST_END();
@@ -164,7 +164,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(1, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_BOOL);
     assert(vm_value.number.boolean == false);
     OP_TEST_END();
@@ -178,7 +178,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(5, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == -10);
     OP_TEST_END();
@@ -191,7 +191,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(5, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.integer == 98345);
     OP_TEST_END();
@@ -204,7 +204,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(1, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.integer == 0);
     OP_TEST_END();
@@ -217,7 +217,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(1, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.integer == 1);
     OP_TEST_END();
@@ -230,7 +230,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(2, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.integer == 43);
     OP_TEST_END();
@@ -243,7 +243,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(5, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_FLOAT);
     assert(vm_value.number.real == (float)-12.600000);
     OP_TEST_END();
@@ -258,7 +258,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(13, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_ARRAY);
     assert(vm_value.heap_ref == 0);
     OP_TEST_END();
@@ -290,7 +290,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(16, 2, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 10);
     OP_TEST_END();
@@ -308,7 +308,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(24, 2, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 45);
     OP_TEST_END();
@@ -330,7 +330,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(46, 2, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 30);
     assert(thread->indirect == 1);
@@ -346,7 +346,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 8);
     OP_TEST_END();
@@ -361,7 +361,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 2);
     OP_TEST_END();
@@ -376,7 +376,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 15);
     OP_TEST_END();
@@ -391,7 +391,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 2);
     OP_TEST_END();
@@ -419,7 +419,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 0);
     OP_TEST_END();
@@ -434,7 +434,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 7);
     OP_TEST_END();
@@ -449,7 +449,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 1);
     OP_TEST_END();
@@ -464,7 +464,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_BOOL);
     assert(vm_value.number.boolean == 1);
     OP_TEST_END();
@@ -479,7 +479,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_BOOL);
     assert(vm_value.number.boolean == 0);
     OP_TEST_END();
@@ -494,7 +494,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_BOOL);
     assert(vm_value.number.boolean == 1);
     OP_TEST_END();
@@ -509,7 +509,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_BOOL);
     assert(vm_value.number.boolean == 1);
     OP_TEST_END();
@@ -523,7 +523,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(6, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 7);
     OP_TEST_END();
@@ -537,7 +537,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(6, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 5);
     OP_TEST_END();
@@ -552,7 +552,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_BOOL);
     assert(vm_value.number.boolean == 0);
     OP_TEST_END();
@@ -566,7 +566,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(2, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_BOOL);
     assert(vm_value.number.boolean == 0);
     OP_TEST_END();
@@ -582,10 +582,10 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(20, 2, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 12);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_FLOAT);
     assert(vm_value.number.real == 34);
     OP_TEST_END();
@@ -649,9 +649,9 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(35, 2, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_NULL);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 30);
     OP_TEST_END();
@@ -677,7 +677,7 @@ void test_opcodes(void) {
     thread->state->foreign_functions[0] = foreign_function_test;
     TEST_EXECUTE;
     OP_TEST_START(17, 3, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 55);
     OP_TEST_END();
@@ -701,7 +701,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(18, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 35);
     OP_TEST_END();
@@ -727,7 +727,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(27, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 1);
     OP_TEST_END();
@@ -751,7 +751,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(18, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 35);
     OP_TEST_END();
@@ -779,25 +779,25 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(36, 7, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_FLOAT);
     assert(vm_value.number.real == (float)-234.45);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == -67000);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.uinteger == 66000);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == -31000);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.uinteger == 33000);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == -1);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.uinteger == 3);
     OP_TEST_END();
@@ -813,7 +813,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(6, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
     assert(strcmp(vm_value.cstr.addr, "string test") == 0);
     OP_TEST_END();
@@ -828,7 +828,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(7, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_FLOAT);
     assert(vm_value.number.real == 23);
     OP_TEST_END();
@@ -864,7 +864,7 @@ void test_opcodes(void) {
     TEST_EXECUTE;
     OP_TEST_START(15, 1, 0);
     assert(thread->indirect == 12);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.uinteger == 12);
     OP_TEST_END();
@@ -901,7 +901,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(33, 2, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
     assert(strcmp(vm_value.cstr.addr, "string test") == 0);
     OP_TEST_END();
@@ -926,7 +926,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(33, 2, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.uinteger == 11);
     OP_TEST_END();
@@ -951,7 +951,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(29, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
     assert(strcmp(vm_value.cstr.addr, "string") == 0);
     OP_TEST_END();
@@ -976,7 +976,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(29, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
     assert(strcmp(vm_value.cstr.addr, "test") == 0);
     OP_TEST_END();
@@ -1002,7 +1002,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
     assert(strcmp(vm_value.cstr.addr, "ing te") == 0);
     OP_TEST_END();
@@ -1029,7 +1029,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
     assert(strcmp(vm_value.cstr.addr, "strest") == 0);
     OP_TEST_END();
@@ -1056,7 +1056,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
     assert(strcmp(vm_value.cstr.addr, "str other stringing test") == 0);
     OP_TEST_END();
@@ -1083,7 +1083,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_CONST_STRING);
     assert(strcmp(vm_value.cstr.addr, "str other s") == 0);
     OP_TEST_END();
@@ -1110,7 +1110,7 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(28, 1, 0);
-    vm_value = vm_do_pop(&thread);
+    vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.uinteger == 3);
     OP_TEST_END();

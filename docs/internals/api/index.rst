@@ -108,17 +108,17 @@ VM INTERNALS
 .. code-block:: C
    :caption: Push value
    
-      void vm_do_push(vm_thread_t **thread, vm_value_t value);
+      void vm_push(vm_thread_t **thread, vm_value_t value);
 
 .. code-block:: C
    :caption: Pop value
    
-      vm_value_t vm_do_pop(vm_thread_t **thread);
+      vm_value_t vm_pop(vm_thread_t **thread);
 
 .. code-block:: C
    :caption: Drop elements n elements from stack
    
-      vm_errors_t vm_do_drop_n(vm_thread_t **thread, uint32_t qty);
+      vm_errors_t vm_drop_n(vm_thread_t **thread, uint32_t qty);
 
 .. code-block:: C
    :caption: Push frame (for call)

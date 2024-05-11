@@ -14,13 +14,14 @@
  * @copyright MIT License
  * @see https://github.com/hiperiondev/stack_vm
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "vm.h"
 
 vm_value_t ffi_print(vm_thread_t **thread, uint32_t fn) {
-    vm_value_t val = vm_do_pop(thread);
+    vm_value_t val = vm_pop(thread);
     switch (val.type) {
         case VM_VAL_NULL:
             printf("(null)\n");

@@ -41,7 +41,7 @@
                 _zzz_new_obj.lib_obj.lib_idx = lidx;                                                                                               \
                 _zzz_new_obj.lib_obj.addr = NULL;                                                                                                  \
                 _zzz_new_value.lib_obj.heap_ref = vm_heap_save((*thread)->state->heap, _zzz_new_obj, &((*thread)->frames[(*thread)->fc].gc_mark)); \
-                vm_do_push(thread, _zzz_new_value);                                                                                                \
+                vm_push(thread, _zzz_new_value);                                                                                                \
             }
 
 ///// utils /////
@@ -271,7 +271,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             vm_value_t find_pos = {VM_VAL_UINT};
             find_pos.number.uinteger = libstring_strpos(string1, string2, STK_TRD(thread).number.uinteger);
             STK_DROP3(thread);
-            vm_do_push(thread, find_pos);
+            vm_push(thread, find_pos);
         }
         break;
 

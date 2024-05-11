@@ -77,6 +77,22 @@
 
 ////////////// END VM CONFIGURATION //////////////
 
+////////////////// word id ///////////////////////
+
+#define GET_BIT(v, b)  ((v >> b) & 1)
+#define SET_BIT(v, b)  ((v) | (1 << b))
+#define CLR_BIT(v, b)  ((v) & (~(1 << b)))
+
+#define ID_ALLOC_WORD(id)        (id / 32)
+#define ID_ALLOC_BIT(id)         (id % 32)
+#define ID_POS(id_word, id_bit)  ((id_word * 32) + id_bit)
+
+#define vm_wordpos_set_bit(alloc_word, id)    alloc_word[ID_ALLOC_WORD(id)] = (SET_BIT(alloc_word[ID_ALLOC_WORD(id)], ID_ALLOC_BIT(id)))
+#define vm_wordpos_unset_bit(alloc_word, id)  alloc_word[ID_ALLOC_WORD(id)] = (CLR_BIT(alloc_word[ID_ALLOC_WORD(id)], ID_ALLOC_BIT(id)))
+#define vm_wordpos_isset_bit(alloc_word, id)  (GET_BIT(alloc_word[ID_ALLOC_WORD(id)], ID_ALLOC_BIT(id)) ? 1 : 0)
+
+//////////////////////////////////////////////////
+
 #define OP_INDIRECT(op)       (op & 0xc0)                         /**< indirect argument */
 
 #define STK_OBJ(thread, pos)  (*thread)->stack[pos]               /**< generic access to stack */
@@ -190,7 +206,7 @@
     val.type = VM_VAL_FLOAT;    \
     val.number.real = f
 
-////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 
 /**
  * @enum VM_ERRORS
@@ -198,24 +214,24 @@
  *
  */
 typedef enum VM_ERRORS {
-    VM_ERR_OK,             /**< ok */
-    VM_ERR_HALT,           /**< end with halt */
-    VM_ERR_UNKNOWNOP,      /**< op unknown */
-    VM_ERR_CONST_BADTYPE,  /**< bad type in constant */
-    VM_ERR_PRG_END,        /**< end program or pc beyond program length */
-    VM_ERR_OUTOFRANGE,     /**< value out of range */
-    VM_ERR_BAD_VALUE,      /**< value type not allowed */
-    VM_ERR_DIVBYZERO,      /**< division by zero */
-    VM_ERR_TOOMANYTHREADS, /**< calls exceed VM_THREAD_MAX_CALL_DEPTH */
-    VM_ERR_INVALIDRETURN,  /**< return not associated with call */
-    VM_ERR_FOREINGFNUNKN,  /**< foreign function unknown */
-    VM_ERR_OUTOFMEMORY,    /**< can't allocate heap */
-    VM_ERR_LOCALNOTEXIST,  /**< local variable not exist or out of range */
-    VM_ERR_HEAPNOTEXIST,   /**< referenced heap not used or not exist */
-    VM_ERR_INDUNDERZERO,   /**< indirect register has been decremented under zero */
-    VM_ERR_OVERFLOW,       /**< overflow */
+    VM_ERR_OK,             /**< ok */                                               ///< VM_ERR_OK
+    VM_ERR_HALT,           /**< end with halt */                                    ///< VM_ERR_HALT
+    VM_ERR_UNKNOWNOP,      /**< op unknown */                                       ///< VM_ERR_UNKNOWNOP
+    VM_ERR_CONST_BADTYPE,  /**< bad type in constant */                             ///< VM_ERR_CONST_BADTYPE
+    VM_ERR_PRG_END,        /**< end program or pc beyond program length */          ///< VM_ERR_PRG_END
+    VM_ERR_OUTOFRANGE,     /**< value out of range */                               ///< VM_ERR_OUTOFRANGE
+    VM_ERR_BAD_VALUE,      /**< value type not allowed */                           ///< VM_ERR_BAD_VALUE
+    VM_ERR_DIVBYZERO,      /**< division by zero */                                 ///< VM_ERR_DIVBYZERO
+    VM_ERR_TOOMANYTHREADS, /**< calls exceed VM_THREAD_MAX_CALL_DEPTH */            ///< VM_ERR_TOOMANYTHREADS
+    VM_ERR_INVALIDRETURN,  /**< return not associated with call */                  ///< VM_ERR_INVALIDRETURN
+    VM_ERR_FOREINGFNUNKN,  /**< foreign function unknown */                         ///< VM_ERR_FOREINGFNUNKN
+    VM_ERR_OUTOFMEMORY,    /**< can't allocate heap */                              ///< VM_ERR_OUTOFMEMORY
+    VM_ERR_LOCALNOTEXIST,  /**< local variable not exist or out of range */         ///< VM_ERR_LOCALNOTEXIST
+    VM_ERR_HEAPNOTEXIST,   /**< referenced heap not used or not exist */            ///< VM_ERR_HEAPNOTEXIST
+    VM_ERR_INDUNDERZERO,   /**< indirect register has been decremented under zero *////< VM_ERR_INDUNDERZERO
+    VM_ERR_OVERFLOW,       /**< overflow */                                         ///< VM_ERR_OVERFLOW
     //[...]//
-    VM_ERR_FAIL            /**< generic fail */
+    VM_ERR_FAIL            /**< generic fail */                                     ///< VM_ERR_FAIL
 } vm_errors_t;
 
 /**
@@ -331,19 +347,20 @@ typedef struct vm_frame_s {
  *
  */
 typedef struct vm_thread_s {
-             uint8_t exit_value;                       /**< exit value from HALT */
-         vm_errors_t status;                           /**< vm status */
-                bool halted;                           /**< vm is halted */
-          vm_state_t *state;                           /**< each thread stores a reference to its state */
-            uint32_t global_vars[VM_MAX_GLOBAL_VARS];  /**< global vars (frame 0 heap indexes) */
-            uint32_t global_vars_qty;                  /**< global vars quantity */
-            uint32_t indirect;                         /**< indirect register */
-            uint32_t pc, fp, sp;                       /**< program counter, frame pointer, stack pointer */
-          vm_value_t ret_val;                          /**< return value from CALL / CALL_FOREIGN */
-            uint32_t fc;                               /**< frame counter */
-          vm_frame_t frames[VM_THREAD_MAX_CALL_DEPTH]; /**< frames */
-          vm_value_t stack[VM_THREAD_STACK_SIZE];      /**< vm stack */
-                void *userdata;                        /**< generic userdata pointer (not used in vm but useful for foreign functions) */
+             uint8_t exit_value;                                             /**< exit value from HALT */
+         vm_errors_t status;                                                 /**< vm status */
+                bool halted;                                                 /**< vm is halted */
+          vm_state_t *state;                                                 /**< each thread stores a reference to its state */
+            uint32_t global_vars[VM_MAX_GLOBAL_VARS];                        /**< global vars (frame 0 heap indexes) */
+            uint32_t global_vars_qty;                                        /**< global vars quantity */
+            uint32_t indirect;                                               /**< indirect register */
+            uint32_t pc, fp, sp;                                             /**< program counter, frame pointer, stack pointer */
+          vm_value_t ret_val;                                                /**< return value from CALL / CALL_FOREIGN */
+            uint32_t fc;                                                     /**< frame counter */
+          vm_frame_t frames[VM_THREAD_MAX_CALL_DEPTH];                       /**< frames */
+            uint32_t frame_exist[((VM_THREAD_MAX_CALL_DEPTH - 1) / 32) + 1]; /**< frame exist (for fiber implementation) */
+          vm_value_t stack[VM_THREAD_STACK_SIZE];                            /**< vm stack */
+                void *userdata;                                              /**< generic userdata pointer (not used in vm but useful for foreign functions) */
 } vm_thread_t;
 
 /**
@@ -408,31 +425,31 @@ void vm_create_thread(vm_thread_t **thread);
 void vm_destroy_thread(vm_thread_t **thread);
 
 /**
- * @fn void vm_do_push(vm_thread_t **thread, vm_value_t value)
+ * @fn void vm_push(vm_thread_t **thread, vm_value_t value)
  * @brief Push value
  *
  * @param thread Thread
  * @param value Value
  */
-void vm_do_push(vm_thread_t **thread, vm_value_t value);
+void vm_push(vm_thread_t **thread, vm_value_t value);
 
 /**
- * @fn vm_value_t vm_do_pop(vm_thread_t **thread)
+ * @fn vm_value_t vm_pop(vm_thread_t **thread)
  * @brief Pop value
  *
  * @param thread Thread
  * @return Value Value
  */
-vm_value_t vm_do_pop(vm_thread_t **thread);
+vm_value_t vm_pop(vm_thread_t **thread);
 
 /**
- * @fn vm_errors_t vm_do_drop_n(vm_thread_t **thread, uint32_t qty)
+ * @fn vm_errors_t vm_drop_n(vm_thread_t **thread, uint32_t qty)
  * @brief Drop elements n elements from stack
  *
  * @param thread Thread
  * @param qty Quantity
  */
-vm_errors_t vm_do_drop_n(vm_thread_t **thread, uint32_t qty);
+vm_errors_t vm_drop_n(vm_thread_t **thread, uint32_t qty);
 
 /**
  * @fn void vm_push_frame(vm_thread_t **thread, uint8_t nargs)

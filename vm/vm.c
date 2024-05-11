@@ -72,15 +72,15 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
 }
 
 // stack
-void vm_do_push(vm_thread_t **thread, vm_value_t value) {
+void vm_push(vm_thread_t **thread, vm_value_t value) {
     STK_OBJ(thread, (*thread)->sp++)= value;
 }
 
-vm_value_t vm_do_pop(vm_thread_t **thread) {
+vm_value_t vm_pop(vm_thread_t **thread) {
     return STK_OBJ(thread, --(*thread)->sp);
 }
 
-vm_errors_t vm_do_drop_n(vm_thread_t **thread, uint32_t qty) {
+vm_errors_t vm_drop_n(vm_thread_t **thread, uint32_t qty) {
     if (qty < 1 || qty - 1 > (*thread)->sp) {
         return VM_ERR_BAD_VALUE;
     }
@@ -95,22 +95,24 @@ vm_errors_t vm_do_drop_n(vm_thread_t **thread, uint32_t qty) {
     return VM_ERR_OK;
 }
 
-void vm_do_push_frame(vm_thread_t **thread, uint8_t locals) {
+void vm_push_frame(vm_thread_t **thread, uint8_t locals) {
     (*thread)->frames[(*thread)->fc].pc = (*thread)->pc;
     (*thread)->frames[(*thread)->fc].fp = (*thread)->fp;
     (*thread)->frames[(*thread)->fc].locals = locals;
     ++(*thread)->fc;
-    (*thread)->fp = (*thread)->sp;
 
+    vm_wordpos_set_bit((*thread)->frame_exist, (*thread)->fc);
+    (*thread)->fp = (*thread)->sp;
     (*thread)->frames[(*thread)->fc].gc_mark = vm_heap_new_gc_mark((*thread)->state->heap);
 }
 
-void vm_do_pop_frame(vm_thread_t **thread) {
+void vm_pop_frame(vm_thread_t **thread) {
     vm_heap_gc_collect((*thread)->state->heap, &((*thread)->frames[(*thread)->fc].gc_mark), true, thread);
 #ifdef VM_HEAP_SHRINK_AFTER_GC
     vm_heap_shrink((*thread)->state->heap);
 #endif
 
+    vm_wordpos_unset_bit((*thread)->frame_exist, (*thread)->fc);
     (*thread)->sp = (*thread)->fp;
     vm_frame_t frame = (*thread)->frames[--(*thread)->fc];
     (*thread)->sp -= frame.locals;
@@ -166,7 +168,7 @@ void vm_step(vm_thread_t **thread) {
             break;
 
         case PUSH_NEW_HEAP_OBJ: {
-            vm_value_t lib_idx = vm_do_pop(thread);
+            vm_value_t lib_idx = vm_pop(thread);
             if (lib_idx.type != VM_VAL_UINT || lib_idx.number.uinteger > (*thread)->state->lib_qty)
                 err = VM_ERR_BAD_VALUE;
 
@@ -182,7 +184,7 @@ void vm_step(vm_thread_t **thread) {
 
             uint32_t heap_ref = vm_heap_save((*thread)->state->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
             ref.lib_obj.heap_ref = heap_ref;
-            vm_do_push(thread, ref);
+            vm_push(thread, ref);
             (*thread)->state->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, lib_idx.number.uinteger, heap_ref);
         }
             break;
@@ -221,13 +223,13 @@ void vm_step(vm_thread_t **thread) {
 
         case PUSH_TRUE: {
             vm_new_bool(val, true);
-            vm_do_push(thread, val);
+            vm_push(thread, val);
         }
         break;
 
         case PUSH_FALSE: {
             vm_new_bool(val, false);
-            vm_do_push(thread, val);
+            vm_push(thread, val);
         }
         break;
 
@@ -269,7 +271,7 @@ void vm_step(vm_thread_t **thread) {
 
         case PUSH_FLOAT: {
             vm_new_float(val, vm_read_f32(thread, &(*thread)->pc));
-            vm_do_push(thread, val);
+            vm_push(thread, val);
         }
         break;
 
@@ -346,13 +348,13 @@ void vm_step(vm_thread_t **thread) {
         break;
 
         case PUSH_ARRAY: {
-            vm_value_t heap_id = vm_do_pop(thread);
+            vm_value_t heap_id = vm_pop(thread);
             if (heap_id.type == VM_VAL_UINT) {
                 uint32_t ref = heap_id.number.uinteger;
                 heap_id.heap_ref = ref;
                 heap_id.type = VM_VAL_ARRAY;
 
-                vm_do_push(thread, heap_id);
+                vm_push(thread, heap_id);
             } else
                 err = VM_ERR_BAD_VALUE;
             break;
@@ -377,7 +379,7 @@ void vm_step(vm_thread_t **thread) {
                     val.type = VM_VAL_ARRAY;
                     val.heap_ref = heap_id;
 
-                    vm_do_push(thread, val);
+                    vm_push(thread, val);
                 }
             } else
                 err = VM_ERR_BAD_VALUE;
@@ -398,7 +400,7 @@ void vm_step(vm_thread_t **thread) {
             }
 
             if (arr->type == VM_VAL_ARRAY && index >= 0 && index < arr->array.qty)
-                vm_do_push(thread, arr->array.fields[index]);
+                vm_push(thread, arr->array.fields[index]);
             else
                 err = VM_ERR_BAD_VALUE;
         }
@@ -417,7 +419,7 @@ void vm_step(vm_thread_t **thread) {
             }
 
             vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, STK_SND(thread).heap_ref);
-            vm_value_t val = vm_do_pop(thread);
+            vm_value_t val = vm_pop(thread);
 
             if (arr->type == VM_VAL_ARRAY && index >= 0 && index < arr->array.qty)
                 arr->array.fields[index] = val;
@@ -447,14 +449,14 @@ void vm_step(vm_thread_t **thread) {
 
 #define BIN_OP_INT_UINT(OP, operator)                                                            \
     case OP: {                                                                                   \
-        vm_value_t val2 = vm_do_pop(thread);                                                     \
-        vm_value_t val1 = vm_do_pop(thread);                                                     \
+        vm_value_t val2 = vm_pop(thread);                                                     \
+        vm_value_t val1 = vm_pop(thread);                                                     \
         if(val1.type == VM_VAL_UINT && val2.type == VM_VAL_UINT) {                               \
         	vm_new_uint(val, val1.number.uinteger operator val2.number.uinteger);                \
-            vm_do_push(thread, val);                                                             \
+            vm_push(thread, val);                                                             \
         } else {                                                                                 \
         	vm_new_int(val, (int32_t)val1.number.integer operator (int32_t)val2.number.integer); \
-            vm_do_push(thread, val);                                                             \
+            vm_push(thread, val);                                                             \
         }                                                                                        \
     } break;
 
@@ -555,21 +557,21 @@ void vm_step(vm_thread_t **thread) {
         break;
 
         case EQU: {
-            vm_value_t b = vm_do_pop(thread);
-            vm_value_t a = vm_do_pop(thread);
+            vm_value_t b = vm_pop(thread);
+            vm_value_t a = vm_pop(thread);
 
             vm_new_bool(val, vm_are_values_equal(thread, a, b));
-            vm_do_push(thread, val);
+            vm_push(thread, val);
         }
         break;
 
         case NOT: {
-            vm_value_t a = vm_do_pop(thread);
+            vm_value_t a = vm_pop(thread);
             if (a.type != VM_VAL_BOOL) {
                 err = VM_ERR_BAD_VALUE;
             } else {
                 vm_new_bool(val, !a.number.boolean);
-                vm_do_push(thread, val);
+                vm_push(thread, val);
             }
         }
         break;
@@ -578,7 +580,7 @@ void vm_step(vm_thread_t **thread) {
             uint32_t var_idx = vm_read_u32(thread, &(*thread)->pc);
 
             if(var_idx == 0xffffffff) { // is indirect register
-                vm_value_t value = vm_do_pop(thread);
+                vm_value_t value = vm_pop(thread);
                 if(value.type != VM_VAL_UINT) {
                     err = VM_ERR_BAD_VALUE;
                     break;
@@ -590,7 +592,7 @@ void vm_step(vm_thread_t **thread) {
 
             vm_heap_object_t value = {
                 .type = VM_VAL_GENERIC,
-                .value = vm_do_pop(thread)
+                .value = vm_pop(thread)
             };
 
             if (var_idx > VM_MAX_GLOBAL_VARS)
@@ -617,7 +619,7 @@ void vm_step(vm_thread_t **thread) {
                     .number.uinteger = (*thread)->indirect
                 };
 
-                vm_do_push(thread, value);
+                vm_push(thread, value);
                 break;
             }
 
@@ -625,7 +627,7 @@ void vm_step(vm_thread_t **thread) {
                 err = VM_ERR_OUTOFRANGE;
             else {
                 vm_heap_object_t *value = vm_heap_load((*thread)->state->heap, (*thread)->global_vars[var_idx]);
-                vm_do_push(thread, value->value);
+                vm_push(thread, value->value);
             }
         }
         break;
@@ -656,7 +658,7 @@ void vm_step(vm_thread_t **thread) {
                 new_pc += (*thread)->indirect;
             }
 
-            vm_value_t val = vm_do_pop(thread);
+            vm_value_t val = vm_pop(thread);
 
             if (val.type != VM_VAL_BOOL && val.type != VM_VAL_UINT && val.type != VM_VAL_UINT && val.type != VM_VAL_FLOAT) {
                 err = VM_ERR_BAD_VALUE;
@@ -678,7 +680,7 @@ void vm_step(vm_thread_t **thread) {
             }
 
             if ((*thread)->fc < VM_THREAD_MAX_CALL_DEPTH) {
-                vm_do_push_frame(thread, nargs);
+                vm_push_frame(thread, nargs);
                 (*thread)->pc = pc_idx;
             } else
                 err = VM_ERR_TOOMANYTHREADS;
@@ -689,16 +691,16 @@ void vm_step(vm_thread_t **thread) {
             vm_value_t vm_value_null = {VM_VAL_NULL};
             (*thread)->ret_val = vm_value_null;
             if ((*thread)->fc > 0)
-                vm_do_pop_frame(thread);
+                vm_pop_frame(thread);
             else
                 err = VM_ERR_INVALIDRETURN;
         }
         break;
 
         case RETURN_VALUE: {
-            (*thread)->ret_val = vm_do_pop(thread);
+            (*thread)->ret_val = vm_pop(thread);
             if ((*thread)->fc > 0)
-                vm_do_pop_frame(thread);
+                vm_pop_frame(thread);
             else
                 err = VM_ERR_INVALIDRETURN;
         }
@@ -741,7 +743,7 @@ void vm_step(vm_thread_t **thread) {
             (*thread)->state->program[(*thread)->pc++];
 
             if (local_idx < (*thread)->frames[(*thread)->fc - 1].locals)
-                vm_do_push(thread, (*thread)->stack[(*thread)->fp - (local_idx + 1)]);
+                vm_push(thread, (*thread)->stack[(*thread)->fp - (local_idx + 1)]);
             else
                 err = VM_ERR_LOCALNOTEXIST;
         }
@@ -754,7 +756,7 @@ void vm_step(vm_thread_t **thread) {
             (*thread)->state->program[(*thread)->pc++];
 
             if (local_idx < (*thread)->frames[(*thread)->fc - 1].locals) {
-                vm_value_t val = vm_do_pop(thread);
+                vm_value_t val = vm_pop(thread);
                 (*thread)->stack[(*thread)->fp - (local_idx + 1)] = val;
             } else
                 err = VM_ERR_LOCALNOTEXIST;
@@ -762,7 +764,7 @@ void vm_step(vm_thread_t **thread) {
         break;
 
         case GET_RETVAL: {
-            vm_do_push(thread, (*thread)->ret_val);
+            vm_push(thread, (*thread)->ret_val);
         }
         break;
 

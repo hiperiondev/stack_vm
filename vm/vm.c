@@ -66,6 +66,8 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
         case VM_VAL_CONST_STRING:
             result = (strcmp(a.cstr.addr, b.cstr.addr) == 0);
             break;
+
+        default:
     }
 
     return result;
@@ -529,14 +531,15 @@ void vm_step(vm_thread_t **thread) {
         case INC: {
             switch (STK_TOP(thread).type) {
                 case VM_VAL_UINT:
-                ++STK_TOP(thread).number.uinteger;
+                    ++STK_TOP(thread).number.uinteger;
                 break;
                 case VM_VAL_INT:
-                ++STK_TOP(thread).number.integer;
+                    ++STK_TOP(thread).number.integer;
                 break;
                 case VM_VAL_FLOAT:
-                ++STK_TOP(thread).number.real;
+                    ++STK_TOP(thread).number.real;
                 break;
+                default:
             }
         }
         break;
@@ -544,14 +547,15 @@ void vm_step(vm_thread_t **thread) {
         case DEC: {
             switch (STK_TOP(thread).type) {
                 case VM_VAL_UINT:
-                --STK_TOP(thread).number.uinteger;
+                    --STK_TOP(thread).number.uinteger;
                 break;
                 case VM_VAL_INT:
-                --STK_TOP(thread).number.integer;
+                    --STK_TOP(thread).number.integer;
                 break;
                 case VM_VAL_FLOAT:
-                --STK_TOP(thread).number.real;
+                    --STK_TOP(thread).number.real;
                 break;
+                default:
             }
         }
         break;
@@ -794,6 +798,7 @@ void vm_step(vm_thread_t **thread) {
                             STK_TOP(thread).type = VM_VAL_UINT;
                         }
                         break;
+                        default:
                     }
                 }
                 break;
@@ -811,6 +816,7 @@ void vm_step(vm_thread_t **thread) {
                             STK_TOP(thread).type = VM_VAL_INT;
                         }
                         break;
+                        default:
                     }
                 }
                 break;
@@ -829,6 +835,7 @@ void vm_step(vm_thread_t **thread) {
                             STK_TOP(thread).type = VM_VAL_FLOAT;
                         }
                         break;
+                        default:
                     }
                 }
                 break;

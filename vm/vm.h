@@ -270,7 +270,7 @@ typedef struct vm_heap_s vm_heap_t;
  *
  */
 typedef struct vm_value_s {
-    uint8_t type;              /**< value type */
+    vm_value_type_t type;      /**< value type */
     union {
         union {
                 bool boolean;  /**< VM_VAL_BOOL */

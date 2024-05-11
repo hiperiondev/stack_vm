@@ -18,6 +18,8 @@
 #ifndef FFI_FIBER_H_
 #define FFI_FIBER_H_
 
+#define FFI_MAX_FIBERS 64
+
 typedef enum {
     FFI_FIBER_ENQUEUE, // enqueue this frame
     FFI_FIBER_DEQUEUE, // dequeue this fame

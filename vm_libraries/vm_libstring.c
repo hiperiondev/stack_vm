@@ -40,7 +40,7 @@
                 _zzz_new_obj.lib_obj.identifier = STRING_LIBRARY_IDENTIFIER;                                                                       \
                 _zzz_new_obj.lib_obj.lib_idx = lidx;                                                                                               \
                 _zzz_new_obj.lib_obj.addr = NULL;                                                                                                  \
-                _zzz_new_value.lib_obj.heap_ref = vm_heap_save((*thread)->state->heap, _zzz_new_obj, &((*thread)->frames[(*thread)->fc].gc_mark)); \
+                _zzz_new_value.lib_obj.heap_ref = vm_heap_save((*thread)->heap, _zzz_new_obj, &((*thread)->frames[(*thread)->fc].gc_mark)); \
                 vm_push(thread, _zzz_new_value);                                                                                                \
             }
 
@@ -93,7 +93,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
             break;
 
         case VM_EDFAT_GC: {
-            free(vm_heap_load((*thread)->state->heap, arg)->lib_obj.addr);
+            free(vm_heap_load((*thread)->heap, arg)->lib_obj.addr);
         }
             break;
 
@@ -168,7 +168,7 @@ vm_errors_t lib_entry_strings(vm_thread_t **thread, uint8_t call_type, uint32_t 
 
         case LIBSTRING_FN_CONCAT: {
             if((STK_SND(thread).type != VM_VAL_LIB_OBJ
-                    && (vm_heap_load((*thread)->state->heap, STK_SND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER)
+                    && (vm_heap_load((*thread)->heap, STK_SND(thread).lib_obj.heap_ref))->lib_obj.identifier == STRING_LIBRARY_IDENTIFIER)
                     || STK_SND(thread).type != VM_VAL_CONST_STRING) {
                 return VM_ERR_BAD_VALUE;
             }

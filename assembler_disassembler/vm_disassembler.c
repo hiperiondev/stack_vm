@@ -31,7 +31,6 @@ uint8_t vm_disassembler(uint8_t *program, uint32_t program_len) {
     vm_program_t prg;
     prg.prog = program;
     prg.prog_len = program_len;
-    thread->state = calloc(1, sizeof(vm_state_t));
     uint32_t pc = 0;
     uint8_t op = prg.prog[pc];
     char prefix[3] = { '\0' };
@@ -98,7 +97,6 @@ uint8_t vm_disassembler(uint8_t *program, uint32_t program_len) {
                     // TODO: implement
                     break;
                 default:
-                    free(thread->state);
                     free(thread);
                     return VM_DIS_FAIL;
             }
@@ -112,7 +110,6 @@ uint8_t vm_disassembler(uint8_t *program, uint32_t program_len) {
         op = prg.prog[pc];
     }
 
-    free(thread->state);
     free(thread);
     return 0;
 }

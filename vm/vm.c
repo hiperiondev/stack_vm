@@ -54,12 +54,12 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
             break;
 
         case VM_VAL_LIB_OBJ:
-            result = (*thread)->state->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, a.lib_obj.lib_idx, 2) == VM_ERR_OK;
+            result = (*thread)->externals.lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, a.lib_obj.lib_idx, 2) == VM_ERR_OK;
             break;
 
         case VM_VAL_ARRAY:
-            vm_heap_object_t *a1 = vm_heap_load((*thread)->state->heap, a.heap_ref);
-            vm_heap_object_t *a2 = vm_heap_load((*thread)->state->heap, b.heap_ref);
+            vm_heap_object_t *a1 = vm_heap_load((*thread)->heap, a.heap_ref);
+            vm_heap_object_t *a2 = vm_heap_load((*thread)->heap, b.heap_ref);
             result = a1->array.fields == a2->array.fields;
             break;
 
@@ -107,13 +107,13 @@ void vm_push_frame(vm_thread_t **thread, uint8_t locals) {
     vm_wordpos_set_bit((*thread)->frame_exist, (*thread)->fc);
 #endif
     (*thread)->fp = (*thread)->sp;
-    (*thread)->frames[(*thread)->fc].gc_mark = vm_heap_new_gc_mark((*thread)->state->heap);
+    (*thread)->frames[(*thread)->fc].gc_mark = vm_heap_new_gc_mark((*thread)->heap);
 }
 
 void vm_pop_frame(vm_thread_t **thread) {
-    vm_heap_gc_collect((*thread)->state->heap, &((*thread)->frames[(*thread)->fc].gc_mark), true, thread);
+    vm_heap_gc_collect((*thread)->heap, &((*thread)->frames[(*thread)->fc].gc_mark), true, thread);
 #ifdef VM_HEAP_SHRINK_AFTER_GC
-    vm_heap_shrink((*thread)->state->heap);
+    vm_heap_shrink((*thread)->heap);
 #endif
 
 #ifdef VM_ENABLE_FRAMES_ALIVE
@@ -131,7 +131,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
     if ((*thread) == NULL)
         return;
 
-    if ((*thread)->state == NULL || (*thread)->halted == true) {
+    if ((*thread)->halted) {
         (*thread)->status = VM_ERR_FAIL;
         return;
     }
@@ -175,7 +175,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
 
         case PUSH_NEW_HEAP_OBJ: {
             vm_value_t lib_idx = vm_pop(thread);
-            if (lib_idx.type != VM_VAL_UINT || lib_idx.number.uinteger > (*thread)->state->lib_qty)
+            if (lib_idx.type != VM_VAL_UINT || lib_idx.number.uinteger > (*thread)->externals.lib_qty)
                 err = VM_ERR_BAD_VALUE;
 
             vm_value_t ref = {
@@ -188,10 +188,10 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                     .lib_obj.lib_idx = lib_idx.number.uinteger,
             };
 
-            uint32_t heap_ref = vm_heap_save((*thread)->state->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
+            uint32_t heap_ref = vm_heap_save((*thread)->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
             ref.lib_obj.heap_ref = heap_ref;
             vm_push(thread, ref);
-            (*thread)->state->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, lib_idx.number.uinteger, heap_ref);
+            (*thread)->externals.lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, lib_idx.number.uinteger, heap_ref);
         }
             break;
 
@@ -202,7 +202,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 err = VM_ERR_BAD_VALUE;
             else {
                 uint32_t idx = value.number.uinteger;
-                vm_heap_object_t *obj = vm_heap_load((*thread)->state->heap, idx);
+                vm_heap_object_t *obj = vm_heap_load((*thread)->heap, idx);
                 if (obj->type == VM_VAL_NULL)
                     err = VM_ERR_HEAPNOTEXIST;
                 else {
@@ -216,7 +216,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                             value.lib_obj.heap_ref = idx;
                             value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
                             STK_TOP(thread) = value;
-                            err = (*thread)->state->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, obj->lib_obj.lib_idx, idx);
+                            err = (*thread)->externals.lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, obj->lib_obj.lib_idx, idx);
                         }
                         break;
                         default:
@@ -374,7 +374,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 memcpy(arr.array.fields, &STK_OBJ(thread, (*thread)->sp - n_fields), sizeof(vm_value_t) * n_fields);
                 arr.type = VM_VAL_ARRAY;
                 arr.array.qty = n_fields;
-                uint32_t heap_id = vm_heap_save((*thread)->state->heap, arr, &((*thread)->frames[(*thread)->fc].gc_mark));
+                uint32_t heap_id = vm_heap_save((*thread)->heap, arr, &((*thread)->frames[(*thread)->fc].gc_mark));
 
                 (*thread)->sp -= n_fields;
 
@@ -394,7 +394,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
 
         case GET_ARRAY_VALUE: {
             uint16_t index = vm_read_u16(thread, program, &(*thread)->pc);
-            vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, STK_TOP(thread).heap_ref);
+            vm_heap_object_t *arr = vm_heap_load((*thread)->heap, STK_TOP(thread).heap_ref);
 
             if (indirect) {
                 uint32_t _indx = index + (*thread)->indirect;
@@ -424,7 +424,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 index = _indx;
             }
 
-            vm_heap_object_t *arr = vm_heap_load((*thread)->state->heap, STK_SND(thread).heap_ref);
+            vm_heap_object_t *arr = vm_heap_load((*thread)->heap, STK_SND(thread).heap_ref);
             vm_value_t val = vm_pop(thread);
 
             if (arr->type == VM_VAL_ARRAY && index >= 0 && index < arr->array.qty)
@@ -607,10 +607,10 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 err = VM_ERR_OUTOFRANGE;
             else {
                 if (var_idx < (*thread)->global_vars_qty) {
-                    if (!vm_heap_set((*thread)->state->heap, value, (*thread)->global_vars[var_idx]))
+                    if (!vm_heap_set((*thread)->heap, value, (*thread)->global_vars[var_idx]))
                         err = VM_ERR_OUTOFRANGE;
                 } else {
-                    uint32_t heap_id = vm_heap_save((*thread)->state->heap, value, &((*thread)->frames[0].gc_mark));
+                    uint32_t heap_id = vm_heap_save((*thread)->heap, value, &((*thread)->frames[0].gc_mark));
                     (*thread)->global_vars[var_idx] = heap_id;
                     ++(*thread)->global_vars_qty;
                 }
@@ -634,7 +634,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             if (var_idx > (*thread)->global_vars_qty - 1)
                 err = VM_ERR_OUTOFRANGE;
             else {
-                vm_heap_object_t *value = vm_heap_load((*thread)->state->heap, (*thread)->global_vars[var_idx]);
+                vm_heap_object_t *value = vm_heap_load((*thread)->heap, (*thread)->global_vars[var_idx]);
                 vm_push(thread, value->value);
             }
         }
@@ -727,8 +727,8 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 f_idx += (*thread)->indirect;
             }
 
-            if (f_idx <= (*thread)->state->foreign_functions_qty - 1) {
-                (*thread)->ret_val = (*thread)->state->foreign_functions[f_idx](thread, fn, arg);
+            if (f_idx <= (*thread)->externals.foreign_functions_qty - 1) {
+                (*thread)->ret_val = (*thread)->externals.foreign_functions[f_idx](thread, fn, arg);
             } else
                 err = VM_ERR_FOREINGFNUNKN;
         }
@@ -738,7 +738,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             if (STK_TOP(thread).type == VM_VAL_LIB_OBJ) {
                 uint8_t calltype = vm_read_byte(thread, program, &(*thread)->pc);
                 uint32_t arg = vm_read_u32(thread, program, &(*thread)->pc);
-                err = (*thread)->state->lib[STK_TOP(thread).lib_obj.lib_idx](thread, calltype, STK_TOP(thread).lib_obj.lib_idx, arg);
+                err = (*thread)->externals.lib[STK_TOP(thread).lib_obj.lib_idx](thread, calltype, STK_TOP(thread).lib_obj.lib_idx, arg);
             } else
                 err = VM_ERR_BAD_VALUE;
         }
@@ -780,7 +780,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         case TO_TYPE: {
             if (STK_TOP(thread).type == VM_VAL_LIB_OBJ) {
                 uint32_t arg = vm_read_u32(thread, program, &(*thread)->pc);
-                err = (*thread)->state->lib[STK_TOP(thread).lib_obj.lib_idx](thread, VM_EDFAT_TOTYPE, STK_TOP(thread).lib_obj.lib_idx, arg);
+                err = (*thread)->externals.lib[STK_TOP(thread).lib_obj.lib_idx](thread, VM_EDFAT_TOTYPE, STK_TOP(thread).lib_obj.lib_idx, arg);
             }
 #ifdef VM_ENABLE_TOTYPES
             uint8_t type = program->prog[(*thread)->pc++];
@@ -891,25 +891,23 @@ void* vm_alloc(size_t size, void *userdata) {
 
 void vm_create_thread(vm_thread_t **thread) {
     (*thread) = calloc(1, sizeof(vm_thread_t));
-    (*thread)->state = calloc(1, sizeof(vm_state_t));
-    (*thread)->state->heap = vm_heap_create(1);
+    (*thread)->heap = vm_heap_create(1);
     (*thread)->halted = false;
     (*thread)->global_vars_qty = 0;
     (*thread)->indirect = 0;
     (*thread)->userdata = NULL;
-    (*thread)->frames[0].gc_mark = vm_heap_new_gc_mark((*thread)->state->heap);
+    (*thread)->frames[0].gc_mark = vm_heap_new_gc_mark((*thread)->heap);
 }
 
 void vm_destroy_thread(vm_thread_t **thread) {
-    vm_heap_gc_collect((*thread)->state->heap, &((*thread)->frames[0].gc_mark), true, thread);
-    vm_heap_destroy((*thread)->state->heap, thread);
-    if ((*thread)->state->lib_qty > 0)
-        free((*thread)->state->lib);
-    if ((*thread)->state->foreign_functions_qty > 0)
-        free((*thread)->state->foreign_functions);
+    vm_heap_gc_collect((*thread)->heap, &((*thread)->frames[0].gc_mark), true, thread);
+    vm_heap_destroy((*thread)->heap, thread);
+    if ((*thread)->externals.lib_qty > 0)
+        free((*thread)->externals.lib);
+    if ((*thread)->externals.foreign_functions_qty > 0)
+        free((*thread)->externals.foreign_functions);
     for (uint32_t n = 0; n < VM_THREAD_STACK_SIZE; ++n)
         if ((*thread)->stack[n].type == VM_VAL_CONST_STRING && (*thread)->stack[n].cstr.is_program == false)
             free((*thread)->stack[n].cstr.addr);
-    free((*thread)->state);
     free((*thread));
 }

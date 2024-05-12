@@ -673,9 +673,9 @@ void test_opcodes(void) {
         return ret;
     }
 
-    thread->state->foreign_functions = malloc(sizeof(void*));
-    thread->state->foreign_functions_qty = 1;
-    thread->state->foreign_functions[0] = foreign_function_test;
+    thread->externals.foreign_functions = malloc(sizeof(void*));
+    thread->externals.foreign_functions_qty = 1;
+    thread->externals.foreign_functions[0] = foreign_function_test;
     TEST_EXECUTE;
     OP_TEST_START(21, 3, 0);
     vm_value = vm_pop(&thread);
@@ -896,9 +896,9 @@ void test_opcodes(void) {
             ".string \"string test\"\n" //
             );                          //
 
-    thread->state->lib = calloc(1, sizeof(lib_entry));
-    thread->state->lib[0] = lib_entry_strings;
-    ++thread->state->lib_qty;
+    thread->externals.lib = calloc(1, sizeof(lib_entry));
+    thread->externals.lib[0] = lib_entry_strings;
+    ++thread->externals.lib_qty;
 
     TEST_EXECUTE;
     OP_TEST_START(33, 2, 0);
@@ -921,9 +921,9 @@ void test_opcodes(void) {
             ".string \"string test\"\n" //
             );                          //
 
-    thread->state->lib = calloc(1, sizeof(lib_entry));
-    thread->state->lib[0] = lib_entry_strings;
-    ++thread->state->lib_qty;
+    thread->externals.lib = calloc(1, sizeof(lib_entry));
+    thread->externals.lib[0] = lib_entry_strings;
+    ++thread->externals.lib_qty;
 
     TEST_EXECUTE;
     OP_TEST_START(33, 2, 0);
@@ -946,9 +946,9 @@ void test_opcodes(void) {
             ".string \"other string\"\n" //
             );                           //
 
-    thread->state->lib = calloc(1, sizeof(lib_entry));
-    thread->state->lib[0] = lib_entry_strings;
-    ++thread->state->lib_qty;
+    thread->externals.lib = calloc(1, sizeof(lib_entry));
+    thread->externals.lib[0] = lib_entry_strings;
+    ++thread->externals.lib_qty;
 
     TEST_EXECUTE;
     OP_TEST_START(29, 1, 0);
@@ -971,9 +971,9 @@ void test_opcodes(void) {
             ".string \"other string\"\n" //
             );                           //
 
-    thread->state->lib = calloc(1, sizeof(lib_entry));
-    thread->state->lib[0] = lib_entry_strings;
-    ++thread->state->lib_qty;
+    thread->externals.lib = calloc(1, sizeof(lib_entry));
+    thread->externals.lib[0] = lib_entry_strings;
+    ++thread->externals.lib_qty;
 
     TEST_EXECUTE;
     OP_TEST_START(29, 1, 0);
@@ -997,9 +997,9 @@ void test_opcodes(void) {
             ".string \"other string\"\n" //
             );                           //
 
-    thread->state->lib = calloc(1, sizeof(lib_entry));
-    thread->state->lib[0] = lib_entry_strings;
-    ++thread->state->lib_qty;
+    thread->externals.lib = calloc(1, sizeof(lib_entry));
+    thread->externals.lib[0] = lib_entry_strings;
+    ++thread->externals.lib_qty;
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
@@ -1024,9 +1024,9 @@ void test_opcodes(void) {
             ".string \" other string\"\n" //
             );                            //
 
-    thread->state->lib = calloc(1, sizeof(lib_entry));
-    thread->state->lib[0] = lib_entry_strings;
-    ++thread->state->lib_qty;
+    thread->externals.lib = calloc(1, sizeof(lib_entry));
+    thread->externals.lib[0] = lib_entry_strings;
+    ++thread->externals.lib_qty;
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
@@ -1051,9 +1051,9 @@ void test_opcodes(void) {
             ".string \" other string\"\n" //
             );                            //
 
-    thread->state->lib = calloc(1, sizeof(lib_entry));
-    thread->state->lib[0] = lib_entry_strings;
-    ++thread->state->lib_qty;
+    thread->externals.lib = calloc(1, sizeof(lib_entry));
+    thread->externals.lib[0] = lib_entry_strings;
+    ++thread->externals.lib_qty;
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
@@ -1078,9 +1078,9 @@ void test_opcodes(void) {
             ".string \" other string\"\n" //
             );                            //
 
-    thread->state->lib = calloc(1, sizeof(lib_entry));
-    thread->state->lib[0] = lib_entry_strings;
-    ++thread->state->lib_qty;
+    thread->externals.lib = calloc(1, sizeof(lib_entry));
+    thread->externals.lib[0] = lib_entry_strings;
+    ++thread->externals.lib_qty;
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
@@ -1105,9 +1105,9 @@ void test_opcodes(void) {
             ".string \"ing\"\n"         //
             );                          //
 
-    thread->state->lib = calloc(1, sizeof(lib_entry));
-    thread->state->lib[0] = lib_entry_strings;
-    ++thread->state->lib_qty;
+    thread->externals.lib = calloc(1, sizeof(lib_entry));
+    thread->externals.lib[0] = lib_entry_strings;
+    ++thread->externals.lib_qty;
 
     TEST_EXECUTE;
     OP_TEST_START(28, 1, 0);

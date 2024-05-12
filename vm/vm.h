@@ -182,14 +182,14 @@
  * @brief Heap object by reference
  *
  */
-#define HEAP_OBJ(ref)  vm_heap_load((*thread)->state->heap, ref)
+#define HEAP_OBJ(ref)  vm_heap_load((*thread)->heap, ref)
 
 /**
  * @def NEW_HEAP_REF
  * @brief Create a new variable pointer referenced heap object
  *
  */
-#define NEW_HEAP_REF(_refobj_, ref)  vm_heap_object_t *_refobj_ = vm_heap_load((*thread)->state->heap, ref)
+#define NEW_HEAP_REF(_refobj_, ref)  vm_heap_object_t *_refobj_ = vm_heap_load((*thread)->heap, ref)
 
 //////////////////// internals ////////////////////
 
@@ -329,16 +329,25 @@ typedef struct vm_program_s {
 } vm_program_t;
 
 /**
+ * @struct vm_ffilib_s
+ * @brief External functions
+ *
+ */
+typedef struct vm_ffilib_s {
+    vm_foreign_function_t *foreign_functions;    /**< pointers to foreign functions */
+                 uint32_t foreign_functions_qty; /**< foreign functions quantity */
+                lib_entry *lib;                  /**< library entry functions */
+                 uint32_t lib_qty;               /**< library quantity */
+} vm_ffilib_t;
+
+/**
  * @struct vm_state_s
  * @brief VM internal state
  *
  */
 typedef struct vm_state_s {
-                vm_heap_t *heap;                 /**< heap */
-    vm_foreign_function_t *foreign_functions;    /**< pointers to foreign functions */
-                 uint32_t foreign_functions_qty; /**< foreign functions quantity */
-                lib_entry *lib;                  /**< library entry functions */
-                 uint32_t lib_qty;               /**< library quantity */
+      vm_heap_t *heap; /**< heap */
+    vm_ffilib_t externals; /**< external functions and libraries */
 } vm_state_t;
 
 /**
@@ -361,7 +370,6 @@ typedef struct vm_thread_s {
              uint8_t exit_value;                                             /**< exit value from HALT */
          vm_errors_t status;                                                 /**< vm status */
                 bool halted;                                                 /**< vm is halted */
-          vm_state_t *state;                                                 /**< each thread stores a reference to its state */
             uint32_t global_vars[VM_MAX_GLOBAL_VARS];                        /**< global vars (frame 0 heap indexes) */
             uint32_t global_vars_qty;                                        /**< global vars quantity */
             uint32_t indirect;                                               /**< indirect register */
@@ -373,6 +381,8 @@ typedef struct vm_thread_s {
             uint32_t frame_exist[((VM_THREAD_MAX_CALL_DEPTH - 1) / 32) + 1]; /**< frame exist (for fiber implementation) */
 #endif
           vm_value_t stack[VM_THREAD_STACK_SIZE];                            /**< vm stack */
+          vm_heap_t *heap;                                                   /**< heap */
+        vm_ffilib_t externals;                                               /**< external functions and libraries */
                 void *userdata;                                              /**< generic userdata pointer (not used in vm but useful for foreign functions) */
 } vm_thread_t;
 

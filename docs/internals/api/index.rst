@@ -93,7 +93,7 @@ VM INTERNALS
 .. code-block:: C
    :caption: Run a single cycle of the vm
    
-      void vm_step(vm_thread_t **thread);
+      void vm_step(vm_thread_t **thread, vm_program_t program);
 
 .. code-block:: C
    :caption: Create new thread
@@ -133,32 +133,32 @@ VM INTERNALS
 .. code-block:: C
    :caption: Read byte from program
    
-      uint8_t vm_read_byte(vm_thread_t **thread, uint32_t *pc);
+      uint8_t vm_read_byte(vm_thread_t **thread, vm_program_t program, uint32_t *pc);
 
 .. code-block:: C
    :caption: Read 16 bit integer from program
    
-      int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc);
+      int16_t vm_read_i16(vm_thread_t **thread, vm_program_t program, uint32_t *pc);
 
 .. code-block:: C
    :caption: Read 16 bit unsigned integer from program
    
-      uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc);
+      uint16_t vm_read_u16(vm_thread_t **thread, vm_program_t program, uint32_t *pc);
 
 .. code-block:: C
    :caption: Read 32 bit integer from program
    
-      int32_t vm_read_i32(vm_thread_t **thread, uint32_t *pc);
+      int32_t vm_read_i32(vm_thread_t **thread, vm_program_t program, uint32_t *pc);
 
 .. code-block:: C
    :caption: Read 32 bit unsigned integer from program
    
-      uint32_t vm_read_u32(vm_thread_t **thread, uint32_t *pc);
+      uint32_t vm_read_u32(vm_thread_t **thread, vm_program_t program, uint32_t *pc);
 
 .. code-block:: C
    :caption: Read 32 bit float from program
    
-      float vm_read_f32(vm_thread_t **thread, uint32_t *pc);
+      float vm_read_f32(vm_thread_t **thread, vm_program_t program, uint32_t *pc);
 
 .. rst-class:: lead
 

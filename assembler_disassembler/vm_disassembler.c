@@ -28,10 +28,12 @@
 
 uint8_t vm_disassembler(uint8_t *program, uint32_t program_len) {
     vm_thread_t *thread = calloc(1, sizeof(vm_thread_t));
+    vm_program_t prg;
+    prg.prog = program;
+    prg.prog_len = program_len;
     thread->state = calloc(1, sizeof(vm_state_t));
-    thread->state->program = program;
     uint32_t pc = 0;
-    uint8_t op = thread->state->program[pc];
+    uint8_t op = prg.prog[pc];
     char prefix[3] = { '\0' };
 
     while (pc < program_len) {
@@ -63,34 +65,34 @@ uint8_t vm_disassembler(uint8_t *program, uint32_t program_len) {
             switch (opcodes[op].arg_type[n]) {
                 case ARG_U08:
                     if (pc_remainder >= 1)
-                        printf("%u ", vm_read_byte(&thread, &pc));
+                        printf("%u ", vm_read_byte(&thread, &prg, &pc));
                     break;
                 case ARG_U16:
                     if (pc_remainder >= 2)
-                        printf("%u ", vm_read_u16(&thread, &pc));
+                        printf("%u ", vm_read_u16(&thread, &prg, &pc));
                     break;
                 case ARG_U32:
                     if (pc_remainder >= 4)
-                        printf("%u ", vm_read_u32(&thread, &pc));
+                        printf("%u ", vm_read_u32(&thread, &prg, &pc));
                     break;
                 case ARG_I08:
                     if (pc_remainder >= 1)
-                        printf("%d ", (int8_t) vm_read_byte(&thread, &pc));
+                        printf("%d ", (int8_t) vm_read_byte(&thread, &prg, &pc));
                     break;
                 case ARG_I16:
                     if (pc_remainder >= 1)
-                        printf("%d ", vm_read_i16(&thread, &pc));
+                        printf("%d ", vm_read_i16(&thread, &prg, &pc));
                     break;
                 case ARG_I32:
                     if (pc_remainder >= 4)
-                        printf("%d ", vm_read_i32(&thread, &pc));
+                        printf("%d ", vm_read_i32(&thread, &prg, &pc));
                     break;
                 case ARG_F32:
                     if (pc_remainder >= 4)
-                        printf("%f ", vm_read_f32(&thread, &pc));
+                        printf("%f ", vm_read_f32(&thread, &prg, &pc));
                     break;
                 case ARG_STR:
-                    printf("\"%s\" ", thread->state->program + pc);
+                    printf("\"%s\" ", prg.prog + pc);
                     break;
                 case ARG_NVL:
                     // TODO: implement
@@ -104,10 +106,10 @@ uint8_t vm_disassembler(uint8_t *program, uint32_t program_len) {
 
         printf("\n");
 
-        if (pc > program_len - 1)
+        if (pc > prg.prog_len - 1)
             break;
 
-        op = program[pc];
+        op = prg.prog[pc];
     }
 
     free(thread->state);

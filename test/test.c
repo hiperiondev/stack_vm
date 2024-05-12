@@ -71,14 +71,14 @@ void test_opcodes(void) {
         printf("      -- start disassembler\n" BYEL);                                                                                                   \
         vm_disassembler(hex, qty);                                                                                                                      \
         printf(BWHT"      -- end disassembler\n");                                                                                                      \
-        thread->state->program = hex;                                                                                                                   \
-        thread->state->program_len = qty;                                                                                                               \
+        program.prog = hex;                                                                                                                             \
+        program.prog_len = qty   ;                                                                                                                      \
         thread->halted = false
 
 #define TEST_EXECUTE                                                                                                                                    \
 	    printf("      -- start execute\n");                                                                                                             \
-        while(thread->pc < thread->state->program_len && thread->halted == false)                                                                       \
-            vm_step(&thread);                                                                                                                           \
+        while(thread->pc < program.prog_len && thread->halted == false)                                                                                 \
+            vm_step(&thread, &program);                                                                                                                 \
         printf("      -- execute result: %s [(%u) %s] (exit value: %u)\n", thread->status == VM_ERR_OK ? BGRN"ok"BWHT : BRED"fail"BWHT, thread->status, \
             vm_errors[thread->status], thread->exit_value);                                                                                             \
         printf("      -- pc: %u, sp: %u, fp: %u\n", thread->pc, thread->sp, thread->fp)
@@ -113,6 +113,7 @@ void test_opcodes(void) {
     char *str = NULL;
     vm_thread_t *thread = NULL;
     vm_value_t vm_value;
+    vm_program_t program;
     label_macro_t **label = NULL;
     uint32_t label_qty = 0;
 

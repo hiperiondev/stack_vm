@@ -323,14 +323,17 @@ typedef vm_value_t (*vm_foreign_function_t)(vm_thread_t **thread, uint8_t fn, ui
  */
 typedef vm_errors_t (*lib_entry)(vm_thread_t **thread, uint8_t call_type, uint32_t lib_idx, uint32_t args);
 
+typedef struct vm_program_s {
+    uint8_t *prog;              /**< program */
+   uint32_t prog_len;           /**< program length */
+} vm_program_t;
+
 /**
  * @struct vm_state_s
  * @brief VM internal state
  *
  */
 typedef struct vm_state_s {
-                  uint8_t *program;              /**< program */
-                 uint32_t program_len;           /**< program length */
                 vm_heap_t *heap;                 /**< heap */
     vm_foreign_function_t *foreign_functions;    /**< pointers to foreign functions */
                  uint32_t foreign_functions_qty; /**< foreign functions quantity */
@@ -411,12 +414,13 @@ typedef struct vm_heap_s {
 /////////////////// API ///////////////////
 
 /**
- * @fn void vm_step(vm_state_thread_t **thread)
+ * @fn void vm_step(vm_state_thread_t **thread, vm_program_t program)
  * @brief Run a single cycle of the vm
  *
  * @param thread Thread
+ * @param program Program
  */
-void vm_step(vm_thread_t **thread);
+void vm_step(vm_thread_t **thread, vm_program_t *program);
 
 /**
  * @fn void vm_create_thread(vm_state_thread_t **thread)
@@ -479,78 +483,84 @@ void vm_push_frame(vm_thread_t **thread, uint8_t nargs);
 void vm_pop_frame(vm_thread_t **thread);
 
 /**
- * @fn uint8_t vm_read_byte(vm_thread_t **thread, uint32_t *pc)
+ * @fn uint8_t vm_read_byte(vm_thread_t **thread, vm_program_t program, uint32_t *pc)
  * @brief Read byte from program
  *
  * @param thread Thread
+ * @param program Program
  * @param pc Program counter
  * @return a uint8 value from program
  */
-#define vm_read_byte(thread, pc) (*thread)->state->program[(*pc)++]
+#define vm_read_byte(thread, program, pc) (program)->prog[(*pc)++]
 
 /**
- * @fn int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc)
+ * @fn int16_t vm_read_i16(vm_thread_t **thread, vm_program_t program, uint32_t *pc)
  * @brief Read 16 bit integer from program
  *
  * @param thread Thread
+ * @param program Program
  * @param pc Program counter
  * @return a int16 value from program
  */
-inline int16_t vm_read_i16(vm_thread_t **thread, uint32_t *pc) {
+inline int16_t vm_read_i16(vm_thread_t **thread, vm_program_t *program, uint32_t *pc) {
     *pc += 2;
-    return (int16_t)*((uint32_t*)((*thread)->state->program + *pc - 2));
+    return (int16_t)*((uint32_t*)(program->prog + *pc - 2));
 }
 
 /**
- * @fn uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc)
+ * @fn uint16_t vm_read_u16(vm_thread_t **thread, vm_program_t program, uint32_t *pc)
  * @brief Read 16 bit unsigned integer from program
  *
  * @param thread Thread
+ * @param program Program
  * @param pc Program counter
  * @return a uint16 value from program
  */
-inline uint16_t vm_read_u16(vm_thread_t **thread, uint32_t *pc) {
+inline uint16_t vm_read_u16(vm_thread_t **thread, vm_program_t *program, uint32_t *pc) {
     *pc += 2;
-    return (uint16_t)*((uint32_t*)((*thread)->state->program + *pc - 2));
+    return (uint16_t)*((uint32_t*)(program->prog + *pc - 2));
 }
 
 /**
- * @fn int32_t vm_read_i32(vm_thread_t **thread, uint32_t *pc)
+ * @fn int32_t vm_read_i32(vm_thread_t **thread, vm_program_t program, uint32_t *pc)
  * @brief Read 32 bit integer from program
  *
  * @param thread Thread
+ * @param program Program
  * @param pc Program counter
  * @return a int32 value from program
  */
-inline int32_t vm_read_i32(vm_thread_t **thread, uint32_t *pc) {
+inline int32_t vm_read_i32(vm_thread_t **thread, vm_program_t *program, uint32_t *pc) {
     *pc += 4;
-    return (int32_t)*((uint32_t*)((*thread)->state->program + *pc - 4));
+    return (int32_t)*((uint32_t*)(program->prog + *pc - 4));
 }
 
 /**
- * @fn uint32_t vm_read_u32(vm_thread_t **thread, uint32_t *pc)
+ * @fn uint32_t vm_read_u32(vm_thread_t **thread, vm_program_t program, uint32_t *pc)
  * @brief Read 32 bit unsigned integer from program
  *
  * @param thread Thread
+ * @param program Program
  * @param pc Program counter
  * @return a uint32 value from program
  */
-inline uint32_t vm_read_u32(vm_thread_t **thread, uint32_t *pc) {
+inline uint32_t vm_read_u32(vm_thread_t **thread, vm_program_t *program, uint32_t *pc) {
     *pc += 4;
-    return (uint32_t) *((uint32_t*) ((*thread)->state->program + *pc - 4));
+    return (uint32_t) *((uint32_t*) (program->prog + *pc - 4));
 }
 
 /**
- * @fn float vm_read_f32(vm_thread_t **thread, uint32_t *pc)
+ * @fn float vm_read_f32(vm_thread_t **thread, vm_program_t program, uint32_t *pc)
  * @brief Read 32 bit float from program
  *
  * @param thread Thread
+ * @param program Program
  * @param pc Program counter
  * @return a float value from program
  */
-inline float vm_read_f32(vm_thread_t **thread, uint32_t *pc) {
+inline float vm_read_f32(vm_thread_t **thread, vm_program_t *program, uint32_t *pc) {
     *pc += 4;
-    return *((float*) ((*thread)->state->program + *pc - 4));
+    return *((float*) (program->prog + *pc - 4));
 }
 
 /////////// heap ////////

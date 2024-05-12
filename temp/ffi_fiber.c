@@ -21,7 +21,7 @@
 #include "ffi_fiber.h"
 
 typedef struct {
-    uint32_t frame;    //
+    uint32_t function; //
     uint32_t yield_pc; //
         bool in_use;   //
 } ffi_fiber_t;
@@ -42,11 +42,6 @@ static vm_value_t ffi_fiber_yield(vm_thread_t **thread) {
         if(!scheduler_queue[scheduler_pos].in_use)
             continue;
 
-        if(!vm_wordpos_isset_bit((*thread)->frame_exist, scheduler_queue[scheduler_pos].frame)) { // frame is scheduled but not exist anymore, then dequeue.
-            scheduler_queue[scheduler_pos].in_use = false;
-            continue;
-        }
-
         scheduler_queue[scheduler_pos].yield_pc = (*thread)->pc;
 
         // TODO: Implement
@@ -60,12 +55,12 @@ vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn, uint32_t arg) {
     vm_value_t ret = { VM_VAL_NULL };
 
     switch (fn) {
-        case FFI_FIBER_ENQUEUE: {
+        case FFI_FIBER_NEW: {
             bool have_pos = false;
             for (uint32_t n = 0; n < FFI_MAX_FIBERS; n++) {
                 if (!scheduler_queue[n].in_use) {
                     scheduler_queue[n].in_use = true;
-                    scheduler_queue[n].frame = (*thread)->fc;
+                    scheduler_queue[n].function = arg;
                     have_pos = true;
                     break;
                 }

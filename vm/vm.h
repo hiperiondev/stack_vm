@@ -75,6 +75,13 @@
  */
 #define VM_ENABLE_TOTYPES
 
+/**
+ * @def VM_ENABLE_FRAMES_ALIVE
+ * @brief Enable frame alive tracking
+ *
+ */
+#define VM_ENABLE_FRAMES_ALIVE
+
 ////////////// END VM CONFIGURATION //////////////
 
 ////////////////// word id ///////////////////////
@@ -359,7 +366,9 @@ typedef struct vm_thread_s {
           vm_value_t ret_val;                                                /**< return value from CALL / CALL_FOREIGN */
             uint32_t fc;                                                     /**< frame counter */
           vm_frame_t frames[VM_THREAD_MAX_CALL_DEPTH];                       /**< frames */
+#ifdef VM_ENABLE_FRAMES_ALIVE
             uint32_t frame_exist[((VM_THREAD_MAX_CALL_DEPTH - 1) / 32) + 1]; /**< frame exist (for fiber implementation) */
+#endif
           vm_value_t stack[VM_THREAD_STACK_SIZE];                            /**< vm stack */
                 void *userdata;                                              /**< generic userdata pointer (not used in vm but useful for foreign functions) */
 } vm_thread_t;

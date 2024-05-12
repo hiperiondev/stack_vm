@@ -103,7 +103,9 @@ void vm_push_frame(vm_thread_t **thread, uint8_t locals) {
     (*thread)->frames[(*thread)->fc].locals = locals;
     ++(*thread)->fc;
 
+#ifdef VM_ENABLE_FRAMES_ALIVE
     vm_wordpos_set_bit((*thread)->frame_exist, (*thread)->fc);
+#endif
     (*thread)->fp = (*thread)->sp;
     (*thread)->frames[(*thread)->fc].gc_mark = vm_heap_new_gc_mark((*thread)->state->heap);
 }
@@ -114,7 +116,9 @@ void vm_pop_frame(vm_thread_t **thread) {
     vm_heap_shrink((*thread)->state->heap);
 #endif
 
+#ifdef VM_ENABLE_FRAMES_ALIVE
     vm_wordpos_unset_bit((*thread)->frame_exist, (*thread)->fc);
+#endif
     (*thread)->sp = (*thread)->fp;
     vm_frame_t frame = (*thread)->frames[--(*thread)->fc];
     (*thread)->sp -= frame.locals;

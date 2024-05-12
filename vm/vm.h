@@ -341,16 +341,6 @@ typedef struct vm_ffilib_s {
 } vm_ffilib_t;
 
 /**
- * @struct vm_state_s
- * @brief VM internal state
- *
- */
-typedef struct vm_state_s {
-      vm_heap_t *heap; /**< heap */
-    vm_ffilib_t externals; /**< external functions and libraries */
-} vm_state_t;
-
-/**
  * @struct vm_frame_s
  * @brief VM frame structure
  *

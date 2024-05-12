@@ -24,8 +24,8 @@
 #include <stdint.h>
 
 #define VM_VERSION_MAYOR 2 // indicate a really big change that can cause a lot of incompatibilities with previous versions
-#define VM_VERSION_MINOR 2 // indicate some change on API or opcode
-#define VM_VERSION_PATCH 3 // indicate some minor change or correction
+#define VM_VERSION_MINOR 3 // indicate some change on API or opcode
+#define VM_VERSION_PATCH 0 // indicate some minor change or correction
 
 //////////////// VM CONFIGURATION ////////////////
 

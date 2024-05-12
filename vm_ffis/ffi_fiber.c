@@ -47,15 +47,16 @@ static vm_value_t ffi_fiber_yield(vm_thread_t **thread) {
             continue;
         }
 
+        scheduler_queue[scheduler_pos].yield_pc = (*thread)->pc;
+
         // TODO: Implement
 
     } while (++scheduler_pos != first_pos);
 
-
     return ret;
 }
 
-vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn) {
+vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn, uint32_t arg) {
     vm_value_t ret = { VM_VAL_NULL };
 
     switch (fn) {

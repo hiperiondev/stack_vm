@@ -294,14 +294,15 @@ typedef struct vm_value_s {
 } vm_value_t;
 
 /**
- * @fn vm_value_t (*vm_foreign_function_t)(vm_state_thread_t **thread, uint32_t fn)
+ * @fn vm_value_t (*vm_foreign_function_t)(vm_state_thread_t **thread, uint8_t fn, uint32_t arg)
  * @brief Foreign function prototype
  *
  * @param thread Thread
  * @param fn Internal function
+ * @param arg Generic argument for function
  * @return Any value to ret-val
  */
-typedef vm_value_t (*vm_foreign_function_t)(vm_thread_t **thread, uint32_t fn);
+typedef vm_value_t (*vm_foreign_function_t)(vm_thread_t **thread, uint8_t fn, uint32_t arg);
 
 /**
  * @fn vm_errors_t (*lib_entry)(vm_thread_t **thread, uint8_t call_type, void *args)

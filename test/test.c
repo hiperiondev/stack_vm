@@ -658,14 +658,14 @@ void test_opcodes(void) {
 
     END_TEST();
     ///////////////////////////////////
-    START_TEST(CALL_FOREIGN,     //
-            "PUSH_INT 34\n"      //
-            "PUSH_INT 21\n"      //
-            "CALL_FOREIGN 2 0\n" //
-            "GET_RETVAL\n"       //
-            );                   //
+    START_TEST(CALL_FOREIGN,       //
+            "PUSH_INT 34\n"        //
+            "PUSH_INT 21\n"        //
+            "CALL_FOREIGN 2 0 0\n" //
+            "GET_RETVAL\n"         //
+            );                     //
 
-    vm_value_t foreign_function_test(vm_thread_t **thread, uint32_t fn) {
+    vm_value_t foreign_function_test(vm_thread_t **thread, uint8_t fn, uint32_t arg) {
         vm_value_t ret;
         ret.type = VM_VAL_INT;
         ret.number.integer = STK_TOP(thread).number.integer + STK_SND(thread).number.integer;
@@ -676,7 +676,7 @@ void test_opcodes(void) {
     thread->state->foreign_functions_qty = 1;
     thread->state->foreign_functions[0] = foreign_function_test;
     TEST_EXECUTE;
-    OP_TEST_START(17, 3, 0);
+    OP_TEST_START(21, 3, 0);
     vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 55);

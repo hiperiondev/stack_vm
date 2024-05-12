@@ -68,7 +68,7 @@ const op_t opcodes[] = { //
      {OP(CALL)                 , 1, {ARG_U08, ARG_U32, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x2b
      {OP(RETURN)               , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x2c
      {OP(RETURN_VALUE)         , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x2d
-     {OP(CALL_FOREIGN)         , 1, {ARG_U08, ARG_U32, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x2e
+     {OP(CALL_FOREIGN)         , 1, {ARG_U08, ARG_U32, ARG_U32, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x2e
      {OP(LIB_FN)               , 0, {ARG_U08, ARG_U32, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x2f
      {OP(GET_LOCAL)            , 0, {ARG_U32, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x30
      {OP(GET_LOCAL_FF)         , 0, {ARG_U08, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x31

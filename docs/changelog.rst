@@ -50,3 +50,12 @@ Explore
          internals/architecture/index
          internals/opcodes/index
          internals/api/index 
+         
+ .. tab-item:: Utilities
+
+      .. toctree::
+         :caption: Utilities
+         :titlesonly:
+
+         utilities/ffi/index
+         utilities/library/index

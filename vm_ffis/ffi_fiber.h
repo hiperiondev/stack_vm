@@ -28,6 +28,6 @@ typedef enum {
     FFI_FIBER_YIELD,   // return to scheduler
 } ffi_fiber_fn_t;
 
-vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn);
+vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn, uint32_t arg);
 
 #endif /* FFI_FIBER_H_ */

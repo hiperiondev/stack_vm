@@ -892,6 +892,7 @@ void* vm_alloc(size_t size, void *userdata) {
 void vm_create_thread(vm_thread_t **thread) {
     (*thread) = calloc(1, sizeof(vm_thread_t));
     (*thread)->globals = calloc(1, sizeof(vm_globals_t));
+    (*thread)->stack = calloc(1, VM_THREAD_STACK_SIZE * sizeof(vm_value_t));
     (*thread)->heap = vm_heap_create(1);
     (*thread)->halted = false;
     (*thread)->globals->global_vars_qty = 0;
@@ -907,5 +908,6 @@ void vm_destroy_thread(vm_thread_t **thread) {
     for (uint32_t n = 0; n < VM_THREAD_STACK_SIZE; ++n)
         if ((*thread)->stack[n].type == VM_VAL_CONST_STRING && (*thread)->stack[n].cstr.is_program == false)
             free((*thread)->stack[n].cstr.addr);
+    free((*thread)->stack);
     free((*thread));
 }

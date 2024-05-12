@@ -371,8 +371,8 @@ typedef struct vm_thread_s {
             uint32_t frame_exist[((VM_THREAD_MAX_CALL_DEPTH - 1) / 32) + 1]; /**< frame exist (for fiber implementation) */
 #endif
           vm_value_t stack[VM_THREAD_STACK_SIZE];                            /**< vm stack */
-          vm_heap_t *heap;                                                   /**< heap */
-        vm_ffilib_t externals;                                               /**< external functions and libraries */
+           vm_heap_t *heap;                                                  /**< heap */
+         vm_ffilib_t *externals;                                             /**< external functions and libraries */
                 void *userdata;                                              /**< generic userdata pointer (not used in vm but useful for foreign functions) */
 } vm_thread_t;
 

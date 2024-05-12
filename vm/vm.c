@@ -54,7 +54,7 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
             break;
 
         case VM_VAL_LIB_OBJ:
-            result = (*thread)->externals.lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, a.lib_obj.lib_idx, 2) == VM_ERR_OK;
+            result = (*thread)->externals->lib[a.lib_obj.lib_idx](thread, VM_EDFAT_CMP, a.lib_obj.lib_idx, 2) == VM_ERR_OK;
             break;
 
         case VM_VAL_ARRAY:
@@ -131,10 +131,10 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
     if ((*thread) == NULL)
         return;
 
-    if ((*thread)->halted) {
-        (*thread)->status = VM_ERR_FAIL;
-        return;
-    }
+    //if ((*thread)->halted == true) {
+    //    (*thread)->status = VM_ERR_FAIL;
+    //    return;
+    //}
 
     if ((*thread)->pc > program->prog_len - 1) {
         (*thread)->status = VM_ERR_PRG_END;
@@ -175,7 +175,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
 
         case PUSH_NEW_HEAP_OBJ: {
             vm_value_t lib_idx = vm_pop(thread);
-            if (lib_idx.type != VM_VAL_UINT || lib_idx.number.uinteger > (*thread)->externals.lib_qty)
+            if (lib_idx.type != VM_VAL_UINT || lib_idx.number.uinteger > (*thread)->externals->lib_qty)
                 err = VM_ERR_BAD_VALUE;
 
             vm_value_t ref = {
@@ -191,7 +191,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             uint32_t heap_ref = vm_heap_save((*thread)->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
             ref.lib_obj.heap_ref = heap_ref;
             vm_push(thread, ref);
-            (*thread)->externals.lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, lib_idx.number.uinteger, heap_ref);
+            (*thread)->externals->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, lib_idx.number.uinteger, heap_ref);
         }
             break;
 
@@ -216,7 +216,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                             value.lib_obj.heap_ref = idx;
                             value.lib_obj.lib_idx = obj->lib_obj.lib_idx;
                             STK_TOP(thread) = value;
-                            err = (*thread)->externals.lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, obj->lib_obj.lib_idx, idx);
+                            err = (*thread)->externals->lib[obj->lib_obj.lib_idx](thread, VM_EDFAT_PUSH, obj->lib_obj.lib_idx, idx);
                         }
                         break;
                         default:
@@ -727,8 +727,8 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 f_idx += (*thread)->indirect;
             }
 
-            if (f_idx <= (*thread)->externals.foreign_functions_qty - 1) {
-                (*thread)->ret_val = (*thread)->externals.foreign_functions[f_idx](thread, fn, arg);
+            if (f_idx <= (*thread)->externals->foreign_functions_qty - 1) {
+                (*thread)->ret_val = (*thread)->externals->foreign_functions[f_idx](thread, fn, arg);
             } else
                 err = VM_ERR_FOREINGFNUNKN;
         }
@@ -738,7 +738,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             if (STK_TOP(thread).type == VM_VAL_LIB_OBJ) {
                 uint8_t calltype = vm_read_byte(thread, program, &(*thread)->pc);
                 uint32_t arg = vm_read_u32(thread, program, &(*thread)->pc);
-                err = (*thread)->externals.lib[STK_TOP(thread).lib_obj.lib_idx](thread, calltype, STK_TOP(thread).lib_obj.lib_idx, arg);
+                err = (*thread)->externals->lib[STK_TOP(thread).lib_obj.lib_idx](thread, calltype, STK_TOP(thread).lib_obj.lib_idx, arg);
             } else
                 err = VM_ERR_BAD_VALUE;
         }
@@ -780,7 +780,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         case TO_TYPE: {
             if (STK_TOP(thread).type == VM_VAL_LIB_OBJ) {
                 uint32_t arg = vm_read_u32(thread, program, &(*thread)->pc);
-                err = (*thread)->externals.lib[STK_TOP(thread).lib_obj.lib_idx](thread, VM_EDFAT_TOTYPE, STK_TOP(thread).lib_obj.lib_idx, arg);
+                err = (*thread)->externals->lib[STK_TOP(thread).lib_obj.lib_idx](thread, VM_EDFAT_TOTYPE, STK_TOP(thread).lib_obj.lib_idx, arg);
             }
 #ifdef VM_ENABLE_TOTYPES
             uint8_t type = program->prog[(*thread)->pc++];
@@ -902,10 +902,7 @@ void vm_create_thread(vm_thread_t **thread) {
 void vm_destroy_thread(vm_thread_t **thread) {
     vm_heap_gc_collect((*thread)->heap, &((*thread)->frames[0].gc_mark), true, thread);
     vm_heap_destroy((*thread)->heap, thread);
-    if ((*thread)->externals.lib_qty > 0)
-        free((*thread)->externals.lib);
-    if ((*thread)->externals.foreign_functions_qty > 0)
-        free((*thread)->externals.foreign_functions);
+
     for (uint32_t n = 0; n < VM_THREAD_STACK_SIZE; ++n)
         if ((*thread)->stack[n].type == VM_VAL_CONST_STRING && (*thread)->stack[n].cstr.is_program == false)
             free((*thread)->stack[n].cstr.addr);

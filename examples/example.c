@@ -74,6 +74,8 @@ int main(int argc, char *argv[]) {
     char *program = NULL;
     vm_thread_t *thread = NULL;
     label_macro_t **label = NULL;
+    vm_program_t prg;
+    vm_ffilib_t externals;
     uint32_t label_qty = 0;
 
     printf("start file: %s\n\n", argv[1]);
@@ -82,14 +84,16 @@ int main(int argc, char *argv[]) {
     vm_create_thread(&thread);
 
     // load FFI print (foreign function 0)
-    thread->state->foreign_functions = malloc(sizeof(void*));
-    thread->state->foreign_functions[0] = ffi_print;
-    ++thread->state->foreign_functions_qty;
+    externals.foreign_functions = malloc(sizeof(void*));
+    externals.foreign_functions[0] = ffi_print;
+    ++externals.foreign_functions_qty;
 
     // load LIBRARY string (library 0)
-    thread->state->lib = calloc(1, sizeof(lib_entry));
-    thread->state->lib[0] = lib_entry_strings;
-    ++thread->state->lib_qty;
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_strings;
+    ++externals.lib_qty;
+
+    thread->externals = &externals;
 
     // create empty code space
     hex = malloc(sizeof(uint8_t));
@@ -106,14 +110,14 @@ int main(int argc, char *argv[]) {
     print_hex(hex, qty, 0);
 
     // load code on VM
-    thread->state->program = hex;
-    thread->state->program_len = qty;
+    prg.prog = hex;
+    prg.prog_len = qty;
     thread->halted = false;
 
     // execute code
     printf("\n---------- execute code\n");
-    while (thread->pc < thread->state->program_len && thread->halted == false)
-        vm_step(&thread);
+    while (thread->pc < prg.prog_len && thread->halted == false)
+        vm_step(&thread, &prg);
 
     // print internal end result
     printf("---------- execute result: %s [(%u) %s: %s] (exit value: %u)\n", thread->status == VM_ERR_OK ? "ok" : "fail", thread->status,

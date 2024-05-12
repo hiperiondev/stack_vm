@@ -54,6 +54,27 @@ const char *vm_errors[] = {
 /////////////////////////////////////////////////////////////////////////////////////
 
 void test_opcodes(void) {
+    uint32_t tests_qty = 0, tests_fails = 0;
+    uint32_t progline = 0;
+    uint32_t qty = 0;
+    uint8_t res;
+    uint32_t errline;
+    uint8_t *hex = NULL;
+    char *str = NULL;
+    vm_thread_t *thread = NULL;
+    vm_value_t vm_value;
+    vm_program_t program;
+    vm_ffilib_t externals;
+    label_macro_t **label = NULL;
+    uint32_t label_qty = 0;
+
+    externals.foreign_functions = NULL;
+    externals.lib = NULL;
+    externals.foreign_functions_qty = 0;
+    externals.lib_qty = 0;
+
+    ///////////////////////////////////////////////////////////
+
 #define START_TEST(opcode, prg)                                                                                                                         \
         ++tests_qty;                                                                                                                                    \
         progline = 0;                                                                                                                                   \
@@ -72,8 +93,7 @@ void test_opcodes(void) {
         vm_disassembler(hex, qty);                                                                                                                      \
         printf(BWHT"      -- end disassembler\n");                                                                                                      \
         program.prog = hex;                                                                                                                             \
-        program.prog_len = qty   ;                                                                                                                      \
-        thread->halted = false
+        program.prog_len = qty
 
 #define TEST_EXECUTE                                                                                                                                    \
 	    printf("      -- start execute\n");                                                                                                             \
@@ -103,19 +123,6 @@ void test_opcodes(void) {
         }
 
     printf("\n---[ START TEST OPCODES ]---\n\n");
-
-    uint32_t tests_qty = 0, tests_fails = 0;
-    uint32_t progline = 0;
-    uint32_t qty = 0;
-    uint8_t res;
-    uint32_t errline;
-    uint8_t *hex = NULL;
-    char *str = NULL;
-    vm_thread_t *thread = NULL;
-    vm_value_t vm_value;
-    vm_program_t program;
-    label_macro_t **label = NULL;
-    uint32_t label_qty = 0;
 
     ///////////////////////////////////
     START_TEST(PUSH_NULL,
@@ -673,17 +680,19 @@ void test_opcodes(void) {
         return ret;
     }
 
-    thread->externals.foreign_functions = malloc(sizeof(void*));
-    thread->externals.foreign_functions_qty = 1;
-    thread->externals.foreign_functions[0] = foreign_function_test;
+    externals.foreign_functions = malloc(sizeof(void*));
+    externals.foreign_functions_qty = 1;
+    externals.foreign_functions[0] = foreign_function_test;
+    thread->externals = &externals;
+
     TEST_EXECUTE;
     OP_TEST_START(21, 3, 0);
     vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 55);
     OP_TEST_END();
-
     END_TEST();
+    free(externals.foreign_functions);
     ///////////////////////////////////
     START_TEST(SET_LOCAL / GET_LOCAL, //
             "PUSH_INT 10\n"           //
@@ -896,9 +905,10 @@ void test_opcodes(void) {
             ".string \"string test\"\n" //
             );                          //
 
-    thread->externals.lib = calloc(1, sizeof(lib_entry));
-    thread->externals.lib[0] = lib_entry_strings;
-    ++thread->externals.lib_qty;
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_strings;
+    ++externals.lib_qty;
+    thread->externals = &externals;
 
     TEST_EXECUTE;
     OP_TEST_START(33, 2, 0);
@@ -907,6 +917,7 @@ void test_opcodes(void) {
     assert(strcmp(vm_value.cstr.addr, "string test") == 0);
     OP_TEST_END();
     END_TEST();
+    free(externals.lib);
 
     START_TEST(STRING LIBRARY: LEN,     //
             "PUSH_CONST_STRING str\n"   //
@@ -921,9 +932,10 @@ void test_opcodes(void) {
             ".string \"string test\"\n" //
             );                          //
 
-    thread->externals.lib = calloc(1, sizeof(lib_entry));
-    thread->externals.lib[0] = lib_entry_strings;
-    ++thread->externals.lib_qty;
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_strings;
+    ++externals.lib_qty;
+    thread->externals = &externals;
 
     TEST_EXECUTE;
     OP_TEST_START(33, 2, 0);
@@ -932,6 +944,7 @@ void test_opcodes(void) {
     assert(vm_value.number.uinteger == 11);
     OP_TEST_END();
     END_TEST();
+    free(externals.lib);
 
     START_TEST(STRING LIBRARY: LEFT,//
             "PUSH_UINT 5\n"              // pos for LEFT
@@ -946,9 +959,10 @@ void test_opcodes(void) {
             ".string \"other string\"\n" //
             );                           //
 
-    thread->externals.lib = calloc(1, sizeof(lib_entry));
-    thread->externals.lib[0] = lib_entry_strings;
-    ++thread->externals.lib_qty;
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_strings;
+    ++externals.lib_qty;
+    thread->externals = &externals;
 
     TEST_EXECUTE;
     OP_TEST_START(29, 1, 0);
@@ -957,6 +971,7 @@ void test_opcodes(void) {
     assert(strcmp(vm_value.cstr.addr, "string") == 0);
     OP_TEST_END();
     END_TEST();
+    free(externals.lib);
 
     START_TEST(STRING LIBRARY: RIGHT,//
             "PUSH_UINT 7\n"              // pos for RIGHT
@@ -971,9 +986,10 @@ void test_opcodes(void) {
             ".string \"other string\"\n" //
             );                           //
 
-    thread->externals.lib = calloc(1, sizeof(lib_entry));
-    thread->externals.lib[0] = lib_entry_strings;
-    ++thread->externals.lib_qty;
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_strings;
+    ++externals.lib_qty;
+    thread->externals = &externals;
 
     TEST_EXECUTE;
     OP_TEST_START(29, 1, 0);
@@ -982,6 +998,7 @@ void test_opcodes(void) {
     assert(strcmp(vm_value.cstr.addr, "test") == 0);
     OP_TEST_END();
     END_TEST();
+    free(externals.lib);
 
     START_TEST(STRING LIBRARY: MID,      //
             "PUSH_UINT 3\n"              // posl for MID
@@ -997,9 +1014,10 @@ void test_opcodes(void) {
             ".string \"other string\"\n" //
             );                           //
 
-    thread->externals.lib = calloc(1, sizeof(lib_entry));
-    thread->externals.lib[0] = lib_entry_strings;
-    ++thread->externals.lib_qty;
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_strings;
+    ++externals.lib_qty;
+    thread->externals = &externals;
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
@@ -1008,6 +1026,7 @@ void test_opcodes(void) {
     assert(strcmp(vm_value.cstr.addr, "ing te") == 0);
     OP_TEST_END();
     END_TEST();
+    free(externals.lib);
 
     START_TEST(STRING LIBRARY: DELETE,    //
             "PUSH_UINT 2\n"               // posl for DELETE
@@ -1024,9 +1043,10 @@ void test_opcodes(void) {
             ".string \" other string\"\n" //
             );                            //
 
-    thread->externals.lib = calloc(1, sizeof(lib_entry));
-    thread->externals.lib[0] = lib_entry_strings;
-    ++thread->externals.lib_qty;
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_strings;
+    ++externals.lib_qty;
+    thread->externals = &externals;
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
@@ -1035,6 +1055,7 @@ void test_opcodes(void) {
     assert(strcmp(vm_value.cstr.addr, "strest") == 0);
     OP_TEST_END();
     END_TEST();
+    free(externals.lib);
 
     START_TEST(STRING LIBRARY: INSERT,    //
             "PUSH_UINT 3\n"               // pos for INSERT
@@ -1051,9 +1072,10 @@ void test_opcodes(void) {
             ".string \" other string\"\n" //
             );                            //
 
-    thread->externals.lib = calloc(1, sizeof(lib_entry));
-    thread->externals.lib[0] = lib_entry_strings;
-    ++thread->externals.lib_qty;
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_strings;
+    ++externals.lib_qty;
+    thread->externals = &externals;
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
@@ -1062,6 +1084,7 @@ void test_opcodes(void) {
     assert(strcmp(vm_value.cstr.addr, "str other stringing test") == 0);
     OP_TEST_END();
     END_TEST();
+    free(externals.lib);
 
     START_TEST(STRING LIBRARY: REPLACE,   //
             "PUSH_UINT 3\n"               // pos for REPLACE
@@ -1078,9 +1101,10 @@ void test_opcodes(void) {
             ".string \" other string\"\n" //
             );                            //
 
-    thread->externals.lib = calloc(1, sizeof(lib_entry));
-    thread->externals.lib[0] = lib_entry_strings;
-    ++thread->externals.lib_qty;
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_strings;
+    ++externals.lib_qty;
+    thread->externals = &externals;
 
     TEST_EXECUTE;
     OP_TEST_START(34, 1, 0);
@@ -1089,6 +1113,7 @@ void test_opcodes(void) {
     assert(strcmp(vm_value.cstr.addr, "str other s") == 0);
     OP_TEST_END();
     END_TEST();
+    free(externals.lib);
 
     START_TEST(STRING LIBRARY: FIND,    //
             "PUSH_UINT 3\n"             // pos for FIND
@@ -1105,9 +1130,10 @@ void test_opcodes(void) {
             ".string \"ing\"\n"         //
             );                          //
 
-    thread->externals.lib = calloc(1, sizeof(lib_entry));
-    thread->externals.lib[0] = lib_entry_strings;
-    ++thread->externals.lib_qty;
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_strings;
+    ++externals.lib_qty;
+    thread->externals = &externals;
 
     TEST_EXECUTE;
     OP_TEST_START(28, 1, 0);
@@ -1116,6 +1142,7 @@ void test_opcodes(void) {
     assert(vm_value.number.uinteger == 3);
     OP_TEST_END();
     END_TEST();
+    free(externals.lib);
     ///////////////////////////////////
     printf("---( tests: %u / fails: %u )---\n", tests_qty, tests_fails);
     printf("---[ END TEST OPCODES ]---\n");

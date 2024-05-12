@@ -20,7 +20,7 @@
 
 #include "vm.h"
 
-vm_value_t ffi_print(vm_thread_t **thread, uint32_t fn) {
+vm_value_t ffi_print(vm_thread_t **thread, uint8_t fn, uint32_t arg) {
     vm_value_t val = vm_pop(thread);
     switch (val.type) {
         case VM_VAL_NULL:

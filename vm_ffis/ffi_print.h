@@ -22,6 +22,6 @@
 
 #include "vm.h"
 
-vm_value_t ffi_print(vm_thread_t **thread, uint32_t fn);
+vm_value_t ffi_print(vm_thread_t **thread, uint8_t fn, uint32_t arg);
 
 #endif /* FFI_PRINT_H_ */

@@ -606,13 +606,13 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             if (var_idx > VM_MAX_GLOBAL_VARS)
                 err = VM_ERR_OUTOFRANGE;
             else {
-                if (var_idx < (*thread)->global_vars_qty) {
-                    if (!vm_heap_set((*thread)->heap, value, (*thread)->global_vars[var_idx]))
+                if (var_idx < (*thread)->globals->global_vars_qty) {
+                    if (!vm_heap_set((*thread)->heap, value, (*thread)->globals->global_vars[var_idx]))
                         err = VM_ERR_OUTOFRANGE;
                 } else {
                     uint32_t heap_id = vm_heap_save((*thread)->heap, value, &((*thread)->frames[0].gc_mark));
-                    (*thread)->global_vars[var_idx] = heap_id;
-                    ++(*thread)->global_vars_qty;
+                    (*thread)->globals->global_vars[var_idx] = heap_id;
+                    ++(*thread)->globals->global_vars_qty;
                 }
             }
         }
@@ -631,10 +631,10 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 break;
             }
 
-            if (var_idx > (*thread)->global_vars_qty - 1)
+            if (var_idx > (*thread)->globals->global_vars_qty - 1)
                 err = VM_ERR_OUTOFRANGE;
             else {
-                vm_heap_object_t *value = vm_heap_load((*thread)->heap, (*thread)->global_vars[var_idx]);
+                vm_heap_object_t *value = vm_heap_load((*thread)->heap, (*thread)->globals->global_vars[var_idx]);
                 vm_push(thread, value->value);
             }
         }
@@ -891,9 +891,10 @@ void* vm_alloc(size_t size, void *userdata) {
 
 void vm_create_thread(vm_thread_t **thread) {
     (*thread) = calloc(1, sizeof(vm_thread_t));
+    (*thread)->globals = calloc(1, sizeof(vm_globals_t));
     (*thread)->heap = vm_heap_create(1);
     (*thread)->halted = false;
-    (*thread)->global_vars_qty = 0;
+    (*thread)->globals->global_vars_qty = 0;
     (*thread)->indirect = 0;
     (*thread)->userdata = NULL;
     (*thread)->frames[0].gc_mark = vm_heap_new_gc_mark((*thread)->heap);
@@ -902,7 +903,7 @@ void vm_create_thread(vm_thread_t **thread) {
 void vm_destroy_thread(vm_thread_t **thread) {
     vm_heap_gc_collect((*thread)->heap, &((*thread)->frames[0].gc_mark), true, thread);
     vm_heap_destroy((*thread)->heap, thread);
-
+    free((*thread)->globals);
     for (uint32_t n = 0; n < VM_THREAD_STACK_SIZE; ++n)
         if ((*thread)->stack[n].type == VM_VAL_CONST_STRING && (*thread)->stack[n].cstr.is_program == false)
             free((*thread)->stack[n].cstr.addr);

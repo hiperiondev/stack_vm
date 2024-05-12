@@ -351,6 +351,12 @@ typedef struct vm_frame_s {
     uint32_t *gc_mark; /**< garbage collector mark allocator (used for a per frame gc) */
 } vm_frame_t;
 
+
+typedef struct vm_globals_s {
+    uint32_t global_vars[VM_MAX_GLOBAL_VARS]; /**< global vars (frame 0 heap indexes) */
+    uint32_t global_vars_qty;                 /**< global vars quantity */
+} vm_globals_t;
+
 /**
  * @struct vm_thread_s
  * @brief VM main thread state
@@ -360,8 +366,6 @@ typedef struct vm_thread_s {
              uint8_t exit_value;                                             /**< exit value from HALT */
          vm_errors_t status;                                                 /**< vm status */
                 bool halted;                                                 /**< vm is halted */
-            uint32_t global_vars[VM_MAX_GLOBAL_VARS];                        /**< global vars (frame 0 heap indexes) */
-            uint32_t global_vars_qty;                                        /**< global vars quantity */
             uint32_t indirect;                                               /**< indirect register */
             uint32_t pc, fp, sp;                                             /**< program counter, frame pointer, stack pointer */
           vm_value_t ret_val;                                                /**< return value from CALL / CALL_FOREIGN */
@@ -371,6 +375,7 @@ typedef struct vm_thread_s {
             uint32_t frame_exist[((VM_THREAD_MAX_CALL_DEPTH - 1) / 32) + 1]; /**< frame exist (for fiber implementation) */
 #endif
           vm_value_t stack[VM_THREAD_STACK_SIZE];                            /**< vm stack */
+        vm_globals_t *globals;                                               /**< globals vars */
            vm_heap_t *heap;                                                  /**< heap */
          vm_ffilib_t *externals;                                             /**< external functions and libraries */
                 void *userdata;                                              /**< generic userdata pointer (not used in vm but useful for foreign functions) */

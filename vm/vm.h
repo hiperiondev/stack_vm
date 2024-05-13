@@ -267,9 +267,7 @@ typedef enum VM_EXTERNAL_DATA_FUNCTION_ARG_TYPE {
     VM_EDFAT_TOTYPE,      //
 } vm_edf_arg_type_t;
 
-typedef struct vm_heap_object_s vm_heap_object_t;
 typedef struct vm_thread_s vm_thread_t;
-typedef struct vm_heap_s vm_heap_t;
 
 /**
  * @struct vm_value_s
@@ -358,30 +356,6 @@ typedef struct vm_globals_s {
 } vm_globals_t;
 
 /**
- * @struct vm_thread_s
- * @brief VM main thread state
- *
- */
-typedef struct vm_thread_s {
-             uint8_t exit_value;                                             /**< exit value from HALT */
-         vm_errors_t status;                                                 /**< vm status */
-                bool halted;                                                 /**< vm is halted */
-            uint32_t indirect;                                               /**< indirect register */
-            uint32_t pc, fp, sp;                                             /**< program counter, frame pointer, stack pointer */
-          vm_value_t ret_val;                                                /**< return value from CALL / CALL_FOREIGN */
-            uint32_t fc;                                                     /**< frame counter */
-          vm_frame_t frames[VM_THREAD_MAX_CALL_DEPTH];                       /**< frames */
-#ifdef VM_ENABLE_FRAMES_ALIVE
-            uint32_t frame_exist[((VM_THREAD_MAX_CALL_DEPTH - 1) / 32) + 1]; /**< frame exist (for fiber implementation) */
-#endif
-          vm_value_t *stack;                                                 /**< vm stack */
-        vm_globals_t *globals;                                               /**< globals vars */
-           vm_heap_t *heap;                                                  /**< heap */
-         vm_ffilib_t *externals;                                             /**< external functions and libraries */
-                void *userdata;                                              /**< generic userdata pointer (not used in vm but useful for foreign functions) */
-} vm_thread_t;
-
-/**
  * @struct vm_heap_object_s
  * @brief VM heap objects
  *
@@ -415,6 +389,30 @@ typedef struct vm_heap_s {
             uint32_t size;       /**< size of data heap */
     vm_heap_object_t *data;      /**< heap data */
 } vm_heap_t;
+
+/**
+ * @struct vm_thread_s
+ * @brief VM main thread state
+ *
+ */
+typedef struct vm_thread_s {
+             uint8_t exit_value;                                             /**< exit value from HALT */
+         vm_errors_t status;                                                 /**< vm status */
+                bool halted;                                                 /**< vm is halted */
+            uint32_t indirect;                                               /**< indirect register */
+            uint32_t pc, fp, sp;                                             /**< program counter, frame pointer, stack pointer */
+          vm_value_t ret_val;                                                /**< return value from CALL / CALL_FOREIGN */
+            uint32_t fc;                                                     /**< frame counter */
+          vm_frame_t frames[VM_THREAD_MAX_CALL_DEPTH];                       /**< frames */
+#ifdef VM_ENABLE_FRAMES_ALIVE
+            uint32_t frame_exist[((VM_THREAD_MAX_CALL_DEPTH - 1) / 32) + 1]; /**< frame exist (for fiber implementation) */
+#endif
+          vm_value_t *stack;                                                 /**< vm stack */
+        vm_globals_t *globals;                                               /**< globals vars */
+           vm_heap_t *heap;                                                  /**< heap */
+         vm_ffilib_t *externals;                                             /**< external functions and libraries */
+                void *userdata;                                              /**< generic userdata pointer (not used in vm but useful for foreign functions) */
+} vm_thread_t;
 
 /////////////////// API ///////////////////
 

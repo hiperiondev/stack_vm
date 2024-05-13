@@ -16,14 +16,16 @@
  */
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "vm.h"
 #include "ffi_fiber.h"
 
 typedef struct {
-    uint32_t function; //
-    uint32_t yield_pc; //
-        bool in_use;   //
+        bool in_use;      //
+    uint32_t function;    //
+  vm_value_t *stack;      //
+  vm_frame_t fiber_state; //
 } ffi_fiber_t;
 
 ffi_fiber_t scheduler_queue[FFI_MAX_FIBERS];
@@ -34,7 +36,7 @@ static vm_value_t ffi_fiber_yield(vm_thread_t **thread) {
     ret.type = VM_VAL_BOOL;
     ret.number.boolean = false;
 
-    uint32_t first_pos = scheduler_pos;
+    uint32_t actual_pos = scheduler_pos;
     do {
         if (scheduler_pos > FFI_MAX_FIBERS)
             scheduler_pos = 0;
@@ -42,11 +44,10 @@ static vm_value_t ffi_fiber_yield(vm_thread_t **thread) {
         if(!scheduler_queue[scheduler_pos].in_use)
             continue;
 
-        scheduler_queue[scheduler_pos].yield_pc = (*thread)->pc;
-
         // TODO: Implement
+        break;
 
-    } while (++scheduler_pos != first_pos);
+    } while (++scheduler_pos != actual_pos);
 
     return ret;
 }
@@ -55,12 +56,14 @@ vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn, uint32_t arg) {
     vm_value_t ret = { VM_VAL_NULL };
 
     switch (fn) {
-        case FFI_FIBER_NEW: {
+        case FFI_FIBER_ENQUEUE: {
             bool have_pos = false;
-            for (uint32_t n = 0; n < FFI_MAX_FIBERS; n++) {
+            for (uint32_t n = 1; n < FFI_MAX_FIBERS; n++) {
                 if (!scheduler_queue[n].in_use) {
                     scheduler_queue[n].in_use = true;
                     scheduler_queue[n].function = arg;
+                    scheduler_queue[n].stack = calloc(VM_THREAD_STACK_SIZE, sizeof(vm_value_t));
+                    scheduler_queue[n].fiber_state.gc_mark = vm_heap_new_gc_mark((*thread)->heap);
                     have_pos = true;
                     break;
                 }
@@ -70,8 +73,14 @@ vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn, uint32_t arg) {
         }
             break;
 
-        case FFI_FIBER_DEQUEUE:
+        case FFI_FIBER_DEQUEUE: {
+            vm_heap_gc_collect((*thread)->heap, &(scheduler_queue[scheduler_pos].fiber_state.gc_mark), true, thread);
+            for (uint32_t n = 0; n < VM_THREAD_STACK_SIZE; ++n)
+                if (scheduler_queue[scheduler_pos].stack[n].type == VM_VAL_CONST_STRING && scheduler_queue[scheduler_pos].stack[n].cstr.is_program == false)
+                    free(scheduler_queue[scheduler_pos].stack[n].cstr.addr);
+            free(scheduler_queue[scheduler_pos].stack);
             scheduler_queue[scheduler_pos++].in_use = false;
+        }
             break;
 
         case FFI_FIBER_CURRENT:
@@ -97,8 +106,13 @@ vm_value_t ffi_fiber(vm_thread_t **thread, uint32_t fn, uint32_t arg) {
     return ret;
 }
 
-void ffi_fiber_init(void) {
-    scheduler_pos = 0;
-    for (uint32_t n = 0; n < FFI_MAX_FIBERS; n++)
+void ffi_fiber_init(vm_thread_t **thread) {
+    scheduler_pos = 1;
+    for (uint32_t n = 1; n < FFI_MAX_FIBERS; n++)
         scheduler_queue[n].in_use = false;
+
+    scheduler_queue[0].in_use = true;
+    scheduler_queue[0].stack = (*thread)->stack;
+    scheduler_queue[0].fiber_state.fp = (*thread)->fp;
+    scheduler_queue[0].fiber_state.gc_mark = (*thread)->frames[0].gc_mark;
 }

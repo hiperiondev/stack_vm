@@ -21,7 +21,7 @@
 #define FFI_MAX_FIBERS 64
 
 typedef enum {
-    FFI_FIBER_NEW,     // enqueue function
+    FFI_FIBER_ENQUEUE,     // enqueue function
     FFI_FIBER_DEQUEUE, // dequeue function
     FFI_FIBER_CURRENT, // fiber id for this function
     FFI_FIBER_RESUME,  // resume fiber id

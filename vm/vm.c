@@ -131,11 +131,6 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
     if ((*thread) == NULL)
         return;
 
-    //if ((*thread)->halted == true) {
-    //    (*thread)->status = VM_ERR_FAIL;
-    //    return;
-    //}
-
     if ((*thread)->pc > program->prog_len - 1) {
         (*thread)->status = VM_ERR_PRG_END;
         (*thread)->halted = true;
@@ -143,7 +138,6 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
     }
 
     vm_errors_t err = VM_ERR_OK;
-    //vm_state_t *state = (*thread)->state;
     bool indirect = false;
     int8_t ind_inc = 0;
 
@@ -892,12 +886,9 @@ void* vm_alloc(size_t size, void *userdata) {
 void vm_create_thread(vm_thread_t **thread) {
     (*thread) = calloc(1, sizeof(vm_thread_t));
     (*thread)->globals = calloc(1, sizeof(vm_globals_t));
-    (*thread)->stack = calloc(1, VM_THREAD_STACK_SIZE * sizeof(vm_value_t));
+    (*thread)->stack = calloc(VM_THREAD_STACK_SIZE, sizeof(vm_value_t));
     (*thread)->heap = vm_heap_create(1);
-    (*thread)->halted = false;
     (*thread)->globals->global_vars_qty = 0;
-    (*thread)->indirect = 0;
-    (*thread)->userdata = NULL;
     (*thread)->frames[0].gc_mark = vm_heap_new_gc_mark((*thread)->heap);
 }
 

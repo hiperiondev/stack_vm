@@ -39,6 +39,8 @@ Features
 * Global variables and arrays allocated in heap
 
   * Can allocate local arrays
+  * Arrays can contain any type of value, including arrays
+  
 * Constants in the program area
 * Complete Assembler/Disassembler with directives easily expandable
 

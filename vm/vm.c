@@ -9,7 +9,7 @@
  *
  *   please contact their authors for more information.
  *
- * @author Emiliano Gonzalez (egonzalez . hiperion @ gmail . com))
+ * @author Emiliano Augusto Gonzalez (egonzalez . hiperion @ gmail . com)
  * @date 2024
  * @copyright MIT License
  * @see https://github.com/hiperiondev/stack_vm
@@ -73,15 +73,7 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
     return result;
 }
 
-// stack
-void vm_push(vm_thread_t **thread, vm_value_t value) {
-    STK_OBJ(thread, (*thread)->sp++)= value;
-}
-
-vm_value_t vm_pop(vm_thread_t **thread) {
-    return STK_OBJ(thread, --(*thread)->sp);
-}
-
+/*
 vm_errors_t vm_drop_n(vm_thread_t **thread, uint32_t qty) {
     if (qty < 1 || qty - 1 > (*thread)->sp) {
         return VM_ERR_BAD_VALUE;
@@ -96,6 +88,7 @@ vm_errors_t vm_drop_n(vm_thread_t **thread, uint32_t qty) {
 
     return VM_ERR_OK;
 }
+*/
 
 void vm_push_frame(vm_thread_t **thread, uint8_t locals) {
     (*thread)->frames[(*thread)->fc].pc = (*thread)->pc;

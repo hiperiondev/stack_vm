@@ -9,7 +9,7 @@
  *
  *   please contact their authors for more information.
  *
- * @author Emiliano Gonzalez (egonzalez . hiperion @ gmail . com))
+ * @author Emiliano Augusto Gonzalez (egonzalez . hiperion @ gmail . com)
  * @date 2024
  * @copyright MIT License
  * @see https://github.com/hiperiondev/stack_vm

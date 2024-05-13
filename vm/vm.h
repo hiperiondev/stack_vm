@@ -9,7 +9,7 @@
  *
  *   please contact their authors for more information.
  *
- * @author Emiliano Gonzalez (egonzalez . hiperion @ gmail . com))
+ * @author Emiliano Augusto Gonzalez (egonzalez . hiperion @ gmail . com)
  * @date 2024
  * @copyright MIT License
  * @see https://github.com/hiperiondev/stack_vm
@@ -448,7 +448,9 @@ void vm_destroy_thread(vm_thread_t **thread);
  * @param thread Thread
  * @param value Value
  */
-void vm_push(vm_thread_t **thread, vm_value_t value);
+inline void vm_push(vm_thread_t **thread, vm_value_t value) {
+    STK_OBJ(thread, (*thread)->sp++) = value;
+}
 
 /**
  * @fn vm_value_t vm_pop(vm_thread_t **thread)
@@ -457,7 +459,9 @@ void vm_push(vm_thread_t **thread, vm_value_t value);
  * @param thread Thread
  * @return Value Value
  */
-vm_value_t vm_pop(vm_thread_t **thread);
+inline vm_value_t vm_pop(vm_thread_t **thread) {
+    return STK_OBJ(thread, --(*thread)->sp);
+}
 
 /**
  * @fn vm_errors_t vm_drop_n(vm_thread_t **thread, uint32_t qty)
@@ -465,8 +469,9 @@ vm_value_t vm_pop(vm_thread_t **thread);
  *
  * @param thread Thread
  * @param qty Quantity
- */
+
 vm_errors_t vm_drop_n(vm_thread_t **thread, uint32_t qty);
+ */
 
 /**
  * @fn void vm_push_frame(vm_thread_t **thread, uint8_t nargs)

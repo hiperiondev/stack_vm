@@ -40,7 +40,8 @@ Also the use of native data types has generic options for use as well as the def
 - [x] Libraries for custom data types
 - [x] Simple external functions (FFI)
 - [x] Global variables and arrays allocated in heap
-  - [x] Can allocate local arrays 
+  - [x] Can allocate local arrays
+  - [x] Arrays can contain any type of value, including arrays 
 - [x] Constants in the program area
 - [x] Complete Assembler/Disassembler with directives easily expandable
 

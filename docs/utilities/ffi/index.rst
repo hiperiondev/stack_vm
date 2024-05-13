@@ -7,5 +7,13 @@ Utilities: FFI
 
 .. rst-class:: lead
 
-   Utilities FFI
+Print
+-----
+
+.. rst-class:: lead
+   
+   Minimal print utility
+   
+|
+| Just print top of stack value
 

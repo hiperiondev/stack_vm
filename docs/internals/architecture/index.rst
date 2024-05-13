@@ -32,7 +32,7 @@ Local Variables
  
 .. warning::
 
-   Local variables cannot be used in Frame 0 
+   Local variables cannot be used in Frame 0 without assign correct values on frame 0 before execution. This is not a default behavior.
  
 Frames
 ------

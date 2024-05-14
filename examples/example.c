@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
     ++externals.foreign_functions_qty;
 
     // load LIBRARY string (library 0)
-    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib = malloc(sizeof(void*));
     externals.lib[0] = lib_entry_strings;
     ++externals.lib_qty;
 

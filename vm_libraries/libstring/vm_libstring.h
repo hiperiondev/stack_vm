@@ -1,5 +1,5 @@
 /*
- * @libstring.h
+ * @vm_libstring.h
  *
  * @brief Stack VM
  * @details

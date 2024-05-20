@@ -20,7 +20,6 @@
 #ifndef VM_LIBHASHMAP_H_
 #define VM_LIBHASHMAP_H_
 
-#include "hashtable.h"
 #include "vm.h"
 
 #define HASHTABLE_LIBRARY_IDENTIFIER 0x00000010

@@ -18,7 +18,6 @@
 
 #include <stdlib.h>
 
-#include "hashtable.h"
 #include "vm_libhashmap.h"
 #include "vm.h"
 

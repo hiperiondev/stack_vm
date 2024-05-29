@@ -23,9 +23,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define VM_VERSION_MAYOR 2 // indicate a really big change that can cause a lot of incompatibilities with previous versions
-#define VM_VERSION_MINOR 3 // indicate some change on API or opcode
-#define VM_VERSION_PATCH 2 // indicate some minor change or correction
+#define COMPILER_VERSION_MAYOR 2 // indicate a really big change that can cause a lot of incompatibilities with previous versions
+#define COMPILER_VERSION_MINOR 3 // indicate some change on API or opcode
+#define COMPILER_VERSION_PATCH 2 // indicate some minor change or correction
 
 //////////////// VM CONFIGURATION ////////////////
 
@@ -345,7 +345,7 @@ typedef struct vm_ffilib_s {
  */
 typedef struct vm_frame_s {
     uint32_t pc, fp;   /**< program counter, frame counter */
-     uint8_t locals;   /**< number of arguments (for call) */
+     uint8_t locals;   /**< number of locals */
     uint32_t *gc_mark; /**< garbage collector mark allocator (used for a per frame gc) */
 } vm_frame_t;
 

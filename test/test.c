@@ -694,23 +694,47 @@ void test_opcodes(void) {
     END_TEST();
     free(externals.foreign_functions);
     ///////////////////////////////////
-    START_TEST(SET_LOCAL / GET_LOCAL, //
-            "PUSH_INT 10\n"           //
-            "PUSH_INT 20\n"           //
-            "CALL 2 fun1\n"           //
-            "GET_RETVAL\n"            //
-            "HALT 69\n"               //
-            ".label fun1\n"           //
-            "ADD\n"                   //
-            "SET_LOCAL 0\n"           //
-            "PUSH_INT 5\n"            //
-            "GET_LOCAL 0\n"           //
-            "ADD\n"                   //
-            "RETURN_VALUE\n"          //
-            );                        //
+    START_TEST(1 SET_LOCAL / GET_LOCAL, //
+            "PUSH_INT 10\n"             //
+            "PUSH_INT 20\n"             //
+            "PUSH_NULL_N 10\n"          //
+            "CALL 12 fun1\n"            //
+            "GET_RETVAL\n"              //
+            "HALT 69\n"                 //
+            ".label fun1\n"             //
+            "GET_LOCAL 1\n"             //
+            "RETURN_VALUE\n"            //
+            );                          //
 
     TEST_EXECUTE;
-    OP_TEST_START(18, 1, 0);
+    OP_TEST_START(20, 1, 0);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_INT);
+    assert(vm_value.number.integer == 20);
+    OP_TEST_END();
+
+    END_TEST();
+
+    START_TEST(2 SET_LOCAL / GET_LOCAL, //
+            "PUSH_INT 10\n"             //
+            "PUSH_INT 20\n"             //
+            "PUSH_NULL_N 10\n"          //
+            "CALL 12 fun1\n"            //
+            "GET_RETVAL\n"              //
+            "HALT 69\n"                 //
+            ".label fun1\n"             //
+            "GET_LOCAL 0\n"             //
+            "GET_LOCAL 1\n"             //
+            "ADD\n"                     //
+            "SET_LOCAL 0\n"             //
+            "PUSH_INT 5\n"              //
+            "GET_LOCAL 0\n"             //
+            "ADD\n"                     //
+            "RETURN_VALUE\n"            //
+            );                          //
+
+    TEST_EXECUTE;
+    OP_TEST_START(20, 1, 0);
     vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 35);
@@ -718,22 +742,22 @@ void test_opcodes(void) {
 
     END_TEST();
 
-    START_TEST(SET_LOCAL / GET_LOCAL, //
-            "PUSH_INT 1\n"            //
-            "PUSH_INT 2\n"            //
-            "PUSH_INT 3\n"            //
-            "PUSH_INT 4\n"            //
-            "CALL 3 fun1\n"           //
-            "HALT 69\n"               //
-            ".label fun1\n"           //
-            "PUSH_INT 10\n"           //
-            "SET_LOCAL 0\n"           //
-            "PUSH_INT 11\n"           //
-            "SET_LOCAL 1\n"           //
-            "PUSH_INT 12\n"           //
-            "SET_LOCAL 2\n"           //
-            "RETURN\n"                //
-            );                        //
+    START_TEST(3 SET_LOCAL / GET_LOCAL, //
+            "PUSH_INT 1\n"              //
+            "PUSH_INT 2\n"              //
+            "PUSH_INT 3\n"              //
+            "PUSH_INT 4\n"              //
+            "CALL 3 fun1\n"             //
+            "HALT 69\n"                 //
+            ".label fun1\n"             //
+            "PUSH_INT 10\n"             //
+            "SET_LOCAL 0\n"             //
+            "PUSH_INT 11\n"             //
+            "SET_LOCAL 1\n"             //
+            "PUSH_INT 12\n"             //
+            "SET_LOCAL 2\n"             //
+            "RETURN\n"                  //
+            );                          //
 
     TEST_EXECUTE;
     OP_TEST_START(27, 1, 0);
@@ -744,23 +768,26 @@ void test_opcodes(void) {
 
     END_TEST();
 
-    START_TEST(SET_LOCAL_FF / GET_LOCAL_FF, //
-            "PUSH_INT 10\n"                 //
-            "PUSH_INT 20\n"                 //
-            "CALL 2 fun1\n"                 //
-            "GET_RETVAL\n"                  //
-            "HALT 69\n"                     //
-            ".label fun1\n"                 //
-            "ADD\n"                         //
-            "SET_LOCAL_FF 0\n"              //
-            "PUSH_INT 5\n"                  //
-            "GET_LOCAL_FF 0\n"              //
-            "ADD\n"                         //
-            "RETURN_VALUE\n"                //
+    START_TEST(4 SET_LOCAL_FF / GET_LOCAL_FF, //
+            "PUSH_INT 10\n"                   //
+            "PUSH_INT 20\n"                   //
+            "PUSH_NULL_N 10\n"                //
+            "CALL 12 fun1\n"                  //
+            "GET_RETVAL\n"                    //
+            "HALT 69\n"                       //
+            ".label fun1\n"                   //
+            "GET_LOCAL_FF 0\n"                //
+            "GET_LOCAL_FF 1\n"                //
+            "ADD\n"                           //
+            "SET_LOCAL_FF 0\n"                //
+            "PUSH_INT 5\n"                    //
+            "GET_LOCAL_FF 0\n"                //
+            "ADD\n"                           //
+            "RETURN_VALUE\n"                  //
             );
 
     TEST_EXECUTE;
-    OP_TEST_START(18, 1, 0);
+    OP_TEST_START(20, 1, 0);
     vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 35);

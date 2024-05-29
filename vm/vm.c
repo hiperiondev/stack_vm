@@ -739,7 +739,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             program->prog[(*thread)->pc++];
 
             if (local_idx < (*thread)->frames[(*thread)->fc - 1].locals)
-                vm_push(thread, (*thread)->stack[(*thread)->fp - (local_idx + 1)]);
+                vm_push(thread, (*thread)->stack[(*thread)->fp - (*thread)->frames[(*thread)->fc - 1].locals + local_idx]);
             else
                 err = VM_ERR_LOCALNOTEXIST;
         }
@@ -753,7 +753,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
 
             if (local_idx < (*thread)->frames[(*thread)->fc - 1].locals) {
                 vm_value_t val = vm_pop(thread);
-                (*thread)->stack[(*thread)->fp - (local_idx + 1)] = val;
+                (*thread)->stack[(*thread)->fp - (*thread)->frames[(*thread)->fc - 1].locals + local_idx] = val;
             } else
                 err = VM_ERR_LOCALNOTEXIST;
         }

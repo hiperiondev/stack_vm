@@ -155,12 +155,13 @@ static char* find_macro(char *str, label_macro_t *label) {
     return NULL;
 }
 
-static uint8_t find_op_directive(char *str, uint32_t *instruction, arg_type_t *arg_type, label_macro_t *label, char **macro, uint8_t *indirect) {
+static uint8_t find_op_directive(char *str, uint32_t *instruction, arg_type_t *arg_type, label_macro_t *label, char **macro, uint8_t *indirect, bool *mod_jump) {
     if (str == NULL)
         return ASSBLER_UNKNOWNOP;
 
     uint8_t n = 0;
     *indirect = 0;
+    *mod_jump = false;
 
     if (str[0] == '@') {
         *indirect = 0x40;
@@ -175,11 +176,17 @@ static uint8_t find_op_directive(char *str, uint32_t *instruction, arg_type_t *a
         str[1] = ' ';
     }
 
+    if (str[0] == '#') {
+        *indirect = 0x40;
+        *mod_jump = true;
+        str[0] = ' ';
+    }
+
     trim(str);
 
     while (strlen(opcodes[n].opcode) != 0) {
         if (strcmp(str, opcodes[n].opcode) == 0) {
-            if(*indirect != 0 && !opcodes[n].indirect)
+            if(*indirect != 0 && !opcodes[n].modifier)
                 return ASSBLER_INDNOTALLOWED;
 
             *instruction = n;
@@ -500,8 +507,11 @@ static bool emit(uint8_t **hex, data_t data, arg_type_t type, uint32_t **pc, uin
 }
 
 static uint8_t vm_emit_args(char **spl, uint8_t instruction, arg_type_t arg_type[8], uint32_t *pc, uint8_t **hex, label_macro_t *label,
-        label_pc_t **label_line_to_pc, uint32_t *label_line_to_pc_qty) {
+        label_pc_t **label_line_to_pc, uint32_t *label_line_to_pc_qty, bool mod_jump) {
     data_t value;
+
+    if(mod_jump)
+        arg_type[0] = ARG_U32;
 
     for (uint8_t cnt = 0; cnt < 8; cnt++) {
         if (arg_type[cnt] == ARG_NON)
@@ -557,7 +567,7 @@ static uint8_t vm_emit_args(char **spl, uint8_t instruction, arg_type_t arg_type
     return ASSMBLR_OK;
 }
 ////////////////////////////////////////////////////////////////////////////////
-
+/*
 uint8_t vm_assemble_line(char *str, uint32_t *pc, uint8_t **hex) {
     if (str == NULL)
         return false;
@@ -610,10 +620,11 @@ uint8_t vm_assemble_line(char *str, uint32_t *pc, uint8_t **hex) {
     data_t value;
     value.u32 = instruction;
     emit(hex, value, ARG_U08, &pc, indirect);
-    uint8_t res = vm_emit_args(spl, instruction, arg_type, pc, hex, NULL, NULL, NULL);
+    uint8_t res = vm_emit_args(spl, instruction, arg_type, pc, hex, NULL, NULL, NULL, false);
     free(spl);
     return res;
 }
+*/
 
 static char* vm_assembler_load_fullfile(char *file_name) {
     FILE *fp;
@@ -736,6 +747,7 @@ assembler_error_t vm_assembler(char **program, uint32_t *pc, uint8_t **hex, uint
     size_t count = 0;
     data_t value;
     uint8_t indirect = 0;
+    bool mod_jump = false;
     char *line = NULL;
     char *end = NULL;
     char *start = *program;
@@ -779,7 +791,7 @@ assembler_error_t vm_assembler(char **program, uint32_t *pc, uint8_t **hex, uint
         printf("(%04u) [%04u] %s", (*progline), *pc, line_orig);
 
         // find mnemonics
-        res = find_op_directive(spl[0], &instruction, arg_type, label, &macro, &indirect);
+        res = find_op_directive(spl[0], &instruction, arg_type, label, &macro, &indirect, &mod_jump);
 
         if (res == ASSBLER_INDNOTALLOWED) {
             ret = ASSBLER_INDNOTALLOWED;
@@ -871,7 +883,7 @@ assembler_error_t vm_assembler(char **program, uint32_t *pc, uint8_t **hex, uint
         emit(hex, value, ARG_U08, &pc, indirect);
         indirect = 0;
 
-        ret = vm_emit_args(spl, instruction, arg_type, pc, hex, label, &label_to_pc, &label_to_pc_qty);
+        ret = vm_emit_args(spl, instruction, arg_type, pc, hex, label, &label_to_pc, &label_to_pc_qty, mod_jump);
         if (ret != ASSMBLR_OK)
             goto error;
 

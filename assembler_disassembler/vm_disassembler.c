@@ -24,7 +24,7 @@
 #include "vm_disassembler.h"
 #include "vm_opcodes_def.h"
 
-#define OP_INDIRECT(op)  (op & 0xc0)
+#define OP_MODIFIER(op)  (op & 0xc0)
 
 uint8_t vm_disassembler(uint8_t *program, uint32_t program_len) {
     vm_thread_t *thread = calloc(1, sizeof(vm_thread_t));
@@ -33,15 +33,21 @@ uint8_t vm_disassembler(uint8_t *program, uint32_t program_len) {
     prg.prog_len = program_len;
     uint32_t pc = 0;
     uint8_t op = prg.prog[pc];
+    uint8_t arg_type = ARG_NON;
     char prefix[3] = { '\0' };
 
     while (pc < program_len) {
-        switch(OP_INDIRECT(op)) {
+        bool mod_jump = false;
+        switch(OP_MODIFIER(op)) {
             case 0:
                 sprintf(prefix, "  ");
                 break;
             case 0x40:
-                sprintf(prefix, " @");
+                if (opcodes[op].modifier == 2) {
+                    mod_jump = true;
+                    sprintf(prefix, " #");
+                } else
+                    sprintf(prefix, " @");
                 break;
             case 0x80:
                 sprintf(prefix, "-@");
@@ -58,10 +64,16 @@ uint8_t vm_disassembler(uint8_t *program, uint32_t program_len) {
         uint32_t pc_remainder = program_len - pc;
 
         for (uint8_t n = 0; n < 8; n++) {
-            if (opcodes[op].arg_type[n] == ARG_NON)
+            arg_type = opcodes[op].arg_type[n];
+            if(mod_jump) {
+                arg_type = ARG_U32;
+                mod_jump = false;
+            }
+
+            if (arg_type == ARG_NON)
                 break;
 
-            switch (opcodes[op].arg_type[n]) {
+            switch (arg_type) {
                 case ARG_U08:
                     if (pc_remainder >= 1)
                         printf("%u ", vm_read_byte(&thread, &prg, &pc));

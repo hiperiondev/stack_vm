@@ -478,6 +478,25 @@ void test_opcodes(void) {
     OP_TEST_END();
 
     END_TEST();
+
+    START_TEST(LT JUMP,         //
+            "PUSH_INT 3\n"      //
+            "PUSH_INT 6\n"      //
+            "#LT lbl_true\n"    //
+            "PUSH_FALSE\n"      //
+            "HALT 0\n"          //
+            ".label lbl_true\n" //
+            "PUSH_TRUE\n"       //
+            );                  //
+
+    TEST_EXECUTE;
+    OP_TEST_START(19, 1, 0);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_BOOL);
+    assert(vm_value.number.boolean == 1);
+    OP_TEST_END();
+
+    END_TEST();
     ///////////////////////////////////
     START_TEST(LTE,        //
             "PUSH_INT 6\n" //

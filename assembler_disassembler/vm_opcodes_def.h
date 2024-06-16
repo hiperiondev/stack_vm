@@ -38,7 +38,7 @@ typedef enum {
 
 typedef struct op_s {
     const char opcode[64];
-    bool indirect;
+       uint8_t modifier;
     arg_type_t arg_type[8];
 } op_t;
 

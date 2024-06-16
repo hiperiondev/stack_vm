@@ -24,7 +24,9 @@
  *
  */
 enum VM_OPCODE {
-// NOTE: @ support indirect
+// NOTE: @ support mod indirect
+// NOTE: # support mod jump
+
 //|   opcode              |  id  |  arg1 |  arg2  |  arg3  | description
     PUSH_NULL,         // | 0x00 |   -   |   -    |    -   | push NULL value
     PUSH_NULL_N,       // | 0x01 |   u8  |   -    |    -   | pushes N null values onto the stack
@@ -57,13 +59,13 @@ enum VM_OPCODE {
     MOD,               // | 0x1c |   -   |   -    |    -   | module from top and second element of stack
     OR,                // | 0x1d |   -   |   -    |    -   | logical or from top and second element of stack
     AND,               // | 0x1e |   -   |   -    |    -   | logical and from top and second element of stack
-    LT,                // | 0x1f |   -   |   -    |    -   | lesser
-    LTE,               // | 0x20 |   -   |   -    |    -   | lesser or equal
-    GT,                // | 0x21 |   -   |   -    |    -   | greater
-    GTE,               // | 0x22 |   -   |   -    |    -   | greater or equal
-    INC,               // | 0x23 |   -   |   -    |    -   | increment number (if not number do nothing)
-    DEC,               // | 0x24 |   -   |   -    |    -   | decrement number (if not number do nothing)
-    EQU,               // | 0x25 |   -   |   -    |    -   | equality
+    LT,                // | 0x1f | #u32  |   -    |    -   | lesser. in mod jump if true
+    LTE,               // | 0x20 | #u32  |   -    |    -   | lesser or equal. in mod jump if true
+    GT,                // | 0x21 | #u32  |   -    |    -   | greater. in mod jump if true
+    GTE,               // | 0x22 | #u32  |   -    |    -   | greater or equal. in mod jump if true
+    INC,               // | 0x23 | #u32  |   -    |    -   | increment number (if not number do nothing). in mod jump if true
+    DEC,               // | 0x24 | #u32  |   -    |    -   | decrement number (if not number do nothing). in mod jump if true
+    EQU,               // | 0x25 | #u32  |   -    |    -   | equality. in mod jump if true
     NOT,               // | 0x26 |   -   |   -    |    -   | binary not
     SET_GLOBAL,        // | 0x27 |  u32  |   -    |    -   | set global variable (global 0xffffffff is indirect register)
     GET_GLOBAL,        // | 0x28 |  u32  |   -    |    -   | get global variable (global 0xffffffff is indirect register)

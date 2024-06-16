@@ -73,23 +73,6 @@ static inline bool vm_are_values_equal(vm_thread_t **thread, vm_value_t a, vm_va
     return result;
 }
 
-/*
-vm_errors_t vm_drop_n(vm_thread_t **thread, uint32_t qty) {
-    if (qty < 1 || qty - 1 > (*thread)->sp) {
-        return VM_ERR_BAD_VALUE;
-    }
-
-    for (uint32_t n = 0; n < qty; n++) {
-        if ((*thread)->stack[n].type == VM_VAL_CONST_STRING && (*thread)->stack[n].cstr.is_program == false)
-            free((*thread)->stack[n].cstr.addr);
-    }
-
-    (*thread)->sp -= qty;
-
-    return VM_ERR_OK;
-}
-*/
-
 void vm_push_frame(vm_thread_t **thread, uint8_t locals) {
     (*thread)->frames[(*thread)->fc].pc = (*thread)->pc;
     (*thread)->frames[(*thread)->fc].fp = (*thread)->fp;
@@ -131,19 +114,19 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
     }
 
     vm_errors_t err = VM_ERR_OK;
-    bool indirect = false;
+    bool modifier = false;
     int8_t ind_inc = 0;
 
-    switch (OP_INDIRECT(program->prog[(*thread)->pc])) {
+    switch (OP_MODIFIER(program->prog[(*thread)->pc])) {
         case 0x40:
-            indirect = true;
+            modifier = true;
             break;
         case 0x80:
-            indirect = true;
+            modifier = true;
             ind_inc = -1;
             break;
         case 0xc0:
-            indirect = true;
+            modifier = true;
             ind_inc = 1;
             break;
     }
@@ -279,7 +262,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             uint8_t type = program->prog[(*thread)->pc - 1] - PUSH_CONST_UINT8;
             uint32_t const_pc = vm_read_u32(thread, program, &(*thread)->pc);
 
-            if (indirect) {
+            if (modifier) {
                 if ((*thread)->indirect > 0xffffffff - const_pc) {
                     err = VM_ERR_OVERFLOW;
                     break;
@@ -383,7 +366,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             uint16_t index = vm_read_u16(thread, program, &(*thread)->pc);
             vm_heap_object_t *arr = vm_heap_load((*thread)->heap, STK_TOP(thread).heap_ref);
 
-            if (indirect) {
+            if (modifier) {
                 uint32_t _indx = index + (*thread)->indirect;
                 if (_indx > 0xffff) {
                     err = VM_ERR_OVERFLOW;
@@ -402,7 +385,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         case SET_ARRAY_VALUE: {
             uint16_t index = vm_read_u16(thread, program, &(*thread)->pc);
 
-            if (indirect) {
+            if (modifier) {
                 uint32_t _indx = index + (*thread)->indirect;
                 if (_indx > 0xffff) {
                     err = VM_ERR_OVERFLOW;
@@ -453,30 +436,56 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         }                                                                                        \
     } break;
 
-#define REL_OP(OP, operator)                                                      \
-    case OP: {                                                                    \
-        vm_value_t *a = &STK_SND(thread);                                         \
-        --(*thread)->sp;                                                          \
-        vm_value_t b = STK_NEW(thread);                                           \
-        if (a->type == VM_VAL_FLOAT && b.type == VM_VAL_FLOAT) {                  \
-            a->type = VM_VAL_BOOL;                                                \
-            a->number.boolean = a->number.real operator b.number.real;            \
-        } else if (a->type == VM_VAL_INT && b.type == VM_VAL_INT) {               \
-            a->type = VM_VAL_BOOL;                                                \
-            a->number.boolean = a->number.integer operator b.number.integer;      \
-        } else if (a->type == VM_VAL_UINT && b.type == VM_VAL_UINT) {             \
-            a->type = VM_VAL_BOOL;                                                \
-            a->number.boolean = a->number.uinteger operator b.number.uinteger;    \
-        } else if (a->type == VM_VAL_INT) {                                       \
-            a->type = VM_VAL_BOOL;                                                \
-            a->number.boolean = (float)a->number.integer operator b.number.real;  \
-        } else if (a->type == VM_VAL_UINT) {                                      \
-            a->type = VM_VAL_BOOL;                                                \
-            a->number.boolean = (float)a->number.uinteger operator b.number.real; \
-        } else {                                                                  \
-            a->type = VM_VAL_BOOL;                                                \
-            a->number.boolean = a->number.real operator(float) b.number.integer;  \
-        }                                                                         \
+#define REL_OP(OP, operator)                                                       \
+    case OP: {                                                                     \
+    	uint32_t new_pc = 0;                                                       \
+        if(modifier)                                                               \
+		    new_pc = vm_read_u32(thread, program, &(*thread)->pc);                 \
+        vm_value_t b = vm_pop(thread);                                             \
+        vm_value_t a = vm_pop(thread);                                             \
+        if (a.type == VM_VAL_FLOAT && b.type == VM_VAL_FLOAT) {                    \
+            if(modifier)                                                           \
+                (*thread)->pc = new_pc;                                            \
+            else {                                                                 \
+			    vm_new_bool(val, a.number.real operator b.number.real);            \
+			    vm_push(thread, val);                                              \
+            }                                                                      \
+        } else if (a.type == VM_VAL_INT && b.type == VM_VAL_INT) {                 \
+            if(modifier)                                                           \
+                (*thread)->pc = new_pc;                                            \
+            else {                                                                 \
+                vm_new_bool(val, a.number.integer operator b.number.integer);      \
+                vm_push(thread, val);                                              \
+            }                                                                      \
+        } else if (a.type == VM_VAL_UINT && b.type == VM_VAL_UINT) {               \
+            if(modifier)                                                           \
+                (*thread)->pc = new_pc;                                            \
+            else {                                                                 \
+                vm_new_bool(val, a.number.uinteger operator b.number.uinteger);    \
+                vm_push(thread, val);                                              \
+            }                                                                      \
+        } else if (a.type == VM_VAL_INT) {                                         \
+            if(modifier)                                                           \
+                (*thread)->pc = new_pc;                                            \
+            else {                                                                 \
+                vm_new_bool(val, (float)a.number.integer operator b.number.real);  \
+                vm_push(thread, val);                                              \
+            }                                                                      \
+        } else if (a.type == VM_VAL_UINT) {                                        \
+            if(modifier)                                                           \
+                (*thread)->pc = new_pc;                                            \
+            else {                                                                 \
+                vm_new_bool(val, (float)a.number.uinteger operator b.number.real); \
+                vm_push(thread, val);                                              \
+            }                                                                      \
+        } else {                                                                   \
+            if(modifier)                                                           \
+                (*thread)->pc = new_pc;                                            \
+            else {                                                                 \
+                vm_new_bool(val, a.number.real operator(float) b.number.integer);  \
+                vm_push(thread, val);                                              \
+            }                                                                      \
+        }                                                                          \
     } break;
 
         BIN_OP(ADD, +)
@@ -520,43 +529,72 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
 #undef REL_OP
 
         case INC: {
+            uint32_t new_pc = 0;
+            if(modifier) {
+                new_pc = vm_read_u32(thread, program, &(*thread)->pc);
+            }
+
             switch (STK_TOP(thread).type) {
                 case VM_VAL_UINT:
-                    ++STK_TOP(thread).number.uinteger;
+                ++STK_TOP(thread).number.uinteger;
                 break;
                 case VM_VAL_INT:
-                    ++STK_TOP(thread).number.integer;
+                ++STK_TOP(thread).number.integer;
                 break;
                 case VM_VAL_FLOAT:
-                    ++STK_TOP(thread).number.real;
+                ++STK_TOP(thread).number.real;
                 break;
                 default:
+            }
+
+            if(modifier) {
+                (*thread)->pc = new_pc;
             }
         }
         break;
 
         case DEC: {
+            uint32_t new_pc = 0;
+            if(modifier) {
+                new_pc = vm_read_u32(thread, program, &(*thread)->pc);
+            }
+
             switch (STK_TOP(thread).type) {
                 case VM_VAL_UINT:
-                    --STK_TOP(thread).number.uinteger;
+                --STK_TOP(thread).number.uinteger;
                 break;
                 case VM_VAL_INT:
-                    --STK_TOP(thread).number.integer;
+                --STK_TOP(thread).number.integer;
                 break;
                 case VM_VAL_FLOAT:
-                    --STK_TOP(thread).number.real;
+                --STK_TOP(thread).number.real;
                 break;
                 default:
+            }
+
+            if(modifier) {
+                (*thread)->pc = new_pc;
             }
         }
         break;
 
         case EQU: {
+            uint32_t new_pc = 0;
+            if(modifier) {
+                new_pc = vm_read_u32(thread, program, &(*thread)->pc);
+            }
+
             vm_value_t b = vm_pop(thread);
             vm_value_t a = vm_pop(thread);
 
-            vm_new_bool(val, vm_are_values_equal(thread, a, b));
-            vm_push(thread, val);
+            bool res = vm_are_values_equal(thread, a, b);
+
+            if(modifier && res) {
+                (*thread)->pc = new_pc;
+            } else {
+                vm_new_bool(val, res);
+                vm_push(thread, val);
+            }
         }
         break;
 
@@ -630,7 +668,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         case GOTO: {
             uint32_t new_pc = vm_read_u32(thread, program, &(*thread)->pc);
 
-            if (indirect) {
+            if (modifier) {
                 if ((*thread)->indirect > 0xffffffff - new_pc) {
                     err = VM_ERR_OVERFLOW;
                     break;
@@ -645,7 +683,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         case GOTOZ: {
             uint32_t new_pc = vm_read_u32(thread, program, &(*thread)->pc);
 
-            if (indirect) {
+            if (modifier) {
                 if ((*thread)->indirect > 0xffffffff - new_pc) {
                     err = VM_ERR_OVERFLOW;
                     break;
@@ -666,7 +704,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             uint8_t nargs = program->prog[(*thread)->pc++];
             uint32_t pc_idx = vm_read_u32(thread, program, &(*thread)->pc);
 
-            if (indirect) {
+            if (modifier) {
                 if ((*thread)->indirect > 0xffffffff - pc_idx) {
                     err = VM_ERR_OVERFLOW;
                     break;
@@ -706,7 +744,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             uint32_t arg = vm_read_u32(thread, program, &(*thread)->pc);
             uint32_t f_idx = vm_read_u32(thread, program, &(*thread)->pc);
 
-            if (indirect) {
+            if (modifier) {
                 if ((*thread)->indirect > 0xffffffff - f_idx) {
                     err = VM_ERR_OVERFLOW;
                     break;

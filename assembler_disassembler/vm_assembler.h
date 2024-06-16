@@ -50,7 +50,7 @@ typedef struct label_macro_s {
 
 extern const char *assembler_error[];
 
-          uint8_t vm_assemble_line(char *str, uint32_t *pc, uint8_t **hex);
+         // uint8_t vm_assemble_line(char *str, uint32_t *pc, uint8_t **hex);
             char* vm_assembler_load_file(char *file_name);
 assembler_error_t vm_assembler(char **program, uint32_t *pc, uint8_t **hex, uint32_t *errline, uint32_t *progline, label_macro_t **lbl, uint32_t *label_qty);
 

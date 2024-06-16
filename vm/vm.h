@@ -100,7 +100,7 @@
 
 //////////////////////////////////////////////////
 
-#define OP_INDIRECT(op)       (op & 0xc0)                         /**< indirect argument */
+#define OP_MODIFIER(op)       (op & 0xc0)                         /**< indirect argument */
 
 #define STK_OBJ(thread, pos)  (*thread)->stack[pos]               /**< generic access to stack */
 #define STK_NEW(thread)       (*thread)->stack[(*thread)->sp]     /**< new stack stack object (over top) */

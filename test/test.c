@@ -512,6 +512,25 @@ void test_opcodes(void) {
     OP_TEST_END();
 
     END_TEST();
+
+    START_TEST(LTE JUMP,   //
+            "PUSH_INT 6\n" //
+            "PUSH_INT 3\n" //
+            "#LTE lbl\n"   //
+            "PUSH_TRUE\n"  //
+            "HALT 0\n"     //
+            ".label lbl\n" //
+            "PUSH_FALSE\n" //
+            );             //
+
+    TEST_EXECUTE;
+    OP_TEST_START(19, 1, 0);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_BOOL);
+    assert(vm_value.number.boolean == 0);
+    OP_TEST_END();
+
+    END_TEST();
     ///////////////////////////////////
     START_TEST(GT,         //
             "PUSH_INT 6\n" //
@@ -521,6 +540,25 @@ void test_opcodes(void) {
 
     TEST_EXECUTE;
     OP_TEST_START(11, 1, 0);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_BOOL);
+    assert(vm_value.number.boolean == 1);
+    OP_TEST_END();
+
+    END_TEST();
+
+    START_TEST(GT JUMP,    //
+            "PUSH_INT 6\n" //
+            "PUSH_INT 3\n" //
+            "#GT lbl\n"    //
+            "PUSH_FALSE\n" //
+            "HALT 0\n"     //
+            ".label lbl\n" //
+            "PUSH_TRUE\n"  //
+            );             //
+
+    TEST_EXECUTE;
+    OP_TEST_START(19, 1, 0);
     vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_BOOL);
     assert(vm_value.number.boolean == 1);
@@ -542,6 +580,25 @@ void test_opcodes(void) {
     OP_TEST_END();
 
     END_TEST();
+
+    START_TEST(GTE JUMP,   //
+            "PUSH_INT 6\n" //
+            "PUSH_INT 3\n" //
+            "#GTE lbl\n"   //
+            "PUSH_FALSE\n" //
+            "HALT 0\n"     //
+            ".label lbl\n" //
+            "PUSH_TRUE\n"  //
+            );             //
+
+    TEST_EXECUTE;
+    OP_TEST_START(19, 1, 0);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_BOOL);
+    assert(vm_value.number.boolean == 1);
+    OP_TEST_END();
+
+    END_TEST();
     ///////////////////////////////////
     START_TEST(INC,        //
             "PUSH_INT 6\n" //
@@ -553,6 +610,23 @@ void test_opcodes(void) {
     vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_INT);
     assert(vm_value.number.integer == 7);
+    OP_TEST_END();
+
+    END_TEST();
+
+    START_TEST(INC JUMP,   //
+            "PUSH_INT 6\n" //
+            "#INC lbl\n"   //
+            "HALT 0\n"     //
+            ".label lbl\n" //
+            "INC"          //
+            );             //
+
+    TEST_EXECUTE;
+    OP_TEST_START(13, 1, 0);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_INT);
+    assert(vm_value.number.integer == 8);
     OP_TEST_END();
 
     END_TEST();
@@ -570,6 +644,23 @@ void test_opcodes(void) {
     OP_TEST_END();
 
     END_TEST();
+
+    START_TEST(DEC JUMP,   //
+            "PUSH_INT 6\n" //
+            "#DEC lbl\n"   //
+            "HALT 0\n"     //
+            ".label lbl\n" //
+            "DEC"          //
+            );             //
+
+    TEST_EXECUTE;
+    OP_TEST_START(13, 1, 0);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_INT);
+    assert(vm_value.number.integer == 4);
+    OP_TEST_END();
+
+    END_TEST();
     ///////////////////////////////////
     START_TEST(EQU,        //
             "PUSH_INT 6\n" //
@@ -582,6 +673,25 @@ void test_opcodes(void) {
     vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_BOOL);
     assert(vm_value.number.boolean == 0);
+    OP_TEST_END();
+
+    END_TEST();
+
+    START_TEST(EQU JUMP,   //
+            "PUSH_INT 3\n" //
+            "PUSH_INT 3\n" //
+            "#EQU lbl\n"   //
+            "PUSH_FALSE\n" //
+            "HALT 0\n"     //
+            ".label lbl\n" //
+            "PUSH_INT 9\n" //
+            );             //
+
+    TEST_EXECUTE;
+    OP_TEST_START(23, 1, 0);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_INT);
+    assert(vm_value.number.integer == 9);
     OP_TEST_END();
 
     END_TEST();

@@ -43,11 +43,12 @@ uint8_t vm_disassembler(uint8_t *program, uint32_t program_len) {
                 sprintf(prefix, "  ");
                 break;
             case 0x40:
-                if (opcodes[op].modifier == 2) {
+                if (opcodes[op & 0x3f].modifier == 2) {
                     mod_jump = true;
                     sprintf(prefix, " #");
-                } else
+                } else {
                     sprintf(prefix, " @");
+                }
                 break;
             case 0x80:
                 sprintf(prefix, "-@");

@@ -23,8 +23,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define COMPILER_VERSION_MAYOR 2 // indicate a really big change that can cause a lot of incompatibilities with previous versions
-#define COMPILER_VERSION_MINOR 4 // indicate some change on API or opcode
+#define COMPILER_VERSION_MAYOR 3 // indicate a really big change that can cause a lot of incompatibilities with previous versions
+#define COMPILER_VERSION_MINOR 0 // indicate some change on API or opcode
 #define COMPILER_VERSION_PATCH 0 // indicate some minor change or correction
 
 //////////////// VM CONFIGURATION ////////////////

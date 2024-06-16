@@ -7,7 +7,8 @@ Instructions
    
 **op format: iiOOOOOO**
 
-* i: use indirect register in instruction
+* i: if # jump.
+* i: if @ use indirect register.
 
   * 00: nothing
   * 01: indirect, not change register
@@ -82,20 +83,20 @@ Instructions
 |**OR**                | 0x1d | none  | none   | logical or from top and second element of stack                                               |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
 |**AND**               | 0x1e | none  | none   | logical and from top and second element of stack                                              |
-+----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+ 
-|**LT**                | 0x1f | none  | none   | lesser                                                                                        |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
-|**LTE**               | 0x20 | none  | none   | lesser or equal                                                                               |
+|**LT**                | 0x1f | none  | none   | lesser. in mod jump if true                                                                   |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
-|**GT**                | 0x21 | none  | none   | greater                                                                                       |
+|**LTE**               | 0x20 | none  | none   | lesser or equal. in mod jump if true                                                          |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
-|**GTE**               | 0x22 | none  | none   | greater or equal                                                                              |
+|**GT**                | 0x21 | none  | none   | greater. in mod jump if true                                                                  |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
-|**INC**               | 0x23 | none  | none   | increment number (if not number do nothing)                                                   |
+|**GTE**               | 0x22 | none  | none   | greater or equal. in mod jump if true                                                         |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
-|**DEC**               | 0x24 | none  | none   | decrement number (if not number do nothing)                                                   |
+|**INC**               | 0x23 | none  | none   | increment number (if not number do nothing). in mod jump                                      |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
-|**EQU**               | 0x25 | none  | none   | equality                                                                                      |
+|**DEC**               | 0x24 | none  | none   | decrement number (if not number do nothing). in mod jump                                      |
++----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
+|**EQU**               | 0x25 | none  | none   | equality. in mod jump if true                                                                 |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
 |**NOT**               | 0x26 | none  | none   | binary not                                                                                    |
 +----------------------+------+-------+--------+-----------------------------------------------------------------------------------------------+
@@ -370,49 +371,49 @@ Instruction Description
 
 | *Lesser*
 |
-| ``Program: none``
+| ``Program: #u32``
 | ``Stack: ( value value - true/false )``
 
 .. describe:: LTE
 
 | *Lesser or equal*
 |
-| ``Program: none``
+| ``Program: #u32``
 | ``Stack: ( value value - true/false )``
 
 .. describe:: GT
 
 | *Greater*
 |
-| ``Program: none``
+| ``Program: #u32``
 | ``Stack: ( value value - true/false )``
 
 .. describe:: GTE
 
 | *Greater or equal*
 |
-| ``Program: none``
+| ``Program: #u32``
 | ``Stack: ( value value - true/false )``
 
 .. describe:: INC
 
 | *Increment*
 |
-| ``Program: none``
+| ``Program: #u32``
 | ``Stack: ( value - value )``
 
 .. describe:: DEC
 
 | *Decrement*
 |
-| ``Program: none``
+| ``Program: #u32``
 | ``Stack: ( value - value )``
 
 .. describe:: EQU
 
 | *Equality*
 |
-| ``Program: none``
+| ``Program: #u32``
 | ``Stack: ( value value - true/false )``
 
 .. describe:: NOT

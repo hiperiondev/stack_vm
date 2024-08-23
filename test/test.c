@@ -1011,6 +1011,23 @@ void test_opcodes(void) {
     OP_TEST_END();
     END_TEST();
     ///////////////////////////////////
+    START_TEST(SWAP,        //
+            "PUSH_INT 23\n" //
+            "PUSH_INT 45\n" //
+            "SWAP"          //
+            );              //
+
+    TEST_EXECUTE;
+    OP_TEST_START(11, 2, 0);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_INT);
+    assert(vm_value.number.uinteger == 23);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_INT);
+    assert(vm_value.number.uinteger == 45);
+    OP_TEST_END();
+    END_TEST();
+    ///////////////////////////////////
     START_TEST(HALT,   //
             "HALT 201" //
             );         //

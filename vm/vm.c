@@ -882,6 +882,11 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         }
         break;
 
+        case SWAP: {
+            STK_SWAP(thread);
+        }
+        break;
+
         case HALT: {
             (*thread)->exit_value = program->prog[(*thread)->pc];
             err = VM_ERR_HALT;

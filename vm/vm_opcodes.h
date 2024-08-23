@@ -63,8 +63,8 @@ enum VM_OPCODE {
     LTE,               // | 0x20 | #u32  |   -    |    -   | lesser or equal. in mod jump if true
     GT,                // | 0x21 | #u32  |   -    |    -   | greater. in mod jump if true
     GTE,               // | 0x22 | #u32  |   -    |    -   | greater or equal. in mod jump if true
-    INC,               // | 0x23 | #u32  |   -    |    -   | increment number (if not number do nothing). in mod jump if true
-    DEC,               // | 0x24 | #u32  |   -    |    -   | decrement number (if not number do nothing). in mod jump if true
+    INC,               // | 0x23 | #u32  |   -    |    -   | increment number (if not number do nothing). in mod jump
+    DEC,               // | 0x24 | #u32  |   -    |    -   | decrement number (if not number do nothing). in mod jump
     EQU,               // | 0x25 | #u32  |   -    |    -   | equality. in mod jump if true
     NOT,               // | 0x26 |   -   |   -    |    -   | binary not
     SET_GLOBAL,        // | 0x27 |  u32  |   -    |    -   | set global variable (global 0xffffffff is indirect register)
@@ -83,7 +83,8 @@ enum VM_OPCODE {
     GET_RETVAL,        // | 0x34 |   -   |   -    |    -   | push in stack value from function return
     TO_TYPE,           // | 0x35 |   u8  |   -    |    -   | convert value to new type
     DROP,              // | 0x36 |   -   |   -    |    -   | drop top of stack
-    HALT,              // | 0x37 |   u8  |   -    |    -   | stop vm
+    SWAP,              // | 0x37 |   -   |   -    |    -   | swap top and second element on stack
+    HALT,              // | 0x38 |   u8  |   -    |    -   | stop vm
 };
 
 #endif /* VM_OPCODES_H */

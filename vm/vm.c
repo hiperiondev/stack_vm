@@ -143,28 +143,40 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         }
             break;
 
+        case NEW_HEAP_OBJECT:
         case NEW_LIB_OBJ: {
-            vm_value_t lib_idx = vm_pop(thread);
-            if (lib_idx.type != VM_VAL_UINT || lib_idx.number.uinteger > (*thread)->externals->lib_qty)
-                err = VM_ERR_BAD_VALUE;
+            vm_value_t value = vm_pop(thread);
+            vm_heap_object_t obj;
+            vm_value_t ref;
 
-            vm_value_t ref = {
-                    .type = VM_VAL_LIB_OBJ
-            };
-            vm_heap_object_t obj = {
-                    .type = VM_VAL_LIB_OBJ,
-                    .static_obj = false,
-                    .lib_obj.identifier = 0,
-                    .lib_obj.addr = NULL,
-                    .lib_obj.lib_idx = lib_idx.number.uinteger,
-            };
+            if (program->prog[(*thread)->pc - 1] == NEW_LIB_OBJ) {
+                if (value.type != VM_VAL_UINT || value.number.uinteger > (*thread)->externals->lib_qty) {
+                    err = VM_ERR_BAD_VALUE;
+                    break;
+                }
+
+                ref.type = VM_VAL_LIB_OBJ;
+
+                obj.type = VM_VAL_LIB_OBJ;
+                obj.static_obj = false;
+                obj.lib_obj.identifier = 0;
+                obj.lib_obj.addr = NULL;
+                obj.lib_obj.lib_idx = value.number.uinteger;
+            } else {
+                ref.type = VM_VAL_GENERIC;
+
+                obj.type = VM_VAL_GENERIC;
+                obj.static_obj = false;
+                obj.value = value;
+            }
+
             if (modifier)
                 obj.static_obj = true;
 
             uint32_t heap_ref = vm_heap_save((*thread)->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
             ref.lib_obj.heap_ref = heap_ref;
             vm_push(thread, ref);
-            (*thread)->externals->lib[lib_idx.number.uinteger](thread, VM_EDFAT_NEW, lib_idx.number.uinteger, heap_ref);
+            (*thread)->externals->lib[value.number.uinteger](thread, VM_EDFAT_NEW, value.number.uinteger, heap_ref);
         }
             break;
 

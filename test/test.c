@@ -1317,6 +1317,7 @@ void test_opcodes(void) {
     END_TEST();
     free(externals.lib);
     ///////////////////////////////////
+
     printf("---( tests: %u / fails: %u )---\n", tests_qty, tests_fails);
     printf("---[ END TEST OPCODES ]---\n");
 

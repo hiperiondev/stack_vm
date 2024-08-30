@@ -193,7 +193,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 else {
                     switch (obj->type) {
                         case VM_VAL_GENERIC: {
-                            STK_TOP(thread)= obj->value;
+                            STK_TOP(thread) = obj->value;
                         }
                         break;
                         case VM_VAL_LIB_OBJ: {

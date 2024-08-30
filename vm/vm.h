@@ -655,6 +655,16 @@ bool vm_heap_isgc(vm_heap_t *heap, uint32_t pos, uint32_t *gc_mark);
 bool vm_heap_isallocated(vm_heap_t *heap, uint32_t pos);
 
 /**
+ * @fn bool vm_heap_isstatic(vm_heap_t *heap, uint32_t pos)
+ * @brief Check if heap object is static
+ *
+ * @param heap Heap
+ * @param pos Heap position
+ * @return Status
+ */
+bool vm_heap_isstatic(vm_heap_t *heap, uint32_t pos);
+
+/**
  * @fn void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_thread_t **thread, bool full)
  * @brief Mark as free all gc mark objects
  *

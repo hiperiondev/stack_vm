@@ -121,6 +121,13 @@ bool vm_heap_isgc(vm_heap_t *heap, uint32_t pos, uint32_t *gc_mark) {
     return vm_wordpos_isset_bit(gc_mark, pos);
 }
 
+bool vm_heap_isstatic(vm_heap_t *heap, uint32_t pos) {
+    if (pos > heap->size - 1 || !vm_wordpos_isset_bit(heap->allocated, pos))
+        return false;
+
+    return heap->data[pos].static_obj;
+}
+
 void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_thread_t **thread, bool full) {
     uint32_t allocated_word = 0xffffffff;
 

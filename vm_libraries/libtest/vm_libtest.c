@@ -30,9 +30,11 @@ vm_errors_t lib_entry_test(vm_thread_t **thread, uint8_t call_type, uint32_t lib
     static libtest_data_t *data_test;
 
     data_test = malloc(sizeof(libtest_data_t));
+    data_test->data1 = 123;
+    data_test->data2 = 1.23;
 
     switch (call_type) {
-        // vm cases
+        // vm internal cases
         case VM_EDFAT_NEW: {
             NEW_HEAP_REF(obj, arg);
             obj->lib_obj.addr = data_test;
@@ -52,10 +54,7 @@ vm_errors_t lib_entry_test(vm_thread_t **thread, uint8_t call_type, uint32_t lib
             break;
 
         case VM_EDFAT_GC: {
-            if (!vm_heap_load((*thread)->heap, arg)->static_obj) {
-
-            }
-
+            free(vm_heap_load((*thread)->heap, arg)->lib_obj.addr);
         }
             break;
 
@@ -64,6 +63,7 @@ vm_errors_t lib_entry_test(vm_thread_t **thread, uint8_t call_type, uint32_t lib
         }
             break;
 
+        // library cases
         case LIBTEST_FN_TEST0: {
             printf("TEST_LIBRARY_IDENTIFIER: %u\n", TEST_LIBRARY_IDENTIFIER);
         }

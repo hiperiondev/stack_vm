@@ -60,13 +60,13 @@ Instructions
 +----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+
 |**PUSH_CONST_STRING** | 0x11 | @u32  | none  | push constant string value from program address                                                                  |
 +----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+
-|** NEW_LIB_OBJ**      | 0x12 | none  | none  | create a new heap object referenced to library. @ make static (will not be released by GC)                       |
+|**NEW_LIB_OBJ**       | 0x12 | none  | none  | create a new heap object referenced to library. @ make static (will not be released by GC)                       |
 +----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+
-|** NEW_HEAP_OBJECT**  | 0x13 | none  | none  | make a new heap object and move first element of stack to new object. @ make static (will not be released by GC) |
+|**NEW_HEAP_OBJECT**   | 0x13 | none  | none  | make a new heap object and move first element of stack to new object. @ make static (will not be released by GC) |
 +----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+
-|** PUSH_HEAP_OBJECT** | 0x14 | none  | none  | push a heap object                                                                                               |
+|**PUSH_HEAP_OBJECT**  | 0x14 | none  | none  | push a heap object                                                                                               |
 +----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+
-|** FREE_HEAP_OBJECT** | 0x15 | none  | none  | mark as free a HEAP object                                                                                       |
+|**FREE_HEAP_OBJECT**  | 0x15 | none  | none  | mark as free a HEAP object                                                                                       |
 +----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+
 |**NEW_ARRAY**         | 0x16 |  u16  | none  | create new array in heap and fill with n elements from stack. Push heap index                                    |
 +----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+

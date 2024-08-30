@@ -36,6 +36,7 @@ Also the use of native data types has generic options for use as well as the def
 - [x] Heap with automatic growth and optional shrink. Allocation management by bit mask (simple and fast)
 - [x] Call with frame placement and stack space reservation for local variables
 - [x] Heap management per frame with automatic release at the exit of the frame
+- [x] Generic data objects in HEAP and static attribute (survive to frame GC)
 - [x] Native external data management (via custom function)
 - [x] Libraries for custom data types
 - [x] Simple external functions (FFI)

@@ -87,7 +87,7 @@ void vm_push_frame(vm_thread_t **thread, uint8_t locals) {
 }
 
 void vm_pop_frame(vm_thread_t **thread) {
-    vm_heap_gc_collect((*thread)->heap, &((*thread)->frames[(*thread)->fc].gc_mark), true, thread);
+    vm_heap_gc_collect((*thread)->heap, &((*thread)->frames[(*thread)->fc].gc_mark), true, thread, false);
 #ifdef VM_HEAP_SHRINK_AFTER_GC
     vm_heap_shrink((*thread)->heap);
 #endif
@@ -143,7 +143,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         }
             break;
 
-        case PUSH_NEW_HEAP_OBJ: {
+        case NEW_LIB_OBJ: {
             vm_value_t lib_idx = vm_pop(thread);
             if (lib_idx.type != VM_VAL_UINT || lib_idx.number.uinteger > (*thread)->externals->lib_qty)
                 err = VM_ERR_BAD_VALUE;
@@ -153,10 +153,13 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             };
             vm_heap_object_t obj = {
                     .type = VM_VAL_LIB_OBJ,
+                    .static_obj = false,
                     .lib_obj.identifier = 0,
                     .lib_obj.addr = NULL,
                     .lib_obj.lib_idx = lib_idx.number.uinteger,
             };
+            if (modifier)
+                obj.static_obj = true;
 
             uint32_t heap_ref = vm_heap_save((*thread)->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
             ref.lib_obj.heap_ref = heap_ref;
@@ -193,6 +196,18 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                         break;
                     }
                 }
+            }
+        }
+        break;
+
+        case FREE_HEAP_OBJECT: {
+            vm_value_t value = STK_TOP(thread);
+
+            if (value.type != VM_VAL_UINT) {
+                err = VM_ERR_BAD_VALUE;
+            } else {
+                uint32_t idx = value.number.uinteger;
+                vm_heap_free((*thread)->heap, idx);
             }
         }
         break;
@@ -929,7 +944,7 @@ void vm_create_thread(vm_thread_t **thread) {
 }
 
 void vm_destroy_thread(vm_thread_t **thread) {
-    vm_heap_gc_collect((*thread)->heap, &((*thread)->frames[0].gc_mark), true, thread);
+    vm_heap_gc_collect((*thread)->heap, &((*thread)->frames[0].gc_mark), true, thread, true);
     vm_heap_destroy((*thread)->heap, thread);
     free((*thread)->globals);
     for (uint32_t n = 0; n < VM_THREAD_STACK_SIZE; ++n)

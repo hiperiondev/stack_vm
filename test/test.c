@@ -1068,7 +1068,7 @@ void test_opcodes(void) {
     START_TEST(STRING LIBRARY: TO_CSTR, //
             "PUSH_CONST_STRING str\n"   //
             "PUSH_UINT 0\n"             //
-            "PUSH_NEW_HEAP_OBJ\n"       //
+            "NEW_LIB_OBJ\n"             //
             "SET_GLOBAL 0\n"            //
             "PUSH_INT 99\n"             //
             "GET_GLOBAL 0\n"            //
@@ -1095,7 +1095,7 @@ void test_opcodes(void) {
     START_TEST(STRING LIBRARY: LEN,     //
             "PUSH_CONST_STRING str\n"   //
             "PUSH_UINT 0\n"             //
-            "PUSH_NEW_HEAP_OBJ\n"       //
+            "NEW_LIB_OBJ\n"             //
             "SET_GLOBAL 0\n"            //
             "PUSH_INT 99\n"             //
             "GET_GLOBAL 0\n"            //
@@ -1123,7 +1123,7 @@ void test_opcodes(void) {
             "PUSH_UINT 5\n"              // pos for LEFT
             "PUSH_CONST_STRING str\n"    // push constant string
             "PUSH_UINT 0\n"              // LIBSTRING
-            "PUSH_NEW_HEAP_OBJ\n"        // push new LIBSTRING object
+            "NEW_LIB_OBJ\n"              // push new LIBSTRING object
             "LIB_FN 1 0\n"               // LIBSTRING_FN_LEFT
             "LIB_FN 9 0\n"               // LIBSTRING_FN_TO_CSTR
             "HALT 99\n"                  // end
@@ -1150,7 +1150,7 @@ void test_opcodes(void) {
             "PUSH_UINT 7\n"              // pos for RIGHT
             "PUSH_CONST_STRING str\n"    // push constant string
             "PUSH_UINT 0\n"              // LIBSTRING
-            "PUSH_NEW_HEAP_OBJ\n"        // push new LIBSTRING object
+            "NEW_LIB_OBJ\n"              // push new LIBSTRING object
             "LIB_FN 2 0\n"               // LIBSTRING_FN_RIGHT
             "LIB_FN 9 0\n"               // LIBSTRING_FN_TO_CSTR
             "HALT 99\n"                  // end
@@ -1178,7 +1178,7 @@ void test_opcodes(void) {
             "PUSH_UINT 8\n"              // posr for MID
             "PUSH_CONST_STRING str\n"    // push constant string
             "PUSH_UINT 0\n"              // LIBSTRING
-            "PUSH_NEW_HEAP_OBJ\n"        // push new LIBSTRING object
+            "NEW_LIB_OBJ\n"              // push new LIBSTRING object
             "LIB_FN 3 0\n"               // LIBSTRING_FN_MID
             "LIB_FN 9 0\n"               // LIBSTRING_FN_TO_CSTR
             "HALT 99\n"                  // end
@@ -1206,7 +1206,7 @@ void test_opcodes(void) {
             "PUSH_UINT 8\n"               // posr for DELETE
             "PUSH_CONST_STRING str\n"     // push constant string
             "PUSH_UINT 0\n"               // LIBSTRING
-            "PUSH_NEW_HEAP_OBJ\n"         // push new LIBSTRING object
+            "NEW_LIB_OBJ\n"               // push new LIBSTRING object
             "LIB_FN 6 0\n"                // LIBSTRING_FN_DELETE
             "LIB_FN 9 0\n"                // LIBSTRING_FN_TO_CSTR
             "HALT 99\n"                   // end
@@ -1235,7 +1235,7 @@ void test_opcodes(void) {
             "PUSH_CONST_STRING str2\n"    // push constant string
             "PUSH_CONST_STRING str\n"     // push constant string
             "PUSH_UINT 0\n"               // LIBSTRING
-            "PUSH_NEW_HEAP_OBJ\n"         // push new LIBSTRING object
+            "NEW_LIB_OBJ\n"               // push new LIBSTRING object
             "LIB_FN 5 0\n"                // LIBSTRING_FN_INSERT
             "LIB_FN 9 0\n"                // LIBSTRING_FN_TO_CSTR
             "HALT 99\n"                   // end
@@ -1264,7 +1264,7 @@ void test_opcodes(void) {
             "PUSH_CONST_STRING str2\n"    // push constant string
             "PUSH_CONST_STRING str\n"     // push constant string
             "PUSH_UINT 0\n"               // LIBSTRING
-            "PUSH_NEW_HEAP_OBJ\n"         // push new LIBSTRING object
+            "NEW_LIB_OBJ\n"               // push new LIBSTRING object
             "LIB_FN 7 0\n"                // LIBSTRING_FN_REPLACE
             "LIB_FN 9 0\n"                // LIBSTRING_FN_TO_CSTR
             "HALT 99\n"                   // end
@@ -1293,7 +1293,7 @@ void test_opcodes(void) {
             "PUSH_CONST_STRING str2\n"  // push constant string
             "PUSH_CONST_STRING str\n"   // push constant string
             "PUSH_UINT 0\n"             // LIBSTRING
-            "PUSH_NEW_HEAP_OBJ\n"       // push new LIBSTRING object
+            "NEW_LIB_OBJ\n"             // push new LIBSTRING object
             "LIB_FN 8 0\n"              // LIBSTRING_FN_FIND
             "LIB_FN 9 0\n"              // LIBSTRING_FN_TO_CSTR
             "HALT 99\n"                 // end

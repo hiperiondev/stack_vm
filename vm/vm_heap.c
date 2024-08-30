@@ -39,7 +39,7 @@ vm_heap_t* vm_heap_create(uint32_t size) {
 }
 
 void vm_heap_destroy(vm_heap_t *heap, vm_thread_t **thread) {
-    vm_heap_gc_collect(heap, &(heap->allocated), true, thread);
+    vm_heap_gc_collect(heap, &(heap->allocated), true, thread, true);
     free(heap->data);
     free(heap);
 }
@@ -121,7 +121,7 @@ bool vm_heap_isgc(vm_heap_t *heap, uint32_t pos, uint32_t *gc_mark) {
     return vm_wordpos_isset_bit(gc_mark, pos);
 }
 
-void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_thread_t **thread) {
+void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_thread_t **thread, bool full) {
     uint32_t allocated_word = 0xffffffff;
 
     while (++allocated_word < ((ID_ALLOC_WORD(heap->size)) / 32) + 1) {
@@ -129,7 +129,7 @@ void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_
             continue;
         } else {
             for (uint8_t b = 0; b < 32; b++) {
-                if (GET_BIT((*gc_mark)[allocated_word], b)) {
+                if (GET_BIT((*gc_mark)[allocated_word], b) && (!(heap->data[ID_POS(allocated_word, b)].static_obj) || full)) {
                     switch (heap->data[ID_POS(allocated_word, b)].type) {
                         case VM_VAL_LIB_OBJ: {
                             uint32_t idx = ID_POS(allocated_word, b);

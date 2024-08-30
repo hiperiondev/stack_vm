@@ -362,6 +362,7 @@ typedef struct vm_globals_s {
  */
 typedef struct vm_heap_object_s {
     vm_value_type_t type;       /**< value type */
+    bool static_obj;            /**< static data. Not GC */
 
     union {
         vm_value_t value;       /**< generic value */
@@ -654,15 +655,16 @@ bool vm_heap_isgc(vm_heap_t *heap, uint32_t pos, uint32_t *gc_mark);
 bool vm_heap_isallocated(vm_heap_t *heap, uint32_t pos);
 
 /**
- * @fn void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_thread_t **thread)
+ * @fn void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_thread_t **thread, bool full)
  * @brief Mark as free all gc mark objects
  *
  * @param heap Heap
  * @param gc_mark Local gc allocated mark
  * @param free_mark If true erase Local gc allocated mark (free)
+ * @param full If true ignore static and release
  * @param thread Thread
  */
-void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_thread_t **thread);
+void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_thread_t **thread, bool full);
 
 /**
  * @fn uint32_t* vm_heap_new_gc_mark(vm_heap_t *heap)

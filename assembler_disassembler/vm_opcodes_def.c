@@ -25,7 +25,7 @@ const op_t opcodes[] = { //
    // |   opcode              | mod |  arg1 |  arg2  |  arg3  |  arg4  |  arg5  |  arg6  |  arg7  |  arg8  |
      {OP(PUSH_NULL)            , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x00
      {OP(PUSH_NULL_N)          , 0, {ARG_U08, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x01
-     {OP(PUSH_NEW_HEAP_OBJ)    , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x02
+     {OP(NEW_LIB_OBJ)          , 1, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x02
      {OP(PUSH_TRUE)            , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x03
      {OP(PUSH_FALSE)           , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x04
      {OP(PUSH_INT)             , 0, {ARG_I32, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x05
@@ -79,8 +79,8 @@ const op_t opcodes[] = { //
      {OP(TO_TYPE)              , 0, {ARG_U08, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x35
      {OP(DROP)                 , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x36
      {OP(SWAP)                 , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x37
-     {OP(HALT)                 , 0, {ARG_U08, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x38
-     {"39_INSTRUCTION_"        , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x39
+     {OP(FREE_HEAP_OBJECT)     , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x38
+     {OP(HALT)                 , 0, {ARG_U08, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x39
      {"3A_INSTRUCTION_"        , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x3a
      {"3B_INSTRUCTION_"        , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x3b
      {"3C_INSTRUCTION_"        , 0, {ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON, ARG_NON}}, // 0x3c

@@ -30,7 +30,7 @@ enum VM_OPCODE {
 //|   opcode              |  id  |  arg1 |  arg2  |  arg3  | description
     PUSH_NULL,         // | 0x00 |   -   |   -    |    -   | push NULL value
     PUSH_NULL_N,       // | 0x01 |   u8  |   -    |    -   | pushes N null values onto the stack
-    PUSH_NEW_HEAP_OBJ, // | 0x02 |   -   |   -    |    -   | create a new heap object referenced to library
+    NEW_LIB_OBJ, // | 0x02 |   -   |   -    |    -   | create a new heap object referenced to library. @ make static (will not be released by GC)
     PUSH_TRUE,         // | 0x03 |   -   |   -    |    -   | push boolean true value
     PUSH_FALSE,        // | 0x04 |   -   |   -    |    -   | push boolean false value
     PUSH_INT,          // | 0x05 |  i32  |   -    |    -   | push integer value
@@ -84,7 +84,8 @@ enum VM_OPCODE {
     TO_TYPE,           // | 0x35 |   u8  |   -    |    -   | convert value to new type
     DROP,              // | 0x36 |   -   |   -    |    -   | drop top of stack
     SWAP,              // | 0x37 |   -   |   -    |    -   | swap top and second element on stack
-    HALT,              // | 0x38 |   u8  |   -    |    -   | stop vm
+    FREE_HEAP_OBJECT,  // | 0x38 |   -   |   -    |    -   | mark as free a HEAP object
+    HALT,              // | 0x39 |   u8  |   -    |    -   | stop vm
 };
 
 #endif /* VM_OPCODES_H */

@@ -28,6 +28,7 @@
 #include "vm_assembler_utils.h"
 #include "vm_disassembler.h"
 #include "vm_libstring.h"
+#include "vm_libtest.h"
 #include "termcolors.h"
 
 #define EP(x) [x] = #x
@@ -1313,6 +1314,31 @@ void test_opcodes(void) {
     vm_value = vm_pop(&thread);
     assert(vm_value.type == VM_VAL_UINT);
     assert(vm_value.number.uinteger == 3);
+    OP_TEST_END();
+    END_TEST();
+    free(externals.lib);
+    ///////////////////////////////////
+    START_TEST(STRING LIBRARY: STATIC LIB OBJECT,//
+            "CALL 0 fn\n"    //
+            "GET_RETVAL\n"   //
+            "LIB_FN 0 9\n"   // LIBTEST_FN_TEST0
+            "LIB_FN 1 10\n"  // LIBTEST_FN_TEST1
+            "HALT 99\n"      // end
+            ".label fn\n"    //
+            "PUSH_UINT 0\n"  // LIBTEST
+            "@NEW_LIB_OBJ\n" // push new LIBTEST object (static)
+            "LIB_FN 0 3\n"   // LIBTEST_FN_TEST0
+            "LIB_FN 1 4\n"   // LIBTEST_FN_TEST1
+            "RETURN_VALUE\n" //
+            );               //
+
+    externals.lib = calloc(1, sizeof(lib_entry));
+    externals.lib[0] = lib_entry_test;
+    ++externals.lib_qty;
+    thread->externals = &externals;
+
+    TEST_EXECUTE;
+    OP_TEST_START(20, 1, 0);
     OP_TEST_END();
     END_TEST();
     free(externals.lib);

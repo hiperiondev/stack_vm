@@ -27,19 +27,16 @@ vm_errors_t lib_entry_test(vm_thread_t **thread, uint8_t call_type, uint32_t lib
         return VM_ERR_FAIL;
 
     vm_errors_t res = VM_ERR_OK;
-    static libtest_data_t *data_test;
-
-    data_test = malloc(sizeof(libtest_data_t));
-    data_test->data1 = 123;
-    data_test->data2 = 1.23;
 
     switch (call_type) {
         // vm internal cases
         case VM_EDFAT_NEW: {
             NEW_HEAP_REF(obj, arg);
-            obj->lib_obj.addr = data_test;
+            obj->lib_obj.addr = (void*) malloc(sizeof(libtest_data_t));
             obj->lib_obj.identifier = TEST_LIBRARY_IDENTIFIER;
-            STKDROPSND(thread);
+            ((libtest_data_t*) obj->lib_obj.addr)->data1 = 123;
+            ((libtest_data_t*) obj->lib_obj.addr)->data2 = 1.23;
+            printf("NEW OBJECT addr: %p\n", obj->lib_obj.addr);
         }
             break;
 
@@ -63,14 +60,20 @@ vm_errors_t lib_entry_test(vm_thread_t **thread, uint8_t call_type, uint32_t lib
         }
             break;
 
-        // library cases
+            // library cases
         case LIBTEST_FN_TEST0: {
-            printf("TEST_LIBRARY_IDENTIFIER: %u\n", TEST_LIBRARY_IDENTIFIER);
+            vm_value_t obj = STK_TOP(thread);
+            printf("[test0] TEST_LIBRARY_IDENTIFIER: %u (arg: %u)\n", TEST_LIBRARY_IDENTIFIER, arg);
+            printf("    (value addr: %p)\n", vm_heap_load((*thread)->heap, obj.lib_obj.heap_ref)->lib_obj.addr);
+            printf("    (value1: %u)\n", ((libtest_data_t*) (vm_heap_load((*thread)->heap, obj.lib_obj.heap_ref)->lib_obj.addr))->data1);
         }
             break;
 
         case LIBTEST_FN_TEST1: {
-            printf("IDX: %u, ARGUMENT: %u\n", lib_idx, arg);
+            vm_value_t obj = STK_TOP(thread);
+            printf("[test1] IDX: %u, ARGUMENT: %u\n", lib_idx, arg);
+            printf("    (value2: %f)\n", ((libtest_data_t*) (vm_heap_load((*thread)->heap, obj.lib_obj.heap_ref)->lib_obj.addr))->data2);
+
         }
             break;
     }

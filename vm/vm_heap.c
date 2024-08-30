@@ -189,5 +189,8 @@ void vm_heap_shrink(vm_heap_t *heap) {
                 break;
             }
         }
+
+        if(allocated_word == 0)
+            break;
     }
 }

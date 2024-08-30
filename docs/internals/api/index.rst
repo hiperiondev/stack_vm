@@ -206,6 +206,11 @@ HEAP
       bool vm_heap_isallocated(vm_heap_t *heap, uint32_t pos);
 
 .. code-block:: C
+   :caption: Check if heap object is static
+
+      bool vm_heap_isstatic(vm_heap_t *heap, uint32_t pos);
+
+.. code-block:: C
    :caption: Mark as free all gc mark objects
    
       void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_thread_t **thread);

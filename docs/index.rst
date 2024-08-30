@@ -33,6 +33,7 @@ Features
 * Heap with automatic growth and optional shrink. Allocation management by bit mask (simple and fast)
 * Call with frame placement and stack space reservation for local variables
 * Heap management per frame with automatic release at the exit of the frame
+* Generic data objects in HEAP and static attribute (survive to frame GC)
 * Native external data management (via custom function)
 * Libraries for custom data types
 * Simple external functions (FFI)

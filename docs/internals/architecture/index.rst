@@ -56,6 +56,7 @@ Heap
 | *The objects in the heap are not deleted, only their availability is marked.*
 | When a GC is performed the string constants that were dynamically allocated are also freed.
 | The heap does not automatically release the real reserved space, for this the *vm_heap_shrink* function must be invoked (see API) which releases all the space prior to the highest used index (no index relocation is performed).
+| If a heap object is marked as static will not be erased on any GC and must be released with FREE_HEAP_OBJECT.
 | You can also configure this function to be automatically invoked at each output of a Frame (See Configuration).
 
 Stack

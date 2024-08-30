@@ -49,7 +49,7 @@ enum VM_OPCODE {
     NEW_LIB_OBJ,       // | 0x12 |   -   |   -    |    -   | create a new heap object referenced to library. @ make static (will not be released by GC)
     NEW_HEAP_OBJECT,   // | 0x13 |   -   |   -    |    -   | make a new heap object and move first element of stack to new object. @ make static (will not be released by GC)
     PUSH_HEAP_OBJECT,  // | 0x14 |   -   |   -    |    -   | push a heap object
-    FREE_HEAP_OBJECT,  // | 0x15 |   -   |   -    |    -   | mark as free a HEAP object
+    FREE_HEAP_OBJECT,  // | 0x15 |   -   |   -    |    -   | mark as free a heap object
     NEW_ARRAY,         // | 0x16 |  u16  |   -    |    -   | create new array in heap and fill with n elements from stack. push heap index
     PUSH_ARRAY,        // | 0x17 |   -   |   -    |    -   | push array to stack
     GET_ARRAY_VALUE,   // | 0x18 | @u16  |   -    |    -   | get value from array

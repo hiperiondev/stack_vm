@@ -565,7 +565,7 @@ Instruction Description
 | *Swap top and second element on stack*
 |
 | ``Program: none``
-| ``Stack: ( a b - b a)``
+| ``Stack: ( a b - b a )``
 
 .. describe:: HALT
 

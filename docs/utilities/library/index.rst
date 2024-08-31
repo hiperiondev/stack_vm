@@ -17,7 +17,7 @@ Strings
    Add strings management primitives
 
 |   
-| This functions support functions:
+| This library support functions:
  
 ======== ===============================================
      LEN Return the length of a string.

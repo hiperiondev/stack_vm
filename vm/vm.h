@@ -260,11 +260,11 @@ typedef enum VM_VALUE_TYPE {
 } vm_value_type_t;
 
 typedef enum VM_EXTERNAL_DATA_FUNCTION_ARG_TYPE {
-    VM_EDFAT_NEW = 0xfa,  //
-    VM_EDFAT_PUSH,        //
-    VM_EDFAT_CMP,         //
-    VM_EDFAT_GC,          //
-    VM_EDFAT_TOTYPE,      //
+    VM_EDFAT_NEW = 0xfa,  /**< VM_EDFAT_NEW */
+    VM_EDFAT_PUSH,        /**< VM_EDFAT_PUSH */
+    VM_EDFAT_CMP,         /**< VM_EDFAT_CMP */
+    VM_EDFAT_GC,          /**< VM_EDFAT_GC */
+    VM_EDFAT_TOTYPE,      /**< VM_EDFAT_TOTYPE */
 } vm_edf_arg_type_t;
 
 typedef struct vm_thread_s vm_thread_t;
@@ -286,7 +286,7 @@ typedef struct vm_value_s {
         } number;
 
         struct {
-            uint32_t heap_ref; /**< library obj reference */
+            uint32_t heap_ref; /**< library object reference */
             uint32_t lib_idx;  /**< library entry function */
         } lib_obj;
 

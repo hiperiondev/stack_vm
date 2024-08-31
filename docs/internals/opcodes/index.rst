@@ -138,7 +138,9 @@ Instructions
 +----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+
 |**DROP**              | 0x38 | none  | none  | drop top of stack                                                                                                |
 +----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+
-|**HALT**              | 0x39 |   u8  | none  | stop vm                                                                                                          |
+|**SWAP**              | 0x39 | none  | none  | swap top and second element on stack                                                                             |
++----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+
+|**HALT**              | 0x3a |   u8  | none  | stop vm                                                                                                          |
 +----------------------+------+-------+-------+------------------------------------------------------------------------------------------------------------------+
 
 Instruction Description
@@ -489,6 +491,7 @@ Instruction Description
 .. describe:: RETURN_VALUE
 
 | *Return from function with value*
+|
 | ``Value returned is saved on ret_val register``
 | ``Program: none``
 | ``Stack: ( - )``
@@ -556,6 +559,13 @@ Instruction Description
 |
 | ``Program: none``
 | ``Stack: ( value - )``
+
+.. describe:: SWAP
+
+| *Swap top and second element on stack*
+|
+| ``Program: none``
+| ``Stack: ( a b - b a)``
 
 .. describe:: HALT
 

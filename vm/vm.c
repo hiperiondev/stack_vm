@@ -848,11 +848,12 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         break;
 
         case TO_TYPE: {
+#ifdef VM_ENABLE_TOTYPES
             if (STK_TOP(thread).type == VM_VAL_LIB_OBJ) {
                 uint32_t arg = vm_read_u32(thread, program, &(*thread)->pc);
                 err = (*thread)->externals->lib[STK_TOP(thread).lib_obj.lib_idx](thread, VM_EDFAT_TOTYPE, STK_TOP(thread).lib_obj.lib_idx, arg);
             }
-#ifdef VM_ENABLE_TOTYPES
+
             uint8_t type = program->prog[(*thread)->pc++];
             if (STK_TOP(thread).type == type)
                 return;

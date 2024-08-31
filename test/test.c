@@ -1318,7 +1318,7 @@ void test_opcodes(void) {
     END_TEST();
     free(externals.lib);
     ///////////////////////////////////
-    START_TEST(STRING LIBRARY: STATIC LIB OBJECT,//
+    START_TEST(TEST LIBRARY: STATIC LIB OBJECT,//
             "CALL 0 fn\n"    //
             "GET_RETVAL\n"   //
             "LIB_FN 0 9\n"   // LIBTEST_FN_TEST0
@@ -1342,6 +1342,28 @@ void test_opcodes(void) {
     OP_TEST_END();
     END_TEST();
     free(externals.lib);
+    ///////////////////////////////////
+    START_TEST(GENERIC OBJECT,   //
+            "CALL 0 fn\n"        //
+            "GET_GLOBAL 0\n"     //
+            "PUSH_HEAP_OBJECT\n" //
+            "GET_GLOBAL 0\n"     //
+            "FREE_HEAP_OBJECT\n" //
+            "HALT 99\n"          // end
+            ".label fn\n"        //
+            "PUSH_UINT 97\n"     //
+            "@NEW_HEAP_OBJECT\n" // push new generic object (static)
+            "SET_GLOBAL 0\n"     //
+            "RETURN\n"           //
+            );                   //
+
+    TEST_EXECUTE;
+    OP_TEST_START(19, 1, 0);
+    vm_value = vm_pop(&thread);
+    assert(vm_value.type == VM_VAL_UINT);
+    assert(vm_value.number.uinteger == 97);
+    OP_TEST_END();
+    END_TEST();
     ///////////////////////////////////
 
     printf("---( tests: %u / fails: %u )---\n", tests_qty, tests_fails);

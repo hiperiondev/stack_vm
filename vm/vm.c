@@ -148,8 +148,9 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
             vm_value_t value = vm_pop(thread);
             vm_heap_object_t obj;
             vm_value_t ref;
+            bool is_new_lib = program->prog[(*thread)->pc - 1] == NEW_LIB_OBJ ? true : false;
 
-            if (program->prog[(*thread)->pc - 1] == NEW_LIB_OBJ) {
+            if (is_new_lib) {
                 if (value.type != VM_VAL_UINT || value.number.uinteger > (*thread)->externals->lib_qty) {
                     err = VM_ERR_BAD_VALUE;
                     break;
@@ -163,7 +164,7 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 obj.lib_obj.addr = NULL;
                 obj.lib_obj.lib_idx = value.number.uinteger;
             } else {
-                ref.type = VM_VAL_GENERIC;
+                ref.type = VM_VAL_HEAP_REF;
 
                 obj.type = VM_VAL_GENERIC;
                 obj.static_obj = false;
@@ -174,19 +175,31 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 obj.static_obj = true;
 
             uint32_t heap_ref = vm_heap_save((*thread)->heap, obj, &((*thread)->frames[(*thread)->fc].gc_mark));
-            ref.lib_obj.heap_ref = heap_ref;
-            vm_push(thread, ref);
-            (*thread)->externals->lib[value.number.uinteger](thread, VM_EDFAT_NEW, value.number.uinteger, heap_ref);
+
+            if (is_new_lib) {
+                ref.lib_obj.heap_ref = heap_ref;
+                vm_push(thread, ref);
+                (*thread)->externals->lib[value.number.uinteger](thread, VM_EDFAT_NEW, value.number.uinteger, heap_ref);
+            } else {
+                ref.heap_ref = heap_ref;
+                vm_push(thread, ref);
+            }
+
         }
             break;
 
         case PUSH_HEAP_OBJECT: {
             vm_value_t value = STK_TOP(thread);
 
-            if (value.type != VM_VAL_UINT)
+            if (value.type != VM_VAL_LIB_OBJ && value.type != VM_VAL_HEAP_REF)
                 err = VM_ERR_BAD_VALUE;
             else {
-                uint32_t idx = value.number.uinteger;
+                uint32_t idx;
+                if (value.type == VM_VAL_LIB_OBJ)
+                    idx = value.lib_obj.heap_ref;
+                else
+                    idx = value.heap_ref;
+
                 vm_heap_object_t *obj = vm_heap_load((*thread)->heap, idx);
                 if (obj->type == VM_VAL_NULL)
                     err = VM_ERR_HEAPNOTEXIST;
@@ -213,13 +226,18 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
         break;
 
         case FREE_HEAP_OBJECT: {
-            vm_value_t value = STK_TOP(thread);
+            vm_value_t value = vm_pop(thread);
 
-            if (value.type != VM_VAL_UINT) {
+            if (value.type != VM_VAL_LIB_OBJ && value.type != VM_VAL_HEAP_REF) {
                 err = VM_ERR_BAD_VALUE;
             } else {
-                uint32_t idx = value.number.uinteger;
-                vm_heap_free((*thread)->heap, idx);
+                uint32_t idx;
+                if (value.type == VM_VAL_LIB_OBJ) {
+                    idx = value.lib_obj.heap_ref;
+                } else {
+                    idx = value.heap_ref;
+                    vm_heap_free((*thread)->heap, idx);
+                }
             }
         }
         break;

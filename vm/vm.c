@@ -673,13 +673,17 @@ void vm_step(vm_thread_t **thread, vm_program_t *program) {
                 .value = vm_pop(thread)
             };
 
-            if (var_idx > VM_MAX_GLOBAL_VARS)
+            if (var_idx >= VM_MAX_GLOBAL_VARS)
                 err = VM_ERR_OUTOFRANGE;
             else {
                 if (var_idx < (*thread)->globals->global_vars_qty) {
                     if (!vm_heap_set((*thread)->heap, value, (*thread)->globals->global_vars[var_idx]))
                         err = VM_ERR_OUTOFRANGE;
                 } else {
+                    if (var_idx != (*thread)->globals->global_vars_qty) {
+                        err = VM_ERR_OUTOFRANGE;
+                        break;
+                    }
                     uint32_t heap_id = vm_heap_save((*thread)->heap, value, &((*thread)->frames[0].gc_mark));
                     (*thread)->globals->global_vars[var_idx] = heap_id;
                     ++(*thread)->globals->global_vars_qty;

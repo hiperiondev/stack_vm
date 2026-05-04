@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 #define COMPILER_VERSION_MAYOR 4 // indicate a really big change that can cause a lot of incompatibilities with previous versions
 #define COMPILER_VERSION_MINOR 0 // indicate some change on API or opcode
@@ -512,8 +513,10 @@ void vm_pop_frame(vm_thread_t **thread);
  * @return a int16 value from program
  */
 inline int16_t vm_read_i16(vm_thread_t **thread, vm_program_t *program, uint32_t *pc) {
+    int16_t val;
+    memcpy(&val, program->prog + *pc, sizeof(int16_t));
     *pc += 2;
-    return (int16_t)*((uint32_t*)(program->prog + *pc - 2));
+    return val;
 }
 
 /**
@@ -526,8 +529,10 @@ inline int16_t vm_read_i16(vm_thread_t **thread, vm_program_t *program, uint32_t
  * @return a uint16 value from program
  */
 inline uint16_t vm_read_u16(vm_thread_t **thread, vm_program_t *program, uint32_t *pc) {
+    uint16_t val;
+    memcpy(&val, program->prog + *pc, sizeof(uint16_t));
     *pc += 2;
-    return (uint16_t)*((uint32_t*)(program->prog + *pc - 2));
+    return val;
 }
 
 /**
@@ -540,8 +545,10 @@ inline uint16_t vm_read_u16(vm_thread_t **thread, vm_program_t *program, uint32_
  * @return a int32 value from program
  */
 inline int32_t vm_read_i32(vm_thread_t **thread, vm_program_t *program, uint32_t *pc) {
+    int32_t val;
+    memcpy(&val, program->prog + *pc, sizeof(int32_t));
     *pc += 4;
-    return (int32_t)*((uint32_t*)(program->prog + *pc - 4));
+    return val;
 }
 
 /**
@@ -554,8 +561,10 @@ inline int32_t vm_read_i32(vm_thread_t **thread, vm_program_t *program, uint32_t
  * @return a uint32 value from program
  */
 inline uint32_t vm_read_u32(vm_thread_t **thread, vm_program_t *program, uint32_t *pc) {
+    uint32_t val;
+    memcpy(&val, program->prog + *pc, sizeof(uint32_t));
     *pc += 4;
-    return (uint32_t) *((uint32_t*) (program->prog + *pc - 4));
+    return val;
 }
 
 /**
@@ -568,8 +577,10 @@ inline uint32_t vm_read_u32(vm_thread_t **thread, vm_program_t *program, uint32_
  * @return a float value from program
  */
 inline float vm_read_f32(vm_thread_t **thread, vm_program_t *program, uint32_t *pc) {
+    float val;
+    memcpy(&val, program->prog + *pc, sizeof(float));
     *pc += 4;
-    return *((float*) (program->prog + *pc - 4));
+    return val;
 }
 
 /////////// heap ////////

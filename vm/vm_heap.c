@@ -71,7 +71,8 @@ grow:
     if (heap->size + 1 > VM_MAX_HEAP)
         return 0xffffffff;
 
-    heap->data = realloc(heap->data, (++heap->size + 1) * sizeof(vm_heap_object_t));
+    ++heap->size;
+    heap->data = realloc(heap->data, heap->size * sizeof(vm_heap_object_t));
 
     if (ID_ALLOC_WORD(heap->size) == ID_ALLOC_WORD(heap->size) - ID_ALLOC_BIT(heap->size)) { // need more allocated positions
         heap->allocated = realloc(heap->allocated, (ID_ALLOC_WORD(heap->size) + 1) * sizeof(uint32_t));

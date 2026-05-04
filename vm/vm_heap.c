@@ -29,12 +29,24 @@ vm_heap_t* vm_heap_create(uint32_t size) {
     if (size == 0)
         size = 1;
 
-    static vm_heap_t *heap;
+    vm_heap_t *heap = malloc(sizeof(vm_heap_t));
+    if (!heap)
+        return NULL;
 
-    heap = malloc(sizeof(vm_heap_t));
     heap->allocated = calloc(((size - 1) / 32) + 1, sizeof(uint32_t));
-    heap->size = size;
+    if (!heap->allocated) {
+        free(heap);
+        return NULL;
+    }
+
     heap->data = calloc(size, sizeof(vm_heap_object_t));
+    if (!heap->data) {
+        free(heap->allocated);
+        free(heap);
+        return NULL;
+    }
+
+    heap->size = size;
     return heap;
 }
 
@@ -72,20 +84,33 @@ grow:
         return 0xffffffff;
 
     ++heap->size;
-    heap->data = realloc(heap->data, heap->size * sizeof(vm_heap_object_t));
 
-    if (ID_ALLOC_WORD(heap->size) == ID_ALLOC_WORD(heap->size) - ID_ALLOC_BIT(heap->size)) { // need more allocated positions
-        heap->allocated = realloc(heap->allocated, (ID_ALLOC_WORD(heap->size) + 1) * sizeof(uint32_t));
-        heap->allocated[ID_ALLOC_WORD(heap->size)] = 0;
+    {
+        vm_heap_object_t *tmp_data = realloc(heap->data, heap->size * sizeof(vm_heap_object_t));
+        if (!tmp_data)
+            return 0xffffffff;
+        heap->data = tmp_data;
+    }
 
-        *gc_mark = realloc(*gc_mark, (ID_ALLOC_WORD(heap->size) + 1) * sizeof(uint32_t));
-        *gc_mark[ID_ALLOC_WORD(heap->size)] = 0;
+    if (ID_ALLOC_BIT(heap->size - 1) == 0) { // just crossed a 32-slot boundary
+        uint32_t new_word_count = ID_ALLOC_WORD(heap->size - 1) + 1;
+
+        uint32_t *tmp_alloc = realloc(heap->allocated, new_word_count * sizeof(uint32_t));
+        if (!tmp_alloc)
+            return 0xffffffff;
+        heap->allocated = tmp_alloc;
+        heap->allocated[new_word_count - 1] = 0;
+
+        uint32_t *tmp_gc = realloc(*gc_mark, new_word_count * sizeof(uint32_t));
+        if (!tmp_gc)
+            return 0xffffffff;
+        *gc_mark = tmp_gc;
+        (*gc_mark)[new_word_count - 1] = 0;
     }
 
     vm_heap_pos = heap->size - 1;
 
 save:
-
     memcpy(heap->data + vm_heap_pos, &value, sizeof(vm_heap_object_t));
     vm_wordpos_set_bit(heap->allocated, vm_heap_pos);
     vm_wordpos_set_bit((*gc_mark), vm_heap_pos);
@@ -132,7 +157,7 @@ bool vm_heap_isstatic(vm_heap_t *heap, uint32_t pos) {
 void vm_heap_gc_collect(vm_heap_t *heap, uint32_t **gc_mark, bool free_mark, vm_thread_t **thread, bool full) {
     uint32_t allocated_word = 0xffffffff;
 
-    while (++allocated_word < ((ID_ALLOC_WORD(heap->size)) / 32) + 1) {
+    while (++allocated_word < ID_ALLOC_WORD(heap->size) + 1) {
         if ((*gc_mark)[allocated_word] == 0) { // block is not used
             continue;
         } else {
@@ -176,22 +201,34 @@ void vm_heap_shrink(vm_heap_t *heap) {
     if (heap->size == 0)
         return;
 
-    uint32_t allocated_word = ID_ALLOC_WORD(heap->size) + 1;
+    int32_t allocated_word = (int32_t)(ID_ALLOC_WORD(heap->size)) + 1;
 
     while (--allocated_word >= 0) {
         if (heap->allocated[allocated_word] == 0) { // block is empty, erase
             if (allocated_word > 0) {
                 heap->size -= 32;
-                heap->data = realloc(heap->data, (heap->size + 1) * sizeof(vm_heap_object_t));
-                heap->allocated = realloc(heap->allocated, (ID_ALLOC_WORD(heap->size) + 1) * sizeof(uint32_t));
+
+                vm_heap_object_t *tmp_data = realloc(heap->data, heap->size * sizeof(vm_heap_object_t));
+                if (!tmp_data)
+                    return; // cannot shrink; leave heap as-is rather than corrupt it
+                heap->data = tmp_data;
+
+                uint32_t *tmp_alloc = realloc(heap->allocated, (ID_ALLOC_WORD(heap->size) + 1) * sizeof(uint32_t));
+                if (!tmp_alloc)
+                    return;
+                heap->allocated = tmp_alloc;
             } else {
                 heap->size = 1;
-                heap->allocated = realloc(heap->allocated, sizeof(uint32_t));
+
+                uint32_t *tmp_alloc = realloc(heap->allocated, sizeof(uint32_t));
+                if (!tmp_alloc)
+                    return;
+                heap->allocated = tmp_alloc;
                 break;
             }
         }
 
-        if(allocated_word == 0)
+        if (allocated_word == 0)
             break;
     }
 }
